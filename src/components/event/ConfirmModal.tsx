@@ -4,12 +4,14 @@ export default function ConfirmModal({ open, onClose, onConfirm, title }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-lg w-[90%] max-w-md p-6 space-y-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-white rounded-xl shadow-lg w-[90%] max-w-md p-6 space-y-4 relative">
         <h2 className="text-lg font-semibold text-gray-800">
           确认要报名「{title}」吗？
         </h2>
-        <p className="text-sm text-gray-600">报名即表示你会参加。被主办人确认后，原则上无法取消，感谢理解！</p>
+        <p className="text-sm text-gray-600">
+          报名即表示你会参加。被主办人确认后，原则上无法取消，感谢理解！
+        </p>
         <div className="flex justify-end gap-3 pt-4">
           <button
             onClick={onClose}

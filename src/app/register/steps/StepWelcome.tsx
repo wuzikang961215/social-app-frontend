@@ -5,7 +5,7 @@ import { StepProps } from "../page";
 export default function StepWelcome({ onNext }: StepProps) {
   return (
     <div
-      className="text-center cursor-pointer select-none"
+      className="text-center select-none"
       onClick={onNext}
     >
       <p className="text-lg font-medium text-gray-700">

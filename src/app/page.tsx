@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import ConfirmModal from "@/components/ConfirmModal";
+import ConfirmModal from "@/components/event/ConfirmModal";
+import EventDetailModal from "@/components/event/EventDetailModal";
 import Link from "next/link";
 import { MapPin, Clock, Users } from "lucide-react";
 import { LogOut } from "lucide-react";
@@ -16,7 +17,11 @@ interface Event {
   time: string;
   location: string;
   category: string;
+  description: string;
+  tags: string[];
   spotsLeft: number;
+  maxParticipants: number;
+  expired: boolean;
   countdown: number;
   organizer: {
     name: string;
@@ -33,6 +38,7 @@ export default function HomePage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("首页");
 
@@ -80,7 +86,11 @@ export default function HomePage() {
             rawDate: date, // ✅ 用来活动排序
             location: e.location,
             category: e.category,
+            description: e.description,
+            tags: e.tags,
+            maxParticipants: e.maxParticipants,
             spotsLeft: e.maxParticipants - e.participants.length,
+            expired: e.expired,
             countdown,
             organizer: {
               name: e.creator?.username || "等待确认",
@@ -198,7 +208,10 @@ export default function HomePage() {
           className={`rounded-2xl border transition-shadow shadow-md hover:shadow-lg hover:scale-[1.01] transition-transform cursor-pointer ${getCardStyle(
             event
           )}`}
-          onClick={() => router.push(`/event/${event.id}`)}
+          onClick={() => {
+            setSelectedEvent(event);
+            setShowDetail(true);
+          }}
         >
           <CardContent className="p-7 space-y-4">
             <div>
@@ -281,6 +294,25 @@ export default function HomePage() {
           title={selectedEvent.title}
         />
       )}
+
+      {selectedEvent && (
+        <EventDetailModal
+          open={showDetail}
+          onClose={() => setShowDetail(false)}
+          event={{
+            id: selectedEvent.id,
+            title: selectedEvent.title,
+            location: selectedEvent.location,
+            time: selectedEvent.time,
+            category: selectedEvent.category,
+            spotsLeft: selectedEvent.spotsLeft,
+            organizer: selectedEvent.organizer,
+            description: selectedEvent.description,
+          }}
+        />
+      )}
+
+      
     </div>
   );
 }

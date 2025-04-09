@@ -10,11 +10,26 @@ export default function StepUsername({
   onError,
   errors,
 }: StepProps) {
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!formData.username?.trim()) {
       onError?.("username", "用户名不能为空");
       return;
     }
+
+    // ✅ 检查用户名是否重复
+    try {
+      const res = await fetch(`http://localhost:3002/api/auth/check-username?username=${formData.username}`);
+      const data = await res.json();
+      if (data.exists) {
+        onError?.("username", "该用户名已被使用");
+        return;
+      }
+    } catch (err) {
+      console.error("检查用户名失败", err);
+      onError?.("username", "网络错误，请稍后再试");
+      return;
+    }
+
     onNext();
   };
 
@@ -27,7 +42,10 @@ export default function StepUsername({
         type="text"
         name="username"
         value={formData.username}
-        onChange={(e) => setFormData({ username: e.target.value })}
+        onChange={(e) => {
+          setFormData({ username: e.target.value });
+          onError?.("username", ""); // ✅ 清除错误提示
+        }}
         placeholder="比如：peterWu"
         className="w-55 px-4 py-2 rounded-xl bg-gray-100 shadow-inner text-center"
       />
@@ -37,7 +55,7 @@ export default function StepUsername({
         </p>
       )}
       <button onClick={handleNext}>
-        <ArrowRightCircle className="w-8 h-8 text-gray-600 hover:text-black hover:scale-110 transition mt-2" />
+        <ArrowRightCircle className="w-8 h-8 text-indigo-500 hover:scale-110 transition" />
       </button>
     </div>
   );

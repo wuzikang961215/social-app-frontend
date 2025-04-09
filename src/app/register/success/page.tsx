@@ -1,0 +1,59 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
+
+export default function RegisterSuccessPage() {
+  const router = useRouter();
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="bg-white p-10 shadow-xl rounded-2xl w-full max-w-lg min-h-[700px] flex flex-col relative">
+        {/* ❌ 不需要返回上一步或登出按钮 */}
+        {/* 🧠 标题区，模拟主页面布局结构 */}
+        <div className="text-center mb-6">
+          <div className="h-6" /> {/* 占位，统一顶部留白高度 */}
+          <h1 className="text-2xl font-bold text-gray-800">
+            帮你找到真正的朋友
+          </h1>
+          <p className="text-sm text-gray-500 mt-2 italic tracking-wide">
+            🧊 让我们一起击碎这个冷漠的世界
+          </p>
+        </div>
+
+        {/* ✅ 主体内容区 */}
+        <motion.div
+          initial={{ opacity: 0, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="flex flex-col items-center justify-center text-center gap-5 h-full pt-6"
+        >
+          <h1 className="text-2xl font-bold text-gray-800">🎉 信息提交成功！</h1>
+
+          <p className="text-sm text-gray-700 leading-relaxed max-w-md">
+            我们的团队正在审核你的申请。如果审核通过，你将成为留学生高质量搭子社群的
+            <b>“核心社交达人”</b>。
+            <br /><br />
+            我们正在努力筛选有诚意、愿意参与的朋友，让你在这里找到真正聊得来的搭子。
+            <br /><br />
+            请稍候……
+          </p>
+
+          <div className="mt-3 text-xs text-gray-500 italic">
+            你不是一个人，目前已有 <b>20</b> 位搭子加入我们 🧡
+          </div>
+
+          {/* ✅ 返回按钮 */}
+          <button
+            onClick={() => router.push("/login")}
+            className="mt-10 text-sm text-gray-500 hover:text-indigo-500 flex items-center gap-1 transition"
+          >
+            <LogOut className="w-4 h-4" />
+            返回
+          </button>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
