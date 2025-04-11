@@ -4,7 +4,7 @@ export default function ConfirmModal({ open, onClose, onConfirm, title }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-lg w-[90%] max-w-md p-6 space-y-4 relative">
         <h2 className="text-lg font-semibold text-gray-800">
           确认要报名「{title}」吗？
