@@ -1,10 +1,10 @@
 import React from "react";
 
-export default function ConfirmModal({ open, onClose, onConfirm, title }) {
+export default function ConfirmModal({ open, onClose, onConfirm, title, spotsLeft }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-xl shadow-lg w-[90%] max-w-md p-6 space-y-4 relative">
         <h2 className="text-lg font-semibold text-gray-800">
           确认要报名「{title}」吗？
@@ -12,6 +12,11 @@ export default function ConfirmModal({ open, onClose, onConfirm, title }) {
         <p className="text-sm text-gray-600">
           报名即表示你会参加。被主办人确认后，原则上无法取消，感谢理解！
         </p>
+        {spotsLeft === 0 && (
+          <span className="text-sm text-orange-500 mt-2 italic tracking-wide">
+            当前活动已满，你将进入候补名单。
+          </span>
+        )}
         <div className="flex justify-end gap-3 pt-4">
           <button
             onClick={onClose}

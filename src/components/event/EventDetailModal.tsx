@@ -40,8 +40,11 @@ type EventDetailModalProps = {
       cancelCount?: number;
     }[];
     userStatus?: string;
+    isOrganizer?: boolean; // ✅ 新增字段
+    userCancelCount?: number; // ✅ 新增字段
   };
   onJoinClick?: (event: EventDetailModalProps["event"]) => void;
+  onCancelClick?: (event: EventDetailModalProps["event"]) => void;
 };
 
 export default function EventDetailModal({
@@ -49,6 +52,7 @@ export default function EventDetailModal({
   onClose,
   event,
   onJoinClick,
+  onCancelClick,
 }: EventDetailModalProps) {
   const [organizerInfo, setOrganizerInfo] = useState<{
     idealBuddy?: string;
@@ -97,7 +101,7 @@ export default function EventDetailModal({
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center"
         >
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/40" />
 
           <motion.div
             initial={{ scale: 0.96, opacity: 0 }}
@@ -154,11 +158,11 @@ export default function EventDetailModal({
                 <div className="flex items-center gap-2">
                   <Users size={16} className="text-gray-400" />
                   <p>
-                    <span className="font-medium">剩余名额：{event.spotsLeft}</span>
+                    <span className="font-medium">剩余名额：</span>
                     {event.spotsLeft > 0 ? (
-                      <>（最多 {event.maxParticipants} 人）</>
+                      <>{event.spotsLeft} (最多 {event.maxParticipants} 人）</>
                     ) : (
-                      <span className="font-bold text-red-500">已满</span>
+                      <span className="font-bold">已满</span>
                     )}
                   </p>
                 </div>
@@ -197,7 +201,7 @@ export default function EventDetailModal({
               <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-700 space-y-2">
                 <div className="flex items-center gap-2 font-semibold">
                   <Users size={18} className="text-gray-500" />
-                  已确认参与者（{approvedParticipants.length} 人）
+                  已加入（{approvedParticipants.length} 人）
                 </div>
                 <div className="flex flex-wrap gap-2 pt-1">
                   {approvedParticipants.map((p) => (
@@ -212,30 +216,63 @@ export default function EventDetailModal({
               </div>
 
               {/* 报名按钮 */}
-              {onJoinClick && (
+              {(onJoinClick || onCancelClick) && (
                 <div className="pt-2 flex justify-end">
                   <Button
-                    className={`rounded-full px-4 py-2 text-sm transition ${
-                      !event.userStatus || event.userStatus === "cancelled"
-                        ? "bg-indigo-500 hover:bg-indigo-600 text-white"
-                        : ["approved", "checkedIn", "pending", "requestingCancellation"].includes(event.userStatus)
-                        ? "bg-gray-300 text-gray-1000 cursor-default"
-                        : ["denied", "noShow"].includes(event.userStatus)
-                        ? "bg-red-100 text-red-600 cursor-default"
-                        : ""
-                    }`}
-                    disabled={event.userStatus && event.userStatus !== "cancelled"}
+                    className={`
+                      rounded-full px-4 py-2 text-sm transition
+                      ${
+                        event.isOrganizer
+                          ? "bg-gray-300 text-gray-800 cursor-default"
+                          : event.userCancelCount >= 2
+                          ? "bg-red-100 text-red-600 cursor-default"
+                          : !event.userStatus || event.userStatus === "cancelled"
+                          ? "bg-indigo-500 hover:bg-indigo-600 text-white"
+                          : event.userStatus === "approved"
+                          ? "bg-emerald-500 text-white cursor-default"
+                          : event.userStatus === "checkedIn"
+                          ? "bg-cyan-500 text-white cursor-default"
+                          : event.userStatus === "pending"
+                          ? "bg-gray-300 text-gray-800 hover:bg-gray-400"
+                          : event.userStatus === "requestingCancellation"
+                          ? "bg-gray-300 text-gray-800"
+                          : ["denied", "noShow"].includes(event.userStatus)
+                          ? "bg-red-100 text-red-600 cursor-default"
+                          : ""
+                      }
+                    `}
+                    disabled={
+                      event.isOrganizer ||
+                      event.userCancelCount >= 2 ||
+                      !["pending", "cancelled", null].includes(event.userStatus || null)
+                    }
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (!event.userStatus || event.userStatus === "cancelled") {
-                        onJoinClick(event);
-                      }
+
+                      if (
+                        event.isOrganizer ||
+                        event.userCancelCount >= 2 ||
+                        !["pending", "cancelled", null].includes(event.userStatus || null)
+                      )
+                        return;
+
+                        if (!event.userStatus || event.userStatus === "cancelled") {
+                          onJoinClick?.(event);
+                        } else if (event.userStatus === "pending") {
+                          onCancelClick?.(event);
+                        }
                     }}
                   >
-                    {event.userStatus === "approved"
-                      ? "已确认"
+                    {event.isOrganizer
+                      ? "你是主办人"
+                      : event.userCancelCount >= 2
+                      ? "无法加入"
+                      : event.userStatus === "approved"
+                      ? "已加入"
                       : event.userStatus === "pending"
-                      ? "等待审核"
+                      ? event.spotsLeft === 0
+                        ? "候补中"
+                        : "等待审核"
                       : event.userStatus === "denied"
                       ? "报名被拒"
                       : event.userStatus === "checkedIn"

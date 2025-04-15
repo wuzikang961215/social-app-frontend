@@ -8,7 +8,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ConfirmModal from "@/components/event/ConfirmModal";
 import EventDetailModal from "@/components/event/EventDetailModal";
+import CancelModal from "@/components/event/CancelModal";
+import ReviewAndCheckinModal from "@/components/event/ReviewAndCheckinModal";
+import MyProfileModal from "@/components/profile/MyProfileModal"; 
+
 import { MapPin, Clock, Users, LogOut, User } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface Event {
   id: string;
@@ -43,7 +48,9 @@ interface Event {
       | "requestingCancellation";
   }[];
   userStatus?: string | null;
+  userCancelCount?: number;
   isVipOrganizer: boolean;
+  isOrganizer: boolean;
 }
 
 export default function HomePage() {
@@ -53,6 +60,11 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
+
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("首页");
   const [showLaunchMenu, setShowLaunchMenu] = useState(false);
@@ -132,7 +144,9 @@ export default function HomePage() {
               },
               participants: e.participants || [],
               userStatus: currentUser?.status || null,
+              userCancelCount: currentUser?.cancelCount || 0,
               isVipOrganizer: false,
+              isOrganizer: e.creator?.id === currentUserId,
             };
           })
           .sort((a, b) => {
@@ -184,17 +198,90 @@ export default function HomePage() {
     return "border-gray-200 bg-white";
   };
 
-  const handleConfirm = () => {
-    if (selectedEvent) {
-      alert(`已报名「${selectedEvent.title}」！`);
+  const handleConfirm = async () => {
+    if (!selectedEvent) return;
+  
+    try {
+      const token = localStorage.getItem("token");
+  
+      const res = await axios.post(
+        `http://localhost:3002/api/events/${selectedEvent.id}/join`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      toast.success(res.data.message || "报名成功！");
+
+
+      // ✅ 同步更新主页的 event 列表（让按钮变灰）
+      setEvents((prev) =>
+        prev.map((ev) =>
+          ev.id === selectedEvent.id
+            ? { ...ev, userStatus: "pending" }
+            : ev
+        )
+      );
+
       setShowModal(false);
       setShowDetail(false);
+    } catch (err: any) {
+      const msg = err.response?.data?.message || "报名失败，请稍后再试";
+      toast.error(msg);
     }
   };
+
+  const handleCancel = async () => {
+    if (!selectedEvent) return;
+  
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.post(
+        `http://localhost:3002/api/events/${selectedEvent.id}/leave`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      toast.success(res.data.message || "取消成功");
+  
+      // ✅ 本地同步更新 userStatus 和 cancelCount
+      setEvents((prev) =>
+        prev.map((ev) =>
+          ev.id === selectedEvent.id
+            ? {
+                ...ev,
+                userStatus: "cancelled",
+                userCancelCount: (ev.userCancelCount || 0) + 1, // 注意兜底
+              }
+            : ev
+        )
+      );
+  
+      setShowCancelModal(false);
+      setShowDetail(false);
+    } catch (err: any) {
+      const msg = err.response?.data?.message || "取消失败，请稍后再试";
+      toast.error(msg);
+    }
+  };
+  
+  
 
   const handleJoinFromDetail = (event: Event) => {
     setSelectedEvent(event);
     setShowModal(true);
+  };
+
+  const handleCancelFromDetail = (event: Event) => {
+    setSelectedEvent(event);
+    setShowCancelModal(true);
   };
 
   return (
@@ -238,7 +325,7 @@ export default function HomePage() {
             </button>
             <button
               onClick={() => {
-                router.push("/events/create");
+                setShowReviewModal(true);
                 setShowLaunchMenu(false);
               }}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -262,11 +349,12 @@ export default function HomePage() {
 
       {/* 我的按钮 */}
       <button
-        onClick={() => router.push("/profile/me")}
+        onClick={() => setShowProfileModal(true)}
         className="absolute top-20 right-4 flex gap-1 px-3 py-1.5 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full transition"
       >
         <span className="text-base">👤</span> 我的
       </button>
+
 
       {/* 活动卡片 */}
       {filteredEvents.map((event) => (
@@ -319,28 +407,62 @@ export default function HomePage() {
               </Link>
 
               <Button
-                className={`rounded-full px-4 py-2 text-sm transition ${
-                  !event.userStatus || event.userStatus === "cancelled"
-                    ? "bg-indigo-500 hover:bg-indigo-600 text-white"
-                    : ["approved", "checkedIn", "pending", "requestingCancellation"].includes(event.userStatus)
-                    ? "bg-gray-300 text-gray-1000 cursor-default"
-                    : ["denied", "noShow"].includes(event.userStatus)
-                    ? "bg-red-100 text-red-600 cursor-default"
-                    : ""
-                }`}
-                disabled={event.userStatus && event.userStatus !== "cancelled"}
+                className={`
+                  rounded-full px-4 py-2 text-sm transition
+                  ${
+                    event.isOrganizer
+                      ? "bg-gray-300 text-gray-800 cursor-default"
+                      : event.userCancelCount >= 2
+                      ? "bg-red-100 text-red-600 cursor-default"
+                      : !event.userStatus || event.userStatus === "cancelled"
+                      ? "bg-indigo-500 hover:bg-indigo-600 text-white"
+                      : event.userStatus === "approved"
+                      ? "bg-emerald-500 text-white cursor-default"
+                      : event.userStatus === "checkedIn"
+                      ? "bg-cyan-500 text-white cursor-default"
+                      : event.userStatus === "pending"
+                      ? "bg-gray-300 text-gray-800 hover:bg-gray-400"
+                      : event.userStatus === "requestingCancellation"
+                      ? "bg-gray-300 text-gray-800"
+                      : ["denied", "noShow"].includes(event.userStatus)
+                      ? "bg-red-100 text-red-600 cursor-default"
+                      : ""
+                  }
+                `}
+                disabled={
+                  event.isOrganizer ||
+                  event.userCancelCount >= 2 ||
+                  !["pending", "cancelled", null].includes(event.userStatus || null)
+                }
                 onClick={(e) => {
                   e.stopPropagation();
+
+                  if (
+                    event.isOrganizer ||
+                    event.userCancelCount >= 2 ||
+                    !["pending", "cancelled", null].includes(event.userStatus || null)
+                  )
+                    return;
+
+                  setSelectedEvent(event);
+
                   if (!event.userStatus || event.userStatus === "cancelled") {
-                    setSelectedEvent(event);
-                    setShowModal(true);
+                    setShowModal(true); // 报名弹窗
+                  } else if (event.userStatus === "pending") {
+                    setShowCancelModal(true); // 取消申请弹窗
                   }
                 }}
               >
-                {event.userStatus === "approved"
-                  ? "已确认"
+                {event.isOrganizer
+                  ? "你是主办人"
+                  : event.userCancelCount >= 2
+                  ? "无法加入"
+                  : event.userStatus === "approved"
+                  ? "已加入"
                   : event.userStatus === "pending"
-                  ? "等待审核"
+                  ? event.spotsLeft === 0
+                    ? "候补中"
+                    : "等待审核"
                   : event.userStatus === "denied"
                   ? "报名被拒"
                   : event.userStatus === "checkedIn"
@@ -351,6 +473,7 @@ export default function HomePage() {
                   ? "取消申请中"
                   : "立即报名"}
               </Button>
+
             </div>
           </CardContent>
         </Card>
@@ -363,6 +486,17 @@ export default function HomePage() {
           onClose={() => setShowModal(false)}
           onConfirm={handleConfirm}
           title={selectedEvent.title}
+          spotsLeft={selectedEvent.spotsLeft}
+        />
+      )}
+
+      {/* 取消报名弹窗 */}
+      {selectedEvent && (
+        <CancelModal
+          open={showCancelModal}
+          onClose={() => setShowCancelModal(false)}
+          onConfirm={handleCancel}
+          title={selectedEvent.title}
         />
       )}
 
@@ -373,8 +507,23 @@ export default function HomePage() {
           onClose={() => setShowDetail(false)}
           event={selectedEvent}
           onJoinClick={handleJoinFromDetail}
+          onCancelClick={handleCancelFromDetail}
         />
       )}
+
+      {/* 审核与签到弹窗 */}
+      <ReviewAndCheckinModal
+        open={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+      />
+
+      {/* 我的资料页弹窗 */}
+      <MyProfileModal
+        open={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
+
+      
     </div>
   );
 }
