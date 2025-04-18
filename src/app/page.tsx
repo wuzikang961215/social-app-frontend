@@ -58,9 +58,12 @@ export default function HomePage() {
 
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [createdEvents, setCreatedEvents] = useState<any[]>([]);
+  const [joinedEvents, setJoinedEvents] = useState<any[]>([]);
+
   const [showModal, setShowModal] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
-
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -104,68 +107,72 @@ export default function HomePage() {
         router.replace("/login");
         return;
       }
-
+    
       try {
-        const userRes = await axios.get("http://localhost:3002/api/auth/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const currentUserId = userRes.data.id;
-
+        // 获取用户基本信息
+        const [userRes, createdRes, joinedRes] = await Promise.all([
+          axios.get("http://localhost:3002/api/auth/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get("http://localhost:3002/api/events/my-created", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get("http://localhost:3002/api/events/my-participated", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+    
+        setUserInfo(userRes.data);
+        setCreatedEvents(createdRes.data);
+        setJoinedEvents(joinedRes.data);
+    
+        // ✅ 原有主页活动（公共 feed）保持不动
         const eventsRes = await axios.get("http://localhost:3002/api/events", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
+    
         const now = new Date();
-
-        const transformed = eventsRes.data
-          .map((e: any) => {
-            const date = new Date(e.startTime);
-            const countdown = Math.floor((date.getTime() - now.getTime()) / 3600000);
-            const approvedCount = e.participants.filter((p: any) => p.status === "approved").length;
-            const currentUser = e.participants.find((p: any) => p.user.id === currentUserId);
-
-            return {
-              id: e.id,
-              title: e.title,
-              time: formatTimeRange(e.startTime, e.durationMinutes),
-              rawDate: date,
-              location: e.location,
-              category: e.category,
-              description: e.description,
-              tags: e.tags,
-              maxParticipants: e.maxParticipants,
-              spotsLeft: e.maxParticipants - approvedCount,
-              expired: e.expired,
-              countdown,
-              organizer: {
-                name: e.creator?.username || "等待确认",
-                avatar: "/avatar1.png",
-                id: e.creator?.id || "unknown",
-              },
-              participants: e.participants || [],
-              userStatus: currentUser?.status || null,
-              userCancelCount: currentUser?.cancelCount || 0,
-              isVipOrganizer: false,
-              isOrganizer: e.creator?.id === currentUserId,
-            };
-          })
-          .sort((a, b) => {
-            if (a.spotsLeft === 0 && b.spotsLeft > 0) return 1;
-            if (a.spotsLeft > 0 && b.spotsLeft === 0) return -1;
-            if (a.countdown < 6 && b.countdown >= 6) return -1;
-            if (a.countdown >= 6 && b.countdown < 6) return 1;
-            if (a.spotsLeft <= 2 && b.spotsLeft > 2) return -1;
-            if (a.spotsLeft > 2 && b.spotsLeft <= 2) return 1;
-            return a.countdown - b.countdown;
-          });
-
+        const currentUserId = userRes.data.id;
+    
+        const transformed = eventsRes.data.map((e: any) => {
+          const date = new Date(e.startTime);
+          const countdown = Math.floor((date.getTime() - now.getTime()) / 3600000);
+          const approvedCount = e.participants.filter((p: any) => p.status === "approved").length;
+          const currentUser = e.participants.find((p: any) => p.user.id === currentUserId);
+    
+          return {
+            id: e.id,
+            title: e.title,
+            time: formatTimeRange(e.startTime, e.durationMinutes),
+            rawDate: date,
+            location: e.location,
+            category: e.category,
+            description: e.description,
+            tags: e.tags,
+            maxParticipants: e.maxParticipants,
+            spotsLeft: e.maxParticipants - approvedCount,
+            expired: e.expired,
+            countdown,
+            organizer: {
+              name: e.creator?.username || "等待确认",
+              avatar: "/avatar1.png",
+              id: e.creator?.id || "unknown",
+            },
+            participants: e.participants || [],
+            userStatus: currentUser?.status || null,
+            userCancelCount: currentUser?.cancelCount || 0,
+            isVipOrganizer: false,
+            isOrganizer: e.creator?.id === currentUserId,
+          };
+        });
+    
         setEvents(transformed);
       } catch (err) {
         console.error("加载失败", err);
       } finally {
         setLoading(false);
       }
-    };
+    };    
 
     loadData();
   }, [router]);
@@ -194,7 +201,6 @@ export default function HomePage() {
 
   const getCardStyle = (event: Event) => {
     if (event.isVipOrganizer) return "border-blue-300 bg-blue-50";
-    if (event.countdown <= 6 || (event.spotsLeft <= 2 && event.spotsLeft > 0)) return "border-yellow-200 bg-yellow-50";
     return "border-gray-200 bg-white";
   };
 
@@ -386,7 +392,7 @@ export default function HomePage() {
                   <Users size={16} className="text-gray-400" />
                   <span>
                     剩余名额：
-                    <span className={event.spotsLeft <= 1 ? "font-semibold" : ""}>
+                    <span className={event.spotsLeft <= 2 ? "font-semibold" : ""}>
                       {event.spotsLeft === 0 ? "已满" : `${event.spotsLeft}人`}
                     </span>
                   </span>
@@ -521,7 +527,11 @@ export default function HomePage() {
       <MyProfileModal
         open={showProfileModal}
         onClose={() => setShowProfileModal(false)}
+        userInfo={userInfo}
+        createdEvents={createdEvents}
+        joinedEvents={joinedEvents}
       />
+
 
       
     </div>

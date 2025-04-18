@@ -15,7 +15,7 @@ export default function UserInfoCard({ user }: { user: any }) {
       </div>
       <div className="flex items-start gap-2">
         <BadgeCheck size={16} className="text-green-400 mt-0.5" />
-        <span>爱好：{user.hobbies?.join("、") || "未填写"}</span>
+        <span>爱好：{user.interests?.join("、") || "未填写"}</span>
       </div>
       <p className="italic text-gray-500 text-sm">“{user.whyJoin || "TA 还没填写为什么想加入"}”</p>
       <div className="pt-2 flex justify-end">
