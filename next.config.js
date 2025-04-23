@@ -1,8 +1,7 @@
 // next.config.js
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true, // ✅ 完全跳过 eslint 报错
+    ignoreDuringBuilds: true, // ✅ 禁用 ESLint 报错导致构建失败
   },
 };
 
