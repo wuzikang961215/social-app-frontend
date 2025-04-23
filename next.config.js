@@ -1,8 +1,7 @@
-// next.config.js
-const nextConfig = {
+module.exports = {
   eslint: {
-    ignoreDuringBuilds: true, // ✅ 禁用 ESLint 报错导致构建失败
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: true,
   },
-};
-
-module.exports = nextConfig;
+}
