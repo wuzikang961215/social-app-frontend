@@ -13,6 +13,7 @@ import {
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { BASE_URL } from "@/utils/api";
 
 type EventDetailModalProps = {
   open: boolean;
@@ -66,7 +67,7 @@ export default function EventDetailModal({
         try {
           const token = localStorage.getItem("token");
           const res = await axios.get(
-            `http://localhost:3002/api/auth/users/${event.organizer.id}`,
+            `${BASE_URL}/api/auth/users/${event.organizer.id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

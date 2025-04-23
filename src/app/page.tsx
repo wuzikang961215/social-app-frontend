@@ -11,6 +11,7 @@ import EventDetailModal from "@/components/event/EventDetailModal";
 import CancelModal from "@/components/event/CancelModal";
 import ReviewAndCheckinModal from "@/components/event/ReviewAndCheckinModal";
 import MyProfileModal from "@/components/profile/MyProfileModal"; 
+import { BASE_URL } from "@/utils/api";
 
 import { MapPin, Clock, Users, LogOut, User } from "lucide-react";
 import toast from "react-hot-toast";
@@ -111,13 +112,13 @@ export default function HomePage() {
       try {
         // 获取用户基本信息
         const [userRes, createdRes, joinedRes] = await Promise.all([
-          axios.get("http://localhost:3002/api/auth/me", {
+          axios.get(`${BASE_URL}/api/auth/me`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://localhost:3002/api/events/my-created", {
+          axios.get(`${BASE_URL}/api/events/my-created`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://localhost:3002/api/events/my-participated", {
+          axios.get(`${BASE_URL}/api/events/my-participated`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -127,7 +128,7 @@ export default function HomePage() {
         setJoinedEvents(joinedRes.data);
     
         // ✅ 原有主页活动（公共 feed）保持不动
-        const eventsRes = await axios.get("http://localhost:3002/api/events", {
+        const eventsRes = await axios.get(`${BASE_URL}/api/events`, {
           headers: { Authorization: `Bearer ${token}` },
         });
     
@@ -211,7 +212,7 @@ export default function HomePage() {
       const token = localStorage.getItem("token");
   
       const res = await axios.post(
-        `http://localhost:3002/api/events/${selectedEvent.id}/join`,
+        `${BASE_URL}/api/events/api/events/${selectedEvent.id}/join`,
         {},
         {
           headers: {
@@ -246,7 +247,7 @@ export default function HomePage() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        `http://localhost:3002/api/events/${selectedEvent.id}/leave`,
+        `${BASE_URL}/api/events/api/events/${selectedEvent.id}/leave`,
         {},
         {
           headers: {

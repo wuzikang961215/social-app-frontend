@@ -4,6 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { ArrowRightCircle } from "lucide-react";
+import { BASE_URL } from "@/utils/api";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -13,7 +14,7 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:3002/api/auth/login", {
+      const response = await axios.post(`${BASE_URL}/api/auth/login`, {
         email,
         password,
       });

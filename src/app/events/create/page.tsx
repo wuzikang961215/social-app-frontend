@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X, CalendarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { BASE_URL } from "@/utils/api";
 
 export default function CreateEvent() {
   const router = useRouter();
@@ -63,7 +64,7 @@ export default function CreateEvent() {
 
   const handleSubmit = async () => {
     try {
-      const res = await fetch("http://localhost:3002/api/events", {
+      const res = await fetch(`${BASE_URL}/api/events`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

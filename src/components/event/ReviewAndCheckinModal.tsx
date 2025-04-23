@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { X, HeartHandshake, BadgeCheck } from "lucide-react";
 import axios from "axios";
+import { BASE_URL } from "@/utils/api";
 
 export default function ReviewAndCheckinModal({ open, onClose }) {
   const [data, setData] = useState([]);
@@ -35,7 +36,7 @@ export default function ReviewAndCheckinModal({ open, onClose }) {
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:3002/api/events/manage", {
+      const res = await axios.get(`${BASE_URL}/api/events/manage`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -56,7 +57,7 @@ export default function ReviewAndCheckinModal({ open, onClose }) {
       setLoadingMap((prev) => ({ ...prev, [userId + eventId]: true }));
       const token = localStorage.getItem("token");
       await axios.post(
-        `http://localhost:3002/api/events/${eventId}/review`,
+        `${BASE_URL}/api/events/${eventId}/review`,
         { userId, approve },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -74,7 +75,7 @@ export default function ReviewAndCheckinModal({ open, onClose }) {
       setLoadingMap((prev) => ({ ...prev, [userId + eventId]: true }));
       const token = localStorage.getItem("token");
       await axios.post(
-        `http://localhost:3002/api/events/${eventId}/attendance`,
+        `${BASE_URL}/api/events/${eventId}/attendance`,
         { userId, attended },
         {
           headers: { Authorization: `Bearer ${token}` },

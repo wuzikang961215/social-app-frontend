@@ -5,6 +5,7 @@ import ToggleButtonGroup from "@/components/register/ToggleButtonGroup";
 import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { BASE_URL } from "@/utils/api";
 
 export default function StepPromote({
   formData,
@@ -28,7 +29,7 @@ export default function StepPromote({
     }
   
     try {
-      const response = await fetch("http://localhost:3002/api/auth/register", {
+      const response = await fetch(`${BASE_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
