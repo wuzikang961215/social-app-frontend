@@ -1,9 +1,9 @@
+// next.config.js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true, // ✅ 完全跳过 eslint 报错
   },
-  // 你之前想配置的其他项也写在这里
 };
 
 module.exports = nextConfig;

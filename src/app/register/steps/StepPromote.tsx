@@ -10,7 +10,6 @@ import { BASE_URL } from "@/utils/api";
 export default function StepPromote({
   formData,
   setFormData,
-  onNext,
   onError,
   errors,
 }: StepProps) {
