@@ -9,7 +9,6 @@ import { BASE_URL } from "@/utils/api";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLogin, setIsLogin] = useState(true); // 👈 切换登录/注册（暂时只用登录）
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -22,8 +21,12 @@ export default function Login() {
       const { token } = response.data;
       localStorage.setItem("token", token);
       router.push("/");
-    } catch (error: any) {
-      alert(error.response?.data?.message || "登录失败");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        alert(err.response?.data?.message || "登录失败");
+      } else {
+        alert("登录失败");
+      }
     }
   };
 

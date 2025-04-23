@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, CalendarIcon } from "lucide-react";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { BASE_URL } from "@/utils/api";
 
@@ -79,7 +79,7 @@ export default function CreateEvent() {
 
       if (!res.ok) throw new Error("创建失败");
       router.push("/");
-    } catch (err) {
+    } catch (error) {
       alert("创建失败，请重试");
     }
   };

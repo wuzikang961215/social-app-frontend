@@ -13,7 +13,7 @@ import ReviewAndCheckinModal from "@/components/event/ReviewAndCheckinModal";
 import MyProfileModal from "@/components/profile/MyProfileModal"; 
 import { BASE_URL } from "@/utils/api";
 
-import { MapPin, Clock, Users, LogOut, User } from "lucide-react";
+import { MapPin, Clock, Users, LogOut } from "lucide-react";
 import toast from "react-hot-toast";
 
 export interface Event {
@@ -60,7 +60,6 @@ export default function HomePage() {
   const router = useRouter();
 
   const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState<any>(null);
   const [createdEvents, setCreatedEvents] = useState<any[]>([]);
   const [joinedEvents, setJoinedEvents] = useState<any[]>([]);
@@ -172,9 +171,7 @@ export default function HomePage() {
         setEvents(transformed);
       } catch (err) {
         console.error("加载失败", err);
-      } finally {
-        setLoading(false);
-      }
+      } 
     };    
 
     loadData();
