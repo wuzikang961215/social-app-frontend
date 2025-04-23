@@ -1,7 +1,20 @@
 import { User, HeartHandshake, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function UserInfoCard({ user }: { user: any }) {
+export default function UserInfoCard({
+  user,
+}: {
+  user: {
+    username: string;
+    email?: string;
+    score?: number;
+    level?: number;
+    idealBuddy?: string;
+    whyJoin?: string;
+    interests?: string[];
+    isVIP?: boolean;
+  };
+}) {
   return (
     <div className="rounded-xl bg-white p-4 text-sm text-gray-700 space-y-2 border border-gray-200 shadow-sm">
       <div className="flex items-center gap-2 font-semibold">

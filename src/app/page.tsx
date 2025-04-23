@@ -35,6 +35,10 @@ export interface Event {
     avatar: string;
     id: string;
   };
+  creator?: {
+    id: string;
+    username: string;
+  }; // ✅ 👈 加上这个！
   participants: {
     user: {
       id: string;
@@ -56,13 +60,22 @@ export interface Event {
   isOrganizer: boolean;
 }
 
+interface UserInfo {
+  id: string;
+  username: string;
+  idealBuddy?: string;
+  interests?: string[];
+  whyJoin?: string;
+  score?: number;
+}
+
 export default function HomePage() {
   const router = useRouter();
 
   const [events, setEvents] = useState<Event[]>([]);
-  const [userInfo, setUserInfo] = useState<any>(null);
-  const [createdEvents, setCreatedEvents] = useState<any[]>([]);
-  const [joinedEvents, setJoinedEvents] = useState<any[]>([]);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [createdEvents, setCreatedEvents] = useState<Event[]>([]);
+  const [joinedEvents, setJoinedEvents] = useState<Event[]>([]);
 
   const [showModal, setShowModal] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
@@ -136,17 +149,18 @@ export default function HomePage() {
         const now = new Date();
         const currentUserId = userRes.data.id;
     
-        const transformed = eventsRes.data.map((e: any) => {
+        const transformed: Event[] = eventsRes.data.map((e: any): Event => {
           const date = new Date(e.startTime);
           const countdown = Math.floor((date.getTime() - now.getTime()) / 3600000);
           const approvedCount = e.participants.filter((p: any) => p.status === "approved").length;
           const currentUser = e.participants.find((p: any) => p.user.id === currentUserId);
-    
+        
           return {
             id: e.id,
             title: e.title,
             time: formatTimeRange(e.startTime, e.durationMinutes),
-            rawDate: date,
+            startTime: e.startTime,
+            durationMinutes: e.durationMinutes,
             location: e.location,
             category: e.category,
             description: e.description,
@@ -155,19 +169,27 @@ export default function HomePage() {
             spotsLeft: e.maxParticipants - approvedCount,
             expired: e.expired,
             countdown,
+            creator: e.creator,
             organizer: {
               name: e.creator?.username || "等待确认",
               avatar: "/avatar1.png",
               id: e.creator?.id || "unknown",
             },
-            participants: e.participants || [],
-            userStatus: currentUser?.status || null,
+            participants: (e.participants || []).map((p: any) => ({
+              user: {
+                id: p.user.id,
+                username: p.user.username,
+                score: p.user.score,
+              },
+              status: p.status as Event["participants"][number]["status"],
+            })),
+            userStatus: currentUser?.status as Event["userStatus"],
             userCancelCount: currentUser?.cancelCount || 0,
             isVipOrganizer: false,
             isOrganizer: e.creator?.id === currentUserId,
           };
         });
-    
+        
         setEvents(transformed);
       } catch (err) {
         console.error("加载失败", err);
@@ -234,9 +256,13 @@ export default function HomePage() {
 
       setShowModal(false);
       setShowDetail(false);
-    } catch (err: any) {
-      const msg = err.response?.data?.message || "报名失败，请稍后再试";
-      toast.error(msg);
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const msg = err.response?.data?.message || "报名失败，请稍后再试";
+        toast.error(msg);
+      } else {
+        toast.error("报名失败，请稍后再试");
+      }
     }
   };
 
@@ -272,9 +298,13 @@ export default function HomePage() {
   
       setShowCancelModal(false);
       setShowDetail(false);
-    } catch (err: any) {
-      const msg = err.response?.data?.message || "取消失败，请稍后再试";
-      toast.error(msg);
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const msg = err.response?.data?.message || "取消失败，请稍后再试";
+        toast.error(msg);
+      } else {
+        toast.error("取消失败，请稍后再试");
+      }
     }
   };
   
@@ -539,7 +569,7 @@ export default function HomePage() {
       <MyProfileModal
         open={showProfileModal}
         onClose={() => setShowProfileModal(false)}
-        userInfo={userInfo}
+        userInfo={userInfo!} // ✅ 加个叹号：我保证它不是 null
         createdEvents={createdEvents}
         joinedEvents={joinedEvents}
       />

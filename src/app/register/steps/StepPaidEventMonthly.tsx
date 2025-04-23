@@ -11,7 +11,6 @@ export default function StepPaidEventMonthly({
   onNext,
   onError,
   errors,
-  endFlow,
 }: StepProps & { endFlow?: () => void }) {
   const [currentStep, setCurrentStep] = useState(1);
 

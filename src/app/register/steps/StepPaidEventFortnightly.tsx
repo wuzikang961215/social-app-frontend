@@ -11,7 +11,6 @@ export default function StepPaidEventFortnightly({
   onNext,
   onError,
   errors,
-  endFlow,
 }: StepProps & { endFlow?: () => void }) {
   const [currentStep, setCurrentStep] = useState(1);
 

@@ -16,9 +16,49 @@ export default function MyProfileModal({
 }: {
   open: boolean;
   onClose: () => void;
-  userInfo: any;
-  createdEvents: any[];
-  joinedEvents: any[];
+  userInfo: {
+    id: string;
+    username: string;
+    isVIP?: boolean;
+    score?: number;
+    idealBuddy?: string;
+    whyJoin?: string;
+    interests?: string[];
+  };
+  
+  createdEvents: {
+    id: string;
+    title: string;
+    location: string;
+    startTime: string;
+    durationMinutes: number;
+    maxParticipants: number;
+    expired: boolean;
+    participants: {
+      user: {
+        id: string;
+      };
+      status: string;
+      cancelCount?: number;
+    }[];
+  }[];
+  
+  joinedEvents: {
+    id: string;
+    title: string;
+    location: string;
+    startTime: string;
+    durationMinutes: number;
+    maxParticipants: number;
+    expired: boolean;
+    participants: {
+      user: {
+        id: string;
+      };
+      status: string;
+      cancelCount?: number;
+    }[];
+  }[];
 }) {
   const [collapsed, setCollapsed] = useState({
     createdUpcoming: false,

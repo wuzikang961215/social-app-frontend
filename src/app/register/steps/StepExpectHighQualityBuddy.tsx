@@ -30,10 +30,7 @@ export default function StepExpectHighQualityBuddy({
       <ToggleButtonGroup
         options={["是", "否"]}
         value={formData.expectingHighQualityBuddy}
-        onChange={(val) => {
-          setFormData({ expectingHighQualityBuddy: val });
-          onError?.("expectingHighQualityBuddy", "");
-        }}
+        onChange={handleSelect}
       />
 
       {errors?.expectingHighQualityBuddy && (

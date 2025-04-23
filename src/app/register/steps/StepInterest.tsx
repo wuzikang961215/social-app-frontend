@@ -49,7 +49,6 @@ export default function StepInterest({
   };
 
   const handleNext = () => {
-    const trimmed = customText.trim();
     const finalInterests = formData.interests || [];
 
     if (finalInterests.length < 2 || finalInterests.length > 7) {

@@ -30,10 +30,7 @@ export default function StepLookingForBuddy({
       <ToggleButtonGroup
         options={["是", "否"]}
         value={formData.lookingForBuddy}
-        onChange={(val) => {
-          setFormData({ lookingForBuddy: val });
-          onError?.("lookingForBuddy", "");
-        }}
+        onChange={handleSelect}
       />
 
       {errors?.lookingForBuddy && (

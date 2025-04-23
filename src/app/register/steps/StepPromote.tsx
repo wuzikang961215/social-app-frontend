@@ -7,12 +7,9 @@ import { CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { BASE_URL } from "@/utils/api";
 
-export default function StepPromote({
-  formData,
-  setFormData,
-  onError,
-  errors,
-}: StepProps) {
+
+export default function StepPromote(props: StepProps) {
+  const { formData, setFormData, onError, errors } = props;
   const [currentStep, setCurrentStep] = useState(1);
   const router = useRouter();
 

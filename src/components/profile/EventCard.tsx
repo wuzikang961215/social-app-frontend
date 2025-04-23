@@ -1,5 +1,6 @@
 import { User, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { Event } from "@/app/page"; // 👈 or wherever你定义的Event类型
 
 export default function EventCard({
   event,
@@ -8,7 +9,7 @@ export default function EventCard({
   actionLabel,
   onAction,
 }: {
-  event: any;
+  event: Event;
   userStatus?: string;
   showAction?: boolean;
   actionLabel?: string;
@@ -31,7 +32,7 @@ export default function EventCard({
   };
 
   // ✅ 只展示 approved 用户
-  const approvedParticipants = event.participants?.filter((p: any) => p.status === "approved") || [];
+  const approvedParticipants = event.participants?.filter((p) => p.status === "approved") || [];
 
   return (
     <div className="p-4 bg-white text-sm relative">
@@ -51,10 +52,10 @@ export default function EventCard({
           <div className="flex flex-wrap gap-2 pt-1">
             <span
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-gray-600 text-xs shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-100 transition"
-              onClick={() => console.log(`点击了主办人 ${event.creator.username}`)}
+              onClick={() => console.log(`点击了主办人 ${event.creator?.username}`)}
             >
               <User className="w-3.5 h-3.5 text-gray-400" />
-              {event.creator.username}
+              {event.creator?.username}
             </span>
           </div>
         </div>
@@ -67,7 +68,7 @@ export default function EventCard({
           已加入（{approvedParticipants.length}人）
         </div>
         <div className="flex flex-wrap gap-2 pt-1">
-          {approvedParticipants.map((p: any) => (
+          {approvedParticipants.map((p) => (
             <span
               key={p.user.id}
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-gray-600 text-xs shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-100 transition"
