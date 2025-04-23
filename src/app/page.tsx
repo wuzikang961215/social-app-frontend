@@ -16,11 +16,12 @@ import { BASE_URL } from "@/utils/api";
 import { MapPin, Clock, Users, LogOut, User } from "lucide-react";
 import toast from "react-hot-toast";
 
-interface Event {
+export interface Event {
   id: string;
   title: string;
   startTime: string; // ✅ 改为 startTime
   durationMinutes: number; // ✅ 新增
+  time: string;
   location: string;
   category: string;
   description: string;
@@ -38,6 +39,7 @@ interface Event {
     user: {
       id: string;
       username: string;
+      score?: number; // ✅ 新增
     };
     status:
       | "pending"
@@ -212,7 +214,7 @@ export default function HomePage() {
       const token = localStorage.getItem("token");
   
       const res = await axios.post(
-        `${BASE_URL}/api/events/api/events/${selectedEvent.id}/join`,
+        `${BASE_URL}/api/events/${selectedEvent.id}/join`,
         {},
         {
           headers: {
@@ -247,7 +249,7 @@ export default function HomePage() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        `${BASE_URL}/api/events/api/events/${selectedEvent.id}/leave`,
+        `${BASE_URL}/api/events/${selectedEvent.id}/leave`,
         {},
         {
           headers: {
@@ -290,6 +292,14 @@ export default function HomePage() {
     setSelectedEvent(event);
     setShowCancelModal(true);
   };
+
+  const mapScoreToLevel = (score: number): number => {
+    if (score >= 100) return 5;
+    if (score >= 50) return 4;
+    if (score >= 20) return 3;
+    if (score >= 5) return 2;
+    return 1;
+  };  
 
   return (
     <div className="p-6 space-y-8">
@@ -419,7 +429,7 @@ export default function HomePage() {
                   ${
                     event.isOrganizer
                       ? "bg-gray-300 text-gray-800 cursor-default"
-                      : event.userCancelCount >= 2
+                      : (event.userCancelCount ?? 0) >= 2
                       ? "bg-red-100 text-red-600 cursor-default"
                       : !event.userStatus || event.userStatus === "cancelled"
                       ? "bg-indigo-500 hover:bg-indigo-600 text-white"
@@ -438,7 +448,7 @@ export default function HomePage() {
                 `}
                 disabled={
                   event.isOrganizer ||
-                  event.userCancelCount >= 2 ||
+                  (event.userCancelCount ?? 0) >= 2 ||
                   !["pending", "cancelled", null].includes(event.userStatus || null)
                 }
                 onClick={(e) => {
@@ -446,7 +456,7 @@ export default function HomePage() {
 
                   if (
                     event.isOrganizer ||
-                    event.userCancelCount >= 2 ||
+                    (event.userCancelCount ?? 0) >= 2 ||
                     !["pending", "cancelled", null].includes(event.userStatus || null)
                   )
                     return;
@@ -462,7 +472,7 @@ export default function HomePage() {
               >
                 {event.isOrganizer
                   ? "你是主办人"
-                  : event.userCancelCount >= 2
+                  : (event.userCancelCount ?? 0) >= 2
                   ? "无法加入"
                   : event.userStatus === "approved"
                   ? "已加入"
@@ -512,10 +522,14 @@ export default function HomePage() {
         <EventDetailModal
           open={showDetail}
           onClose={() => setShowDetail(false)}
-          event={selectedEvent}
+          event={{
+            ...selectedEvent,
+            userStatus: selectedEvent.userStatus ?? undefined, // ✅ 显式转为 undefined
+          }}
           onJoinClick={handleJoinFromDetail}
           onCancelClick={handleCancelFromDetail}
         />
+        
       )}
 
       {/* 审核与签到弹窗 */}

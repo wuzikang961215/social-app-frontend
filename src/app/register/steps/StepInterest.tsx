@@ -99,7 +99,7 @@ export default function StepInterest({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
               >
-                <MainInterestSelector options={mainOptions} onSelect={handleMainSelect} />
+                <MainInterestSelector options={mainOptions} onSelect={handleMainSelect} selected={selectedMain} />
               </motion.div>
             ) : (
               <motion.div

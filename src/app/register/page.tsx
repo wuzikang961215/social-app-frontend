@@ -64,7 +64,7 @@ export interface FormDataType {
   willPromote: string
 }
 
-interface StepProps {
+export interface StepProps {
   formData: FormDataType;
   setFormData: (data: Partial<FormDataType>) => void;
   onNext: () => void;

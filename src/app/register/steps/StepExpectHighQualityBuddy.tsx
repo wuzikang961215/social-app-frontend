@@ -11,13 +11,13 @@ export default function StepExpectHighQualityBuddy({
   errors,
 }: StepProps) {
   const handleSelect = (choice: string) => {
-    setFormData({ expectHighQualityBuddy: choice });
-    onError?.("expectHighQualityBuddy", "");
+    setFormData({ expectingHighQualityBuddy: choice });
+    onError?.("expectingHighQualityBuddy", "");
   };
 
   const handleNext = () => {
-    if (!formData.expectHighQualityBuddy) {
-      onError?.("expectHighQualityBuddy", "请选择一个选项");
+    if (!formData.expectingHighQualityBuddy) {
+      onError?.("expectingHighQualityBuddy", "请选择一个选项");
       return;
     }
     onNext();
@@ -29,15 +29,15 @@ export default function StepExpectHighQualityBuddy({
       
       <ToggleButtonGroup
         options={["是", "否"]}
-        value={formData.expectHighQualityBuddy}
+        value={formData.expectingHighQualityBuddy}
         onChange={(val) => {
-          setFormData({ expectHighQualityBuddy: val });
-          onError?.("expectHighQualityBuddy", "");
+          setFormData({ expectingHighQualityBuddy: val });
+          onError?.("expectingHighQualityBuddy", "");
         }}
       />
 
-      {errors?.expectHighQualityBuddy && (
-        <p className="text-sm text-orange-500 mt-1">{errors.expectHighQualityBuddy}</p>
+      {errors?.expectingHighQualityBuddy && (
+        <p className="text-sm text-orange-500 mt-1">{errors.expectingHighQualityBuddy}</p>
       )}
       <button onClick={handleNext}>
         <ArrowRightCircle className="w-8 h-8 text-indigo-500 hover:scale-110 transition" />

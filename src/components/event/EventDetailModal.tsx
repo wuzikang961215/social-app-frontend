@@ -14,6 +14,7 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { BASE_URL } from "@/utils/api";
+import type { Event as AppEvent } from "@/app/page";
 
 type EventDetailModalProps = {
   open: boolean;
@@ -35,18 +36,55 @@ type EventDetailModalProps = {
       user: {
         id: string;
         username: string;
-        level: number;
+        level?: number;
       };
       status: string;
       cancelCount?: number;
     }[];
     userStatus?: string;
-    isOrganizer?: boolean; // ✅ 新增字段
-    userCancelCount?: number; // ✅ 新增字段
+    isOrganizer?: boolean;
+    userCancelCount?: number;
   };
-  onJoinClick?: (event: EventDetailModalProps["event"]) => void;
-  onCancelClick?: (event: EventDetailModalProps["event"]) => void;
+  onJoinClick?: (event: AppEvent) => void;
+  onCancelClick?: (event: AppEvent) => void;
 };
+
+// 🔧 封装轻量 event => AppEvent 的转换
+function toFullEvent(event: EventDetailModalProps["event"]): AppEvent {
+  return {
+    id: "temporary-id", // ⚠️ 如果你希望传真实 ID，需要父组件也传 id 进来
+    title: event.title,
+    startTime: "2025-01-01T00:00:00Z", // ⚠️ 同样建议从上层传入
+    durationMinutes: 90,
+    time: event.time,
+    location: event.location,
+    category: "其他",
+    description: event.description || "",
+    tags: event.tags || [],
+    maxParticipants: event.maxParticipants,
+    spotsLeft: event.spotsLeft,
+    expired: false,
+    countdown: 0,
+    organizer: {
+      id: event.organizer?.id || "",
+      name: event.organizer?.name || "",
+      avatar: "/avatar1.png",
+    },
+    participants: event.participants?.map((p) => ({
+      user: {
+        id: p.user.id,
+        username: p.user.username,
+        score: 0, // 补字段
+      },
+      status: p.status as any,
+      cancelCount: p.cancelCount ?? 0,
+    })) || [],
+    userStatus: event.userStatus ?? null,
+    userCancelCount: event.userCancelCount ?? 0,
+    isVipOrganizer: false,
+    isOrganizer: event.isOrganizer ?? false,
+  };
+}
 
 export default function EventDetailModal({
   open,
@@ -69,9 +107,7 @@ export default function EventDetailModal({
           const res = await axios.get(
             `${BASE_URL}/api/auth/users/${event.organizer.id}`,
             {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
+              headers: { Authorization: `Bearer ${token}` },
             }
           );
           setOrganizerInfo({
@@ -126,13 +162,11 @@ export default function EventDetailModal({
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="space-y-6"
             >
-              {/* 标题 */}
               <h2 className="text-xl font-bold text-gray-800">{event.title}</h2>
               <p className="italic text-sm text-gray-600">
                 {event.description || "（暂无介绍）"}
               </p>
 
-              {/* 标签 */}
               {tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag) => (
@@ -146,7 +180,6 @@ export default function EventDetailModal({
                 </div>
               )}
 
-              {/* 活动信息卡片 */}
               <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-700 space-y-2">
                 <div className="flex items-center gap-2">
                   <MapPin size={16} className="text-gray-400" />
@@ -169,7 +202,6 @@ export default function EventDetailModal({
                 </div>
               </div>
 
-              {/* 主办人卡片 */}
               <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-700 space-y-2">
                 <div className="flex items-center gap-2 font-semibold">
                   <User size={18} className="text-gray-500" />
@@ -198,7 +230,6 @@ export default function EventDetailModal({
                 </p>
               </div>
 
-              {/* 参与者卡片 */}
               <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-700 space-y-2">
                 <div className="flex items-center gap-2 font-semibold">
                   <Users size={18} className="text-gray-500" />
@@ -216,7 +247,6 @@ export default function EventDetailModal({
                 </div>
               </div>
 
-              {/* 报名按钮 */}
               {(onJoinClick || onCancelClick) && (
                 <div className="pt-2 flex justify-end">
                   <Button
@@ -225,7 +255,7 @@ export default function EventDetailModal({
                       ${
                         event.isOrganizer
                           ? "bg-gray-300 text-gray-800 cursor-default"
-                          : event.userCancelCount >= 2
+                          : (event.userCancelCount ?? 0) >= 2
                           ? "bg-red-100 text-red-600 cursor-default"
                           : !event.userStatus || event.userStatus === "cancelled"
                           ? "bg-indigo-500 hover:bg-indigo-600 text-white"
@@ -244,7 +274,7 @@ export default function EventDetailModal({
                     `}
                     disabled={
                       event.isOrganizer ||
-                      event.userCancelCount >= 2 ||
+                      (event.userCancelCount ?? 0) >= 2 ||
                       !["pending", "cancelled", null].includes(event.userStatus || null)
                     }
                     onClick={(e) => {
@@ -252,21 +282,23 @@ export default function EventDetailModal({
 
                       if (
                         event.isOrganizer ||
-                        event.userCancelCount >= 2 ||
+                        (event.userCancelCount ?? 0) >= 2 ||
                         !["pending", "cancelled", null].includes(event.userStatus || null)
                       )
                         return;
 
-                        if (!event.userStatus || event.userStatus === "cancelled") {
-                          onJoinClick?.(event);
-                        } else if (event.userStatus === "pending") {
-                          onCancelClick?.(event);
-                        }
+                      const fullEvent = toFullEvent(event);
+
+                      if (!event.userStatus || event.userStatus === "cancelled") {
+                        onJoinClick?.(fullEvent);
+                      } else if (event.userStatus === "pending") {
+                        onCancelClick?.(fullEvent);
+                      }
                     }}
                   >
                     {event.isOrganizer
                       ? "你是主办人"
-                      : event.userCancelCount >= 2
+                      : (event.userCancelCount ?? 0) >= 2
                       ? "无法加入"
                       : event.userStatus === "approved"
                       ? "已加入"

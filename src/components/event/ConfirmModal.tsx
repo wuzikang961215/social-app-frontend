@@ -1,6 +1,18 @@
 import React from "react";
 
-export default function ConfirmModal({ open, onClose, onConfirm, title, spotsLeft }) {
+export default function ConfirmModal({
+  open,
+  onClose,
+  onConfirm,
+  title,
+  spotsLeft,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  spotsLeft: number;
+}) {
   if (!open) return null;
 
   return (

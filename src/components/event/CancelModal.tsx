@@ -1,4 +1,14 @@
-export default function CancelModal({ open, onClose, onConfirm, title }) {
+export default function CancelModal({
+  open,
+  onClose,
+  onConfirm,
+  title,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+}) {
     if (!open) return null;
   
     return (

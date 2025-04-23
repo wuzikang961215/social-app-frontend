@@ -5,24 +5,52 @@ import { X, HeartHandshake, BadgeCheck } from "lucide-react";
 import axios from "axios";
 import { BASE_URL } from "@/utils/api";
 
-export default function ReviewAndCheckinModal({ open, onClose }) {
-  const [data, setData] = useState([]);
-  const [loadingMap, setLoadingMap] = useState({}); // 记录按钮 loading 状态
+type ReviewAndCheckinModalProps = {
+  open: boolean;
+  onClose: () => void;
+};
 
-  // 判断是否已开始
-  const hasEventStarted = (start) => new Date() >= new Date(start);
+type Participant = {
+  user: {
+    id: string;
+    username: string;
+    level?: number;
+    idealBuddy?: string;
+    interests?: string[];
+    whyJoin?: string;
+  };
+  status: string;
+};
 
-  const formatTimeRange = (start, duration) => {
+type EventItem = {
+  id: string;
+  title: string;
+  location: string;
+  startTime: string;
+  durationMinutes: number;
+  maxParticipants: number;
+  participants: Participant[];
+};
+
+export default function ReviewAndCheckinModal({
+  open,
+  onClose,
+}: ReviewAndCheckinModalProps) {
+  const [data, setData] = useState<EventItem[]>([]);
+  const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
+
+  const hasEventStarted = (start: string) => new Date() >= new Date(start);
+
+  const formatTimeRange = (start: string, duration: number) => {
     const startDate = new Date(start);
     const endDate = new Date(startDate.getTime() + duration * 60000);
-    const pad = (n) => n.toString().padStart(2, "0");
-    const format = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const format = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
     const prefix = (() => {
       const now = new Date();
       const nowStr = now.toDateString();
       const startStr = startDate.toDateString();
-
       if (startStr === nowStr) return "今天";
       if (new Date(now.getTime() + 86400000).toDateString() === startStr) return "明天";
       if (new Date(now.getTime() + 2 * 86400000).toDateString() === startStr) return "后天";
@@ -32,14 +60,11 @@ export default function ReviewAndCheckinModal({ open, onClose }) {
     return `${prefix} ${format(startDate)} - ${format(endDate)}`;
   };
 
-  // 加载数据
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(`${BASE_URL}/api/events/manage`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setData(res.data);
     } catch (err) {
@@ -51,17 +76,18 @@ export default function ReviewAndCheckinModal({ open, onClose }) {
     if (open) fetchData();
   }, [open]);
 
-  // 审核接口
-  const handleReview = async (eventId, userId, approve) => {
+  const handleReview = async (
+    eventId: string,
+    userId: string,
+    approve: boolean
+  ) => {
     try {
       setLoadingMap((prev) => ({ ...prev, [userId + eventId]: true }));
       const token = localStorage.getItem("token");
       await axios.post(
         `${BASE_URL}/api/events/${eventId}/review`,
         { userId, approve },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       await fetchData();
     } finally {
@@ -69,17 +95,18 @@ export default function ReviewAndCheckinModal({ open, onClose }) {
     }
   };
 
-  // 签到接口
-  const handleAttendance = async (eventId, userId, attended) => {
+  const handleAttendance = async (
+    eventId: string,
+    userId: string,
+    attended: boolean
+  ) => {
     try {
       setLoadingMap((prev) => ({ ...prev, [userId + eventId]: true }));
       const token = localStorage.getItem("token");
       await axios.post(
         `${BASE_URL}/api/events/${eventId}/attendance`,
         { userId, attended },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       await fetchData();
     } finally {
@@ -110,10 +137,17 @@ export default function ReviewAndCheckinModal({ open, onClose }) {
             event.participants
               .filter((p) => p.status === "pending")
               .map((p) => (
-                <div key={p.user.id + event.id} className="border rounded-xl p-4 space-y-2 bg-white">
+                <div
+                  key={p.user.id + event.id}
+                  className="border rounded-xl p-4 space-y-2 bg-white"
+                >
                   <div className="text-sm font-bold text-gray-800">{event.title}</div>
                   <div className="text-sm text-gray-500 italic">
-                  🕒 {formatTimeRange(event.startTime, event.durationMinutes)} ｜ 📍{event.location} ｜ 剩余名额： {event.maxParticipants - event.participants.filter(p => p.status === "approved").length} 人
+                    🕒 {formatTimeRange(event.startTime, event.durationMinutes)} ｜ 📍
+                    {event.location} ｜ 剩余名额：
+                    {event.maxParticipants -
+                      event.participants.filter((p) => p.status === "approved").length}{" "}
+                    人
                   </div>
 
                   <div className="pt-3 text-sm text-gray-700 space-y-1">
@@ -129,7 +163,9 @@ export default function ReviewAndCheckinModal({ open, onClose }) {
                       <BadgeCheck size={16} className="text-green-400 mt-0.5" />
                       爱好：{p.user.interests?.join("、") || "未填写"}
                     </div>
-                    <p className="italic text-gray-500">“{p.user.whyJoin || "未填写"}”</p>
+                    <p className="italic text-gray-500">
+                      “{p.user.whyJoin || "未填写"}”
+                    </p>
                   </div>
 
                   <div className="flex justify-end gap-3 pt-2">
@@ -162,7 +198,10 @@ export default function ReviewAndCheckinModal({ open, onClose }) {
             event.participants
               .filter((p) => p.status === "approved" && hasEventStarted(event.startTime))
               .map((p) => (
-                <div key={p.user.id + event.id} className="border rounded-xl p-4 space-y-2 bg-white">
+                <div
+                  key={p.user.id + event.id}
+                  className="border rounded-xl p-4 space-y-2 bg-white"
+                >
                   <div className="text-sm font-bold text-gray-800">{event.title}</div>
                   <div className="text-sm text-gray-500 italic">
                     🕒 {formatTimeRange(event.startTime, event.durationMinutes)} ｜ 📍

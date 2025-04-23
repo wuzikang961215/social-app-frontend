@@ -17,7 +17,7 @@ export default function StepPaidEventFortnightly({
 
   const handleSelect = (choice: string) => {
     setFormData({ paidEventFortnightly: choice });
-    onError?.("StepPaidEventFortnightly", "");
+    onError?.("paidEventFortnightly", "");
   };
 
   const handleNext = () => {
