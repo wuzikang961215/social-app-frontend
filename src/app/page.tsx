@@ -115,6 +115,18 @@ export default function HomePage() {
       ? events.filter((e) => !e.expired)
       : events.filter((e) => e.category === selectedCategory && !e.expired);
 
+  const getUserPriority = (event: Event): number => {
+    if (event.isOrganizer) return 3;
+  
+    const status = event.userStatus;
+    if (!status || status === "cancelled") return 0;
+    if (status === "pending") return 1;
+    if (status === "approved" || status === "checkedIn") return 2;
+    return 4;
+  };
+  
+      
+
   useEffect(() => {
     const loadData = async () => {
       const token = localStorage.getItem("token");
@@ -189,6 +201,23 @@ export default function HomePage() {
             isOrganizer: e.creator?.id === currentUserId,
           };
         });
+
+        transformed.sort((a, b) => {
+          const aPriority = getUserPriority(a);
+          const bPriority = getUserPriority(b);
+        
+          if (aPriority !== bPriority) return aPriority - bPriority;
+        
+          const aFull = a.spotsLeft <= 0;
+          const bFull = b.spotsLeft <= 0;
+          if (aFull && !bFull) return 1;
+          if (!aFull && bFull) return -1;
+        
+          const aScore = a.countdown + a.spotsLeft * 2;
+          const bScore = b.countdown + b.spotsLeft * 2;
+          return aScore - bScore;
+        });
+        
         
         setEvents(transformed);
       } catch (err) {
