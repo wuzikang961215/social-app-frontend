@@ -64,5 +64,4 @@ export default function StepEmail({
       </button>
     </div>
   );
-  
 }
