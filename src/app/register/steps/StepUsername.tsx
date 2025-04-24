@@ -2,6 +2,7 @@
 "use client";
 import { StepProps } from "../page";
 import { ArrowRightCircle } from "lucide-react";
+import { BASE_URL } from "@/utils/api";
 
 export default function StepUsername({
   formData,
@@ -18,7 +19,7 @@ export default function StepUsername({
 
     // ✅ 检查用户名是否重复
     try {
-      const res = await fetch(`http://localhost:3002/api/auth/check-username?username=${formData.username}`);
+      const res = await fetch(`${BASE_URL}/api/auth/check-username?username=${formData.username}`);
       const data = await res.json();
       if (data.exists) {
         onError?.("username", "该用户名已被使用");
