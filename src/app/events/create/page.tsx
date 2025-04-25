@@ -42,6 +42,9 @@ export default function CreateEvent() {
 
   const handleSubmit = async () => {
     try {
+      const localTime = new Date(formData.startTime); // 👈 本地时间
+      const isoTime = localTime.toISOString(); // 👈 转为 UTC ISO 字符串
+  
       const res = await fetch(`${BASE_URL}/api/events`, {
         method: "POST",
         headers: {
@@ -50,17 +53,19 @@ export default function CreateEvent() {
         },
         body: JSON.stringify({
           ...formData,
+          startTime: isoTime, // ✅ 替换成带时区的标准格式
           maxParticipants: parseInt(formData.maxParticipants),
           durationMinutes: parseInt(formData.durationMinutes),
         }),
       });
-
+  
       if (!res.ok) throw new Error("创建失败");
       router.push("/");
     } catch (error) {
       alert("创建失败，请重试");
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4 py-12">
