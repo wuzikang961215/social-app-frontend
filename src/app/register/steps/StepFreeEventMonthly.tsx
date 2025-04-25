@@ -29,7 +29,7 @@ export default function StepFreeEventMonthly({
 
   const texts = [
     `我们理解，每位成员的时间安排都不同。`,
-    `但如果你无法每两周参与一次，也许你能<b>每月至少</b>来一次？`,
+    `但如果你无法每两周参加一次，你能否<b>每月至少</b>来一次呢？`,
   ];
 
   return (
@@ -60,7 +60,7 @@ export default function StepFreeEventMonthly({
           className="flex flex-col items-center gap-3 mt-3"
         >
           <div className="text-sm font-medium text-gray-800">
-            你能每月至少参加一次免费活动吗？
+            你能每月至少参加一次这样的社群活动吗？
           </div>
 
           <ToggleButtonGroup

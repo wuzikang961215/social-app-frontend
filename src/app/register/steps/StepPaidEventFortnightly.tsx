@@ -30,9 +30,9 @@ export default function StepPaidEventFortnightly({
   
 
   const texts = [
-    `我们每两周会举办一次<b>精心设计的付费活动</b>，帮助大家不断见面、保持互动。`,
-    `我们的付费活动，融合了心理学中被称为<b>「结构化连接模型」</b>（Inspired by Matthew Lieberman, UCLA）、<b>「快速朋友实验」</b>（Fast Friends Protocol，Arthur Aron）等研究成果，通过<b>高密度、强互动</b>的游戏机制，让大家迅速破冰、自然熟络，没有尴尬，只有笑声。`,
-    `我们保证：<b>每个人</b>都能和在场<b>所有人</b>交上朋友。没有冷场，没有例外。`,
+    `我们每两周会举办一次<b>精心设计的线下活动</b>，帮助大家持续见面、逐步熟悉，建立真实而稳定的连接。`,
+    `这些活动融合了心理学中被称为<b>「结构化连接模型」</b>（Inspired by Matthew Lieberman, UCLA）、<b>「快速朋友实验」</b>（Fast Friends Protocol，Arthur Aron）等研究成果，通过<b>高密度、强互动</b>的游戏机制，让你和在场每个人都能建立熟悉感。`,
+    `我们设立了一定的参与门槛：每场活动费用为<b>34澳元</b>一次，用于保障<b>场地、流程设计与活动体验</b>的整体质量，时长1.5小时。`,
   ];
 
   return (
@@ -79,6 +79,10 @@ export default function StepPaidEventFortnightly({
           <button onClick={handleNext}>
             <ArrowRightCircle className="w-8 h-8 text-indigo-500 hover:scale-110 transition mt-1" />
           </button>
+
+          <p className="text-xs mt-1 italic">
+          💡 特别说明：我们未来也可能开放部分<b>免费测试</b>活动，但名额有限，仅开放给认真填写完整问卷、符合系统匹配机制的用户。
+          </p>
         </motion.div>
       )}
     </div>

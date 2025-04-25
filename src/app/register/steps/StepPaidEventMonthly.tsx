@@ -34,7 +34,8 @@ export default function StepPaidEventMonthly({
 
   const texts = [
     `我们理解，每位成员的时间安排都不同。`,
-    `但如果你无法每两周参与一次，也许你能<b>每月至少</b>来一次？`,
+    `但如果你无法每两周参加一次，那我们想确认——`,
+    `你是否能至少<b>每月</b>参加一次，维持一定频率的连接？`,
   ];
 
   return (
