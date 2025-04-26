@@ -32,16 +32,19 @@ export default function RegisterSuccessPage() {
           <h1 className="text-2xl font-bold text-gray-800">🎉 信息提交成功！</h1>
 
           <p className="text-sm text-gray-700 leading-relaxed max-w-md">
-            我们的团队正在审核你的申请。如果审核通过，你将成为留学生高质量搭子社群的
-            <b>“核心社交达人”</b>。
+            我们的团队正在审核你的申请。
             <br /><br />
-            我们正在努力筛选有诚意、愿意参与的朋友，让你在这里找到真正聊得来的搭子。
+            如果审核通过，你将成为
+            <b>“早期核心共建者”</b>。
+            共同见证并参与<b>一个全新真实社交系统</b>的诞生与成长。
+            <br /><br />
+            我们正在努力筛选有诚意、愿意参与的朋友，让你能遇到真正值得交往的朋友。
             <br /><br />
             请稍候……
           </p>
 
           <div className="mt-3 text-xs text-gray-500 italic">
-            你不是一个人，目前已有 <b>20</b> 位搭子加入我们 🧡
+            你不是一个人，目前已有 <b>3</b> 位志同道合的伙伴加入我们 🧡
           </div>
 
           {/* ✅ 返回按钮 */}
