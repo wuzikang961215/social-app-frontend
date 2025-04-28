@@ -44,7 +44,7 @@ export default function RegisterSuccessPage() {
           </p>
 
           <div className="mt-3 text-xs text-gray-500 italic">
-            你不是一个人，目前已有 <b>9</b> 位志同道合的伙伴加入我们 🧡
+            你不是一个人，目前已有 <b>12</b> 位志同道合的伙伴加入我们 🧡
           </div>
 
           {/* ✅ 返回按钮 */}
