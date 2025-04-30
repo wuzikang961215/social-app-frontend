@@ -163,7 +163,7 @@ export default function EventDetailModal({
               className="space-y-6"
             >
               <h2 className="text-xl font-bold text-gray-800">{event.title}</h2>
-              <p className="italic text-sm text-gray-600">
+              <p className="italic text-sm text-gray-600 whitespace-pre-line">
                 {event.description || "（暂无介绍）"}
               </p>
 
@@ -183,10 +183,12 @@ export default function EventDetailModal({
               <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-700 space-y-2">
                 <div className="flex items-center gap-2">
                   <MapPin size={16} className="text-gray-400" />
+                  <span className="font-medium">地点：</span>
                   <span>{event.location}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock size={16} className="text-gray-400" />
+                  <span className="font-medium">时间：</span>
                   <span>{event.time}</span>
                 </div>
                 <div className="flex items-center gap-2">
