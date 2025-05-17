@@ -54,7 +54,11 @@ export default function CreateEvent() {
   
       router.push("/");
     } catch (error) {
-      alert(error.message || "创建失败，请重试");
+      if (error instanceof Error) {
+        alert(error.message || "创建失败，请重试");
+      } else {
+        alert("创建失败，请重试");
+      }
     }
   };
   
