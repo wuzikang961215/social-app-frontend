@@ -40,8 +40,8 @@ export const getCreatedEvents = () => axiosInstance.get("/api/events/my-created"
 export const getJoinedEvents = () => axiosInstance.get("/api/events/my-participated");
 export const getEvents = () => axiosInstance.get("/api/events");
 export const createEvent = (eventData: any) => axiosInstance.post("/api/events", eventData);
-export const joinEvent = (eventId: string) => axiosInstance.post(`/api/events/${eventId}/join`);
-export const cancelEvent = (eventId: string) => axiosInstance.post(`/api/events/${eventId}/leave`);
+export const joinEvent = (eventId: string) => axiosInstance.post(`/api/events/${eventId}/join`).then(res => res.data);
+export const cancelEvent = (eventId: string) => axiosInstance.post(`/api/events/${eventId}/leave`).then(res => res.data);
 export const getUserById = (userId: string) => axiosInstance.get(`/api/auth/users/${userId}`);
 export const getManageEvents = () => axiosInstance.get("/api/events/manage");
 export const reviewParticipant = (eventId: string, userId: string, approve: boolean) => axiosInstance.post(`/api/events/${eventId}/review`, { userId, approve });

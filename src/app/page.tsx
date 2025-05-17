@@ -225,12 +225,12 @@ export default function HomePage() {
         setEvents(transformed);
       } catch (err) {
         console.error("加载失败", err);
-
-        if (err.message.includes("Token")) {
+      
+        if (err instanceof Error && err.message.includes("Token")) {
           localStorage.removeItem("token");
           router.replace("/login");
         }
-      }
+      }      
     };
 
     loadData();
@@ -242,7 +242,9 @@ export default function HomePage() {
       const data = await joinEvent(selectedEvent.id);
       toast.success(data.message || "报名成功！");
       setEvents((prev) =>
-        prev.map((ev) => (ev.id === selectedEvent.id ? { ...ev, userStatus: "pending" } : ev))
+        prev.map((ev) =>
+          ev.id === selectedEvent.id ? { ...ev, userStatus: "pending" } : ev
+        )
       );
       setShowModal(false);
       setShowDetail(false);
@@ -251,7 +253,6 @@ export default function HomePage() {
     }
   };
   
-
   const handleCancel = async () => {
     if (!selectedEvent) return;
     try {
@@ -260,7 +261,11 @@ export default function HomePage() {
       setEvents((prev) =>
         prev.map((ev) =>
           ev.id === selectedEvent.id
-            ? { ...ev, userStatus: "cancelled", userCancelCount: (ev.userCancelCount || 0) + 1 }
+            ? {
+                ...ev,
+                userStatus: "cancelled",
+                userCancelCount: (ev.userCancelCount || 0) + 1,
+              }
             : ev
         )
       );
