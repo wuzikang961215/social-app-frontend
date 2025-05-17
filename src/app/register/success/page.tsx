@@ -3,17 +3,32 @@
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getUserCount } from "@/lib/api";
 
 export default function RegisterSuccessPage() {
   const router = useRouter();
+  const [userCount, setUserCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchUserCount = async () => {
+      try {
+        const { count } = await getUserCount();
+        setUserCount(count);
+      } catch (err) {
+        console.error("获取用户数量失败", err);
+      }
+    };
+
+    fetchUserCount();
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="bg-white p-10 shadow-xl rounded-2xl w-full max-w-lg min-h-[700px] flex flex-col relative">
-        {/* ❌ 不需要返回上一步或登出按钮 */}
-        {/* 🧠 标题区，模拟主页面布局结构 */}
+        {/* 顶部标题 */}
         <div className="text-center mb-6">
-          <div className="h-6" /> {/* 占位，统一顶部留白高度 */}
+          <div className="h-6" />
           <h1 className="text-2xl font-bold text-gray-800">
             帮你找到真正的朋友
           </h1>
@@ -22,7 +37,6 @@ export default function RegisterSuccessPage() {
           </p>
         </div>
 
-        {/* ✅ 主体内容区 */}
         <motion.div
           initial={{ opacity: 0, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
@@ -44,10 +58,11 @@ export default function RegisterSuccessPage() {
           </p>
 
           <div className="mt-3 text-xs text-gray-500 italic">
-            你不是一个人，目前已有 <b>12</b> 位志同道合的伙伴加入我们 🧡
+            你不是一个人，目前已有{" "}
+            <b>{userCount !== null ? userCount : "..."}</b>{" "}
+            位志同道合的伙伴加入我们 🧡
           </div>
 
-          {/* ✅ 返回按钮 */}
           <button
             onClick={() => router.push("/login")}
             className="mt-10 text-sm text-gray-500 hover:text-indigo-500 flex items-center gap-1 transition"

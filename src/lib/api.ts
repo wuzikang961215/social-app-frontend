@@ -69,6 +69,8 @@ export const registerUser = (formData: any) => {
     willPromote: formData.willPromote === "是",
   });
 };
+export const getUserCount = () => axiosInstance.get("/api/auth/count").then(res => res.data);
+
 
 
 
