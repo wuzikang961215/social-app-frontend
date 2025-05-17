@@ -1,8 +1,7 @@
-// app/register/steps/StepUsername.tsx
 "use client";
 import { StepProps } from "../page";
 import { ArrowRightCircle } from "lucide-react";
-import { BASE_URL } from "@/utils/api";
+import { checkUsernameExists } from "@/lib/api"; // ✅ 引入封装的 axios 请求
 
 export default function StepUsername({
   formData,
@@ -17,11 +16,9 @@ export default function StepUsername({
       return;
     }
 
-    // ✅ 检查用户名是否重复
     try {
-      const res = await fetch(`${BASE_URL}/api/auth/check-username?username=${formData.username}`);
-      const data = await res.json();
-      if (data.exists) {
+      const res = await checkUsernameExists(formData.username);
+      if (res.data.exists) {
         onError?.("username", "该用户名已被使用");
         return;
       }

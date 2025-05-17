@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { X, HeartHandshake, BadgeCheck } from "lucide-react";
-import axios from "axios";
-import { BASE_URL } from "@/utils/api";
+import { getManageEvents, reviewParticipant, markAttendance } from "@/lib/api";
 
 type ReviewAndCheckinModalProps = {
   open: boolean;
@@ -62,15 +61,13 @@ export default function ReviewAndCheckinModal({
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${BASE_URL}/api/events/manage`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await getManageEvents();
       setData(res.data);
     } catch (err) {
       console.error("获取数据失败", err);
     }
   };
+  
 
   useEffect(() => {
     if (open) fetchData();
@@ -83,17 +80,13 @@ export default function ReviewAndCheckinModal({
   ) => {
     try {
       setLoadingMap((prev) => ({ ...prev, [userId + eventId]: true }));
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `${BASE_URL}/api/events/${eventId}/review`,
-        { userId, approve },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await reviewParticipant(eventId, userId, approve);
       await fetchData();
     } finally {
       setLoadingMap((prev) => ({ ...prev, [userId + eventId]: false }));
     }
   };
+  
 
   const handleAttendance = async (
     eventId: string,
@@ -102,17 +95,13 @@ export default function ReviewAndCheckinModal({
   ) => {
     try {
       setLoadingMap((prev) => ({ ...prev, [userId + eventId]: true }));
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `${BASE_URL}/api/events/${eventId}/attendance`,
-        { userId, attended },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await markAttendance(eventId, userId, attended);
       await fetchData();
     } finally {
       setLoadingMap((prev) => ({ ...prev, [userId + eventId]: false }));
     }
   };
+  
 
   if (!open) return null;
 

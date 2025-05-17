@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { BASE_URL } from "@/utils/api";
+import { createEvent } from "@/lib/api"; // ✅ 添加
 
 export default function CreateEvent() {
   const router = useRouter();
@@ -42,27 +42,19 @@ export default function CreateEvent() {
 
   const handleSubmit = async () => {
     try {
-      const localTime = new Date(formData.startTime); // 👈 本地时间
-      const isoTime = localTime.toISOString(); // 👈 转为 UTC ISO 字符串
+      const localTime = new Date(formData.startTime);
+      const isoTime = localTime.toISOString();
   
-      const res = await fetch(`${BASE_URL}/api/events`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          ...formData,
-          startTime: isoTime, // ✅ 替换成带时区的标准格式
-          maxParticipants: parseInt(formData.maxParticipants),
-          durationMinutes: parseInt(formData.durationMinutes),
-        }),
+      await createEvent({
+        ...formData,
+        startTime: isoTime,
+        maxParticipants: parseInt(formData.maxParticipants),
+        durationMinutes: parseInt(formData.durationMinutes),
       });
   
-      if (!res.ok) throw new Error("创建失败");
       router.push("/");
     } catch (error) {
-      alert("创建失败，请重试");
+      alert(error.message || "创建失败，请重试");
     }
   };
   

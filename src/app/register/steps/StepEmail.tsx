@@ -1,7 +1,7 @@
 "use client";
 import { StepProps } from "../page";
 import { ArrowRightCircle } from "lucide-react";
-import { BASE_URL } from "@/utils/api";
+import { checkEmailExists } from "@/lib/api"; // ✅ 改成引入封装的函数
 
 export default function StepEmail({
   formData,
@@ -23,9 +23,8 @@ export default function StepEmail({
 
     // ✅ 检查邮箱是否重复
     try {
-      const res = await fetch(`${BASE_URL}/api/auth/check-email?email=${formData.email}`);
-      const data = await res.json();
-      if (data.exists) {
+      const res = await checkEmailExists(formData.email);
+      if (res.data.exists) {
         onError?.("email", "该邮箱已被使用");
         return;
       }

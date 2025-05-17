@@ -33,9 +33,8 @@ export default function StepPaidEventMonthly({
   };
 
   const texts = [
-    `我们理解，每位成员的时间安排都不同。`,
-    `但如果你无法每两周参加一次，那我们想确认——`,
-    `你是否能至少<b>每月</b>参加一次，维持一定频率的连接？`,
+    `没关系，我们知道每个人的时间都不一样～`,
+    `那如果不是每两周一次，你觉得<b>每月至少参加一次</b>活动，保持一定熟悉感，OK 吗？`,
   ];
 
   return (
@@ -66,7 +65,7 @@ export default function StepPaidEventMonthly({
           className="flex flex-col items-center gap-3 mt-3"
         >
           <div className="text-sm font-medium text-gray-800">
-            你能每月至少参加一次付费活动吗？
+            你愿意每月至少参加一次这样的付费活动吗？
           </div>
 
           <ToggleButtonGroup

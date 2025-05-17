@@ -34,9 +34,9 @@ export default function StepCommitment({
   };
 
   const texts = [
-    `我们正在建立一个<b>人数不多、关系紧密</b>的小圈子，希望你不只是来“看一眼”，而是认真来交朋友。`,
-    `为了让彼此真正熟起来，我们会<b>持续</b>举办<b>线下活动</b>。这需要每一位成员都<b>持续投入时间与精力</b>，建立真实质量的连接。`,
-    `毕竟你也受够了，在澳洲一个人生活、没有能说<b>心里话</b>的人了，对吧？`,
+    `这是一个<b>不尴尬</b>、<b>不无聊</b>、<b>不尬聊</b>的线下小圈子，专治“社交死水”。`,
+    `我们定期办一些<b>轻松又有点疯</b>的活动，帮你认识真·聊得来的人，不是加完就沉底的那种。`,
+    `没有剧本杀、没有酒局，只有<b>人为设计的高质量巧遇</b>。有点刺激，有点走心，刚刚好。`,
   ];
 
   return (
@@ -67,7 +67,7 @@ export default function StepCommitment({
           className="flex flex-col items-center gap-3 mt-3"
         >
           <div className="text-sm font-medium text-gray-800">
-            你愿意认真参与，成为这个小圈子的一员吗？
+            你想试试看，成为这个不一样的圈子的一员吗？
           </div>
 
           <ToggleButtonGroup

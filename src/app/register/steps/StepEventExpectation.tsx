@@ -61,7 +61,7 @@ export default function StepEventExpectation({
         {/* 免费 */}
         <div className="w-full text-left">
           <label className="text-sm text-gray-700 mb-2 block italic">
-            参加<b>轻型自费</b>活动时，我期待
+            参加<b>会员自发</b>活动时，我期待
           </label>
           <input
             type="text"

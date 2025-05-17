@@ -10,10 +10,9 @@ import {
   BadgeCheck,
   X,
 } from "lucide-react";
-import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { BASE_URL } from "@/utils/api";
+import { getUserById } from "@/lib/api"; // ✅ 替代 axios + BASE_URL
 import type { Event as AppEvent } from "@/app/page";
 
 type EventDetailModalProps = {
@@ -104,12 +103,7 @@ export default function EventDetailModal({
       if (event.organizer?.id) {
         try {
           const token = localStorage.getItem("token");
-          const res = await axios.get(
-            `${BASE_URL}/api/auth/users/${event.organizer.id}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
+          const res = await getUserById(event.organizer.id);
           setOrganizerInfo({
             idealBuddy: res.data.idealBuddy,
             hobbies: res.data.interests,

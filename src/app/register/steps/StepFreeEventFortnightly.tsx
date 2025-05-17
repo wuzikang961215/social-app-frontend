@@ -28,14 +28,17 @@ export default function StepFreeEventFortnightly({
   };
 
   const texts = [
-    `除了正式活动以外，我们也会定期组织一些<b>轻型社群活动</b>（如约饭、KTV、逛展等）。`,
-    `这类活动是<b>自费参与</b>，形式轻松，不包含结构化引导，主要用于熟悉氛围、缓解初期陌生感。`,
-    `它们与正式的付费活动<b>互为补充</b>，共同构成我们的真实社交系统。`,
+    `除了正式活动，我们也鼓励大家<b>自己发起小局</b>，比如约饭、KTV、逛展，认识更多聊得来的人。`,
+    `朋友，往往是在<b>轻松又真实的场合</b>里慢慢熟起来的。`,
+    `你发起，我们帮你推广；你参与，我们记得你的活跃。`,
+    `<b>每两周</b>，发起活动累计<b>带来最多人</b>的用户，下一次正式活动<b>免费</b>！`,
+    `参与次数<b>最多</b>的用户，也<b>免费</b>！`,
   ];
-
+  
+  
   return (
     <div
-      className="w-full max-w-md h-[365px] flex flex-col justify-center items-center text-center px-4 pt-3 pb-6 gap-3"
+      className="w-full max-w-md h-[365px] flex flex-col justify-start items-center text-center px-4 pt-3 pb-6 gap-3"
       onClick={() => {
         if (currentStep <= texts.length) {
           setCurrentStep(currentStep + 1);
@@ -61,7 +64,7 @@ export default function StepFreeEventFortnightly({
           className="flex flex-col items-center gap-3 mt-3"
         >
           <div className="text-sm font-medium text-gray-800">
-            你能每两周参加一次这样的社群活动吗？
+            你愿意每两周左右，<b>组织/参与</b>一次这样的会员自发活动吗？
           </div>
 
           <ToggleButtonGroup

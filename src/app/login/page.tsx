@@ -4,7 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { ArrowRightCircle } from "lucide-react";
-import { BASE_URL } from "@/utils/api";
+import { login } from "@/lib/api";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -13,22 +13,19 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post(`${BASE_URL}/api/auth/login`, {
-        email,
-        password,
-      });
-
+      const response = await login(email, password);
       const { token } = response.data;
       localStorage.setItem("token", token);
       router.push("/");
     } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        alert(err.response?.data?.message || "登录失败");
+      if (err instanceof Error) {
+        alert(err.message || "登录失败");
       } else {
         alert("登录失败");
       }
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">

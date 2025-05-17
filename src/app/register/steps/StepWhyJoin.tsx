@@ -41,7 +41,7 @@ export default function StepWhyJoin({
             setFormData({ whyJoin: e.target.value });
             onError?.("whyJoin", "");
           }}
-          placeholder="比如：在澳洲太孤单了，真的很想找到聊得来、有趣的人"
+          placeholder="比如：在澳洲太无聊了，真的很想找到聊得来、有趣的人"
           className="w-full px-4 py-2 rounded-xl bg-gray-100 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300"
         />
         {errors?.whyJoin && (

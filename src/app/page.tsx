@@ -2,25 +2,34 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
-import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
+import toast from "react-hot-toast";
+
 import ConfirmModal from "@/components/event/ConfirmModal";
 import EventDetailModal from "@/components/event/EventDetailModal";
 import CancelModal from "@/components/event/CancelModal";
 import ReviewAndCheckinModal from "@/components/event/ReviewAndCheckinModal";
-import MyProfileModal from "@/components/profile/MyProfileModal"; 
-import { BASE_URL } from "@/utils/api";
+import MyProfileModal from "@/components/profile/MyProfileModal";
+import EventCard from "@/components/event/EventCard";
 
-import { MapPin, Clock, Users, LogOut } from "lucide-react";
-import toast from "react-hot-toast";
+import {
+  getUser,
+  getCreatedEvents,
+  getJoinedEvents,
+  getEvents,
+  joinEvent,
+  cancelEvent,
+} from "@/lib/api";
+
+import { formatTimeRange } from "@/lib/format";
+
+
 
 export interface Event {
   id: string;
   title: string;
-  startTime: string; // ✅ 改为 startTime
-  durationMinutes: number; // ✅ 新增
+  startTime: string;
+  durationMinutes: number;
   time: string;
   location: string;
   category: string;
@@ -38,12 +47,12 @@ export interface Event {
   creator?: {
     id: string;
     username: string;
-  }; // ✅ 👈 加上这个！
+  };
   participants: {
     user: {
       id: string;
       username: string;
-      score?: number; // ✅ 新增
+      score?: number;
     };
     status:
       | "pending"
@@ -88,7 +97,6 @@ export default function HomePage() {
   const [showLaunchMenu, setShowLaunchMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // ⛔ 外部点击关闭弹出菜单
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -110,6 +118,9 @@ export default function HomePage() {
   const uniqueCategories = Array.from(new Set(events.map((e) => e.category)));
   const categories = ["首页", ...uniqueCategories];
 
+  const canCreateEvent = userInfo?.score !== undefined && userInfo.score >= 30;
+  const isScoreLoaded = userInfo?.score !== undefined;
+
   const filteredEvents =
     selectedCategory === "首页"
       ? events.filter((e) => !e.expired)
@@ -117,15 +128,21 @@ export default function HomePage() {
 
   const getUserPriority = (event: Event): number => {
     if (event.isOrganizer) return 3;
-  
     const status = event.userStatus;
     if (!status || status === "cancelled") return 0;
     if (status === "pending") return 1;
     if (status === "approved" || status === "checkedIn") return 2;
     return 4;
   };
-  
-      
+
+  const handleLaunchClick = () => {
+    if (!canCreateEvent) {
+      toast.error(`积分不足，还需 ${30 - (userInfo?.score || 0)} 分才可发起活动`);
+      return;
+    }
+    setShowLaunchMenu((prev) => !prev);
+  };
+
 
   useEffect(() => {
     const loadData = async () => {
@@ -134,39 +151,27 @@ export default function HomePage() {
         router.replace("/login");
         return;
       }
-    
+
       try {
-        // 获取用户基本信息
         const [userRes, createdRes, joinedRes] = await Promise.all([
-          axios.get(`${BASE_URL}/api/auth/me`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`${BASE_URL}/api/events/my-created`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`${BASE_URL}/api/events/my-participated`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-    
+          getUser(),
+          getCreatedEvents(),
+          getJoinedEvents(),
+        ]);        
         setUserInfo(userRes.data);
         setCreatedEvents(createdRes.data);
         setJoinedEvents(joinedRes.data);
-    
-        // ✅ 原有主页活动（公共 feed）保持不动
-        const eventsRes = await axios.get(`${BASE_URL}/api/events`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-    
+
+        const eventsRes = await getEvents();
         const now = new Date();
         const currentUserId = userRes.data.id;
-    
+
         const transformed: Event[] = eventsRes.data.map((e: any): Event => {
           const date = new Date(e.startTime);
           const countdown = Math.floor((date.getTime() - now.getTime()) / 3600000);
           const approvedCount = e.participants.filter((p: any) => p.status === "approved").length;
           const currentUser = e.participants.find((p: any) => p.user.id === currentUserId);
-        
+
           return {
             id: e.id,
             title: e.title,
@@ -193,9 +198,9 @@ export default function HomePage() {
                 username: p.user.username,
                 score: p.user.score,
               },
-              status: p.status as Event["participants"][number]["status"],
+              status: p.status,
             })),
-            userStatus: currentUser?.status as Event["userStatus"],
+            userStatus: currentUser?.status ?? null,
             userCancelCount: currentUser?.cancelCount || 0,
             isVipOrganizer: false,
             isOrganizer: e.creator?.id === currentUserId,
@@ -205,157 +210,67 @@ export default function HomePage() {
         transformed.sort((a, b) => {
           const aPriority = getUserPriority(a);
           const bPriority = getUserPriority(b);
-        
           if (aPriority !== bPriority) return aPriority - bPriority;
-        
+
           const aFull = a.spotsLeft <= 0;
           const bFull = b.spotsLeft <= 0;
           if (aFull && !bFull) return 1;
           if (!aFull && bFull) return -1;
-        
+
           const aScore = a.countdown + a.spotsLeft * 2;
           const bScore = b.countdown + b.spotsLeft * 2;
           return aScore - bScore;
         });
-        
-        
+
         setEvents(transformed);
       } catch (err) {
         console.error("加载失败", err);
-      } 
-    };    
+
+        if (err.message.includes("Token")) {
+          localStorage.removeItem("token");
+          router.replace("/login");
+        }
+      }
+    };
 
     loadData();
   }, [router]);
 
-  const formatTimeRange = (start: string, duration: number) => {
-    const startDate = new Date(start);
-    const endDate = new Date(startDate.getTime() + duration * 60000);
-  
-    const pad = (n: number) => n.toString().padStart(2, "0");
-    const format = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  
-    const prefix = (() => {
-      const now = new Date();
-      const nowStr = now.toDateString();
-      const startStr = startDate.toDateString();
-  
-      if (startStr === nowStr) return "今天";
-      if (new Date(now.getTime() + 86400000).toDateString() === startStr) return "明天";
-      if (new Date(now.getTime() + 2 * 86400000).toDateString() === startStr) return "后天";
-      return startDate.toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" });
-    })();
-  
-    return `${prefix} ${format(startDate)} - ${format(endDate)}`;
-  };
-  
-
-  const getCardStyle = (event: Event) => {
-    if (event.isVipOrganizer) return "border-blue-300 bg-blue-50";
-    return "border-gray-200 bg-white";
-  };
-
   const handleConfirm = async () => {
     if (!selectedEvent) return;
-  
     try {
-      const token = localStorage.getItem("token");
-  
-      const res = await axios.post(
-        `${BASE_URL}/api/events/${selectedEvent.id}/join`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-  
-      toast.success(res.data.message || "报名成功！");
-
-
-      // ✅ 同步更新主页的 event 列表（让按钮变灰）
+      const data = await joinEvent(selectedEvent.id);
+      toast.success(data.message || "报名成功！");
       setEvents((prev) =>
-        prev.map((ev) =>
-          ev.id === selectedEvent.id
-            ? { ...ev, userStatus: "pending" }
-            : ev
-        )
+        prev.map((ev) => (ev.id === selectedEvent.id ? { ...ev, userStatus: "pending" } : ev))
       );
-
       setShowModal(false);
       setShowDetail(false);
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        const msg = err.response?.data?.message || "报名失败，请稍后再试";
-        toast.error(msg);
-      } else {
-        toast.error("报名失败，请稍后再试");
-      }
+    } catch {
+      toast.error("报名失败，请稍后再试");
     }
   };
+  
 
   const handleCancel = async () => {
     if (!selectedEvent) return;
-  
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.post(
-        `${BASE_URL}/api/events/${selectedEvent.id}/leave`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-  
-      toast.success(res.data.message || "取消成功");
-  
-      // ✅ 本地同步更新 userStatus 和 cancelCount
+      const data = await cancelEvent(selectedEvent.id);
+      toast.success(data.message || "取消成功");
       setEvents((prev) =>
         prev.map((ev) =>
           ev.id === selectedEvent.id
-            ? {
-                ...ev,
-                userStatus: "cancelled",
-                userCancelCount: (ev.userCancelCount || 0) + 1, // 注意兜底
-              }
+            ? { ...ev, userStatus: "cancelled", userCancelCount: (ev.userCancelCount || 0) + 1 }
             : ev
         )
       );
-  
       setShowCancelModal(false);
       setShowDetail(false);
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        const msg = err.response?.data?.message || "取消失败，请稍后再试";
-        toast.error(msg);
-      } else {
-        toast.error("取消失败，请稍后再试");
-      }
+    } catch {
+      toast.error("取消失败，请稍后再试");
     }
   };
   
-  
-
-  const handleJoinFromDetail = (event: Event) => {
-    setSelectedEvent(event);
-    setShowModal(true);
-  };
-
-  const handleCancelFromDetail = (event: Event) => {
-    setSelectedEvent(event);
-    setShowCancelModal(true);
-  };
-
-  const mapScoreToLevel = (score: number): number => {
-    if (score >= 100) return 5;
-    if (score >= 50) return 4;
-    if (score >= 20) return 3;
-    if (score >= 5) return 2;
-    return 1;
-  };  
 
   return (
     <div className="p-6 space-y-8">
@@ -377,37 +292,43 @@ export default function HomePage() {
       </div>
 
       {/* 发起活动菜单 */}
-      <div className="relative inline-block mt-4" ref={menuRef}>
-        <button
-          onClick={() => setShowLaunchMenu((prev) => !prev)}
-          className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-indigo-700 bg-indigo-100 hover:bg-indigo-200 rounded-full"
-        >
-          <span className="text-lg">➕</span> 组织活动
-        </button>
+      {isScoreLoaded && (
+        <div className="relative inline-block mt-4" ref={menuRef}>
+          <button
+            onClick={handleLaunchClick}
+            className={`flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-full transition ${
+              canCreateEvent
+                ? "text-indigo-700 bg-indigo-100 hover:bg-indigo-200"
+                : "text-gray-400 bg-gray-200"
+            }`}
+          >
+            <span className="text-lg">➕</span> 组织活动
+          </button>
 
-        {showLaunchMenu && (
-          <div className="absolute z-50 mt-2 left-0 bg-white rounded-lg shadow-lg border w-40">
-            <button
-              onClick={() => {
-                router.push("events/create");
-                setShowLaunchMenu(false);
-              }}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            >
-              创建新活动
-            </button>
-            <button
-              onClick={() => {
-                setShowReviewModal(true);
-                setShowLaunchMenu(false);
-              }}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            >
-              审核与签到
-            </button>
-          </div>
-        )}
-      </div>
+          {showLaunchMenu && canCreateEvent && (
+            <div className="absolute z-50 mt-2 left-0 bg-white rounded-lg shadow-lg border w-40">
+              <button
+                onClick={() => {
+                  router.push("events/create");
+                  setShowLaunchMenu(false);
+                }}
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                创建新活动
+              </button>
+              <button
+                onClick={() => {
+                  setShowReviewModal(true);
+                  setShowLaunchMenu(false);
+                }}
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                审核与签到
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 登出按钮 */}
       <div className="flex justify-between items-center mb-6">
@@ -428,183 +349,66 @@ export default function HomePage() {
         <span className="text-base">👤</span> 我的
       </button>
 
-
       {/* 活动卡片 */}
       {filteredEvents.map((event) => (
-        <Card
+        <EventCard
           key={event.id}
-          className={`rounded-2xl border transition-shadow shadow-md hover:shadow-lg hover:scale-[1.01] transition-transform cursor-pointer ${getCardStyle(event)}`}
+          event={event}
           onClick={() => {
             setSelectedEvent(event);
             setShowDetail(true);
           }}
-        >
-          <CardContent className="p-7 space-y-4">
-            <div>
-              <h2 className="text-lg font-extrabold text-gray-800">{event.title}</h2>
-              <p className="text-sm text-gray-500 mt-1 italic">{event.category}</p>
-            </div>
-
-            <div className="text-sm text-gray-600 space-y-2">
-              <div className="flex items-center gap-2">
-                <MapPin size={16} className="text-gray-400" />
-                <span>{event.location}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock size={16} className="text-gray-400" />
-                <span className={event.time.startsWith("今天") ? "font-semibold" : ""}>{event.time}</span>
-              </div>
-              <div className="flex items-center gap-2 justify-between">
-                <div className="flex items-center gap-2">
-                  <Users size={16} className="text-gray-400" />
-                  <span>
-                    剩余名额：
-                    <span className={event.spotsLeft <= 2 ? "font-semibold" : ""}>
-                      {event.spotsLeft === 0 ? "已满" : `${event.spotsLeft}人`}
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center pt-4 mt-2">
-              <Link
-                href={`/profile/${event.organizer.id}`}
-                onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-2 hover:underline"
-              >
-                <div className="text-sm text-gray-700">
-                  <div className="font-medium">{event.organizer.name}</div>
-                  <div className="text-xs text-gray-500">主办人</div>
-                </div>
-              </Link>
-
-              <Button
-                className={`
-                  rounded-full px-4 py-2 text-sm transition
-                  ${
-                    event.isOrganizer
-                      ? "bg-gray-300 text-gray-800 cursor-default"
-                      : (event.userCancelCount ?? 0) >= 2
-                      ? "bg-red-100 text-red-600 cursor-default"
-                      : !event.userStatus || event.userStatus === "cancelled"
-                      ? "bg-indigo-500 hover:bg-indigo-600 text-white"
-                      : event.userStatus === "approved"
-                      ? "bg-emerald-500 text-white cursor-default"
-                      : event.userStatus === "checkedIn"
-                      ? "bg-cyan-500 text-white cursor-default"
-                      : event.userStatus === "pending"
-                      ? "bg-gray-300 text-gray-800 hover:bg-gray-400"
-                      : event.userStatus === "requestingCancellation"
-                      ? "bg-gray-300 text-gray-800"
-                      : ["denied", "noShow"].includes(event.userStatus)
-                      ? "bg-red-100 text-red-600 cursor-default"
-                      : ""
-                  }
-                `}
-                disabled={
-                  event.isOrganizer ||
-                  (event.userCancelCount ?? 0) >= 2 ||
-                  !["pending", "cancelled", null].includes(event.userStatus || null)
-                }
-                onClick={(e) => {
-                  e.stopPropagation();
-
-                  if (
-                    event.isOrganizer ||
-                    (event.userCancelCount ?? 0) >= 2 ||
-                    !["pending", "cancelled", null].includes(event.userStatus || null)
-                  )
-                    return;
-
-                  setSelectedEvent(event);
-
-                  if (!event.userStatus || event.userStatus === "cancelled") {
-                    setShowModal(true); // 报名弹窗
-                  } else if (event.userStatus === "pending") {
-                    setShowCancelModal(true); // 取消申请弹窗
-                  }
-                }}
-              >
-                {event.isOrganizer
-                  ? "你是主办人"
-                  : (event.userCancelCount ?? 0) >= 2
-                  ? "无法加入"
-                  : event.userStatus === "approved"
-                  ? "已加入"
-                  : event.userStatus === "pending"
-                  ? event.spotsLeft === 0
-                    ? "候补中"
-                    : "等待审核"
-                  : event.userStatus === "denied"
-                  ? "报名被拒"
-                  : event.userStatus === "checkedIn"
-                  ? "已签到"
-                  : event.userStatus === "noShow"
-                  ? "未到场"
-                  : event.userStatus === "requestingCancellation"
-                  ? "取消申请中"
-                  : "立即报名"}
-              </Button>
-
-            </div>
-          </CardContent>
-        </Card>
+          onJoinClick={() => {
+            setSelectedEvent(event);
+            setShowModal(true); // 报名弹窗
+          }}
+          onCancelClick={() => {
+            setSelectedEvent(event);
+            setShowCancelModal(true); // 取消报名弹窗
+          }}
+        />      
       ))}
 
-      {/* 报名确认弹窗 */}
+      {/* 弹窗区域 */}
       {selectedEvent && (
-        <ConfirmModal
-          open={showModal}
-          onClose={() => setShowModal(false)}
-          onConfirm={handleConfirm}
-          title={selectedEvent.title}
-          spotsLeft={selectedEvent.spotsLeft}
-        />
+        <>
+          <ConfirmModal
+            open={showModal}
+            onClose={() => setShowModal(false)}
+            onConfirm={handleConfirm}
+            title={selectedEvent.title}
+            spotsLeft={selectedEvent.spotsLeft}
+          />
+          <CancelModal
+            open={showCancelModal}
+            onClose={() => setShowCancelModal(false)}
+            onConfirm={handleCancel}
+            title={selectedEvent.title}
+          />
+          <EventDetailModal
+            open={showDetail}
+            onClose={() => setShowDetail(false)}
+            event={{ ...selectedEvent, userStatus: selectedEvent.userStatus ?? undefined }}
+            onJoinClick={() => {
+              setSelectedEvent(selectedEvent);
+              setShowModal(true);
+            }}
+            onCancelClick={() => {
+              setSelectedEvent(selectedEvent);
+              setShowCancelModal(true);
+            }}
+          />
+        </>
       )}
 
-      {/* 取消报名弹窗 */}
-      {selectedEvent && (
-        <CancelModal
-          open={showCancelModal}
-          onClose={() => setShowCancelModal(false)}
-          onConfirm={handleCancel}
-          title={selectedEvent.title}
-        />
-      )}
-
-      {/* 活动详情弹窗 */}
-      {selectedEvent && (
-        <EventDetailModal
-          open={showDetail}
-          onClose={() => setShowDetail(false)}
-          event={{
-            ...selectedEvent,
-            userStatus: selectedEvent.userStatus ?? undefined, // ✅ 显式转为 undefined
-          }}
-          onJoinClick={handleJoinFromDetail}
-          onCancelClick={handleCancelFromDetail}
-        />
-        
-      )}
-
-      {/* 审核与签到弹窗 */}
-      <ReviewAndCheckinModal
-        open={showReviewModal}
-        onClose={() => setShowReviewModal(false)}
-      />
-
-      {/* 我的资料页弹窗 */}
+      <ReviewAndCheckinModal open={showReviewModal} onClose={() => setShowReviewModal(false)} />
       <MyProfileModal
         open={showProfileModal}
         onClose={() => setShowProfileModal(false)}
-        userInfo={userInfo!} // ✅ 加个叹号：我保证它不是 null
+        userInfo={userInfo!}
         createdEvents={createdEvents}
         joinedEvents={joinedEvents}
       />
-
-
-      
     </div>
   );
 }

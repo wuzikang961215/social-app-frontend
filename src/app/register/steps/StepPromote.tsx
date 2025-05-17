@@ -5,7 +5,7 @@ import ToggleButtonGroup from "@/components/register/ToggleButtonGroup";
 import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { BASE_URL } from "@/utils/api";
+import { registerUser } from "@/lib/api"; // ✅ 替换 BASE_URL + fetch
 
 export default function StepPromote(props: StepProps) {
   const { formData, setFormData, onError, errors } = props;
@@ -24,29 +24,7 @@ export default function StepPromote(props: StepProps) {
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/api/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-          personality: formData.personality,
-          interests: formData.interests,
-          canJoinPaid: formData.paidEventFortnightly === "是",
-          canJoinPaidMonthly: formData.paidEventMonthly === "是",
-          canJoinFree: formData.freeEventFortnightly === "是",
-          canJoinFreeMonthly: formData.freeEventMonthly === "是",
-          expectPaid: formData.expectPaid,
-          expectFree: formData.expectFree,
-          whyJoin: formData.whyJoin,
-          idealBuddy: formData.idealBuddy,
-          willPromote: formData.willPromote === "是",
-        }),
-      });
-
-      if (!response.ok) throw new Error("提交失败");
-
+      await registerUser(formData); // ✅ 使用封装函数
       router.push("/register/success");
     } catch (err) {
       console.error("注册失败", err);
@@ -55,11 +33,13 @@ export default function StepPromote(props: StepProps) {
   };
 
   const texts = [
-    `最后一个问题，也是最重要的问题 👇`,
-    `你是我们App最早的一批用户，也是我们的<b>核心共建者</b>。`,
-    `我们正在一起创建一个全新的<b>高质量社交网络</b>，彻底改变澳洲留学生<b>孤单、无聊、找不到搭子</b>的现状。`,
-    `未来，会有越来越多的用户通过 App 申请加入我们的社群，而你，将拥有以下权限：`,
-    `发起自己的社交活动，新用户需要参加<b>你的</b>活动，才能加入我们；邀请你信任的人，<b>直接</b>加入；审核活动参与者，<b>筛选</b>出真心想交朋友的人。`,
+    `最后一个问题，也是最重要的 👇`,
+    `你是我们 App 最早的一批用户，也是<b>核心共建者</b>。`,
+    `我们正在一起打造一个<b>高质量的线下社交网络</b>，改变澳洲留学生<b>孤单、无聊、找不到搭子</b>的现状。`,
+    `未来，更多人会通过 App 想加入这个社群，而你将拥有这些权限：`,
+    `✅ 发起自己的社交活动，<b>让新用户参加你的局</b>才能加入；  
+     ✅ 邀请你认可的人，<b>直接加入社群</b>；  
+     ✅ 审核活动参与者，<b>筛选出真心想交朋友的人</b>。`,
   ];
 
   return (
