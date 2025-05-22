@@ -30,9 +30,9 @@ export default function StepPaidEventFortnightly({
   
 
   const texts = [
-    `我们每两周会举办一次<b>精心设计的线下活动</b>，帮助大家持续见面、逐步熟悉，建立真实而稳定的连接。`,
-    `这些活动融合了心理学中被称为<b>「结构化连接模型」</b>（Inspired by Matthew Lieberman, UCLA）、<b>「快速朋友实验」</b>（Fast Friends Protocol，Arthur Aron）等研究成果，通过<b>高密度、强互动</b>的游戏机制，让你和在场每个人都能建立熟悉感。`,
-    `我们设立了一定的参与门槛：每场活动费用为<b>34澳元</b>（这是我们给内部成员的<b>会员价</b>，公开定价为<b>49澳元</b>），主要用于场地、流程设计和社交机制搭建，时长<b>1.5小时</b>。`,
+    `Yodda 社交系统由一组连续的<b>16期线下实验</b>组成，每一期都围绕一个全新主题，设计独立的互动流程与社交机制。`,
+    `活动融合心理学中的<b>结构化连接模型</b>（Structured Social Interaction, Lieberman, UCLA）与<b>快速朋友实验</b>（Fast Friends Protocol, Aron, 1997），每期通过<b>高密度引导+角色任务+沉浸氛围</b>，帮助你在 90 分钟内与在场大多数人建立自然熟悉感。`,
+    `我们设立一定参与门槛：<b>会员票价 34澳元</b>，普通票价为 <b>49澳元</b>，费用用于场地、内容策划与机制搭建。每场活动限额人数，并持续优化匹配机制与用户质量。`,
   ];
 
   return (
@@ -63,7 +63,7 @@ export default function StepPaidEventFortnightly({
           className="flex flex-col items-center gap-3 mt-3"
         >
           <div className="text-sm font-medium text-gray-800">
-            你愿意每两周参加一次这样的付费活动吗？
+            你愿意每两周参加一次Yodda官方付费活动吗？
           </div>
 
           <ToggleButtonGroup

@@ -34,9 +34,9 @@ export default function StepCommitment({
   };
 
   const texts = [
-    `这是一个<b>不尴尬</b>、<b>不无聊</b>、<b>不尬聊</b>的线下小圈子，专治“社交死水”。`,
-    `我们定期办一些<b>轻松又有点疯</b>的活动，帮你认识真·聊得来的人，不是加完就沉底的那种。`,
-    `没有剧本杀、没有酒局，只有<b>人为设计的高质量巧遇</b>。有点刺激，有点走心，刚刚好。`,
+    `我们相信，真正有价值的社交，不是寒暄几句、交换联系方式，而是能够<b>建立持续连接</b>、真正熟起来的过程。`,
+    `Yodda 的线下活动专为此而设计：<b>拒绝尴尬寒暄</b>、<b>避免低效社交</b>，通过结构化引导与现场氛围，帮助你遇见真正聊得来的人。`,
+    `每一次见面，都是一次<b>人为策划的高质量互动</b>，让你在轻松的节奏中建立真实关系，而不是“到场即散”的形式主义社交。`,
   ];
 
   return (
@@ -67,7 +67,7 @@ export default function StepCommitment({
           className="flex flex-col items-center gap-3 mt-3"
         >
           <div className="text-sm font-medium text-gray-800">
-            你想试试看，成为这个不一样的圈子的一员吗？
+            你想试试看，加入这样一个不一样的社交圈吗？
           </div>
 
           <ToggleButtonGroup

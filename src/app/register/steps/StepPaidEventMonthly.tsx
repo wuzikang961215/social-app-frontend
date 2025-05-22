@@ -65,7 +65,7 @@ export default function StepPaidEventMonthly({
           className="flex flex-col items-center gap-3 mt-3"
         >
           <div className="text-sm font-medium text-gray-800">
-            你愿意每月至少参加一次这样的付费活动吗？
+            你愿意每月至少参加一次Yodda官方付费活动吗？
           </div>
 
           <ToggleButtonGroup
