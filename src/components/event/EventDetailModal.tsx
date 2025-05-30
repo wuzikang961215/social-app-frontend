@@ -263,7 +263,7 @@ export default function EventDetailModal({
                           ? "bg-gray-300 text-gray-800 hover:bg-gray-400"
                           : event.userStatus === "requestingCancellation"
                           ? "bg-gray-300 text-gray-800 cursor-default"
-                          : ["denied", "noShow"].includes(event.userStatus)
+                          : ["denied", "noShow"].includes(event.userStatus ?? "")
                           ? "bg-red-100 text-red-600 cursor-default"
                           : event.spotsLeft <= 0
                           ? "bg-gray-300 text-gray-800 cursor-default"
