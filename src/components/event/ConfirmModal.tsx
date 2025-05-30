@@ -24,11 +24,6 @@ export default function ConfirmModal({
         <p className="text-sm text-gray-600">
           报名即表示你会参加。被主办人确认后，原则上无法取消，感谢理解！
         </p>
-        {spotsLeft === 0 && (
-          <span className="text-sm text-orange-500 mt-2 italic tracking-wide">
-            当前活动已满，你将进入候补名单。
-          </span>
-        )}
         <div className="flex justify-end gap-3 pt-4">
           <button
             onClick={onClose}
