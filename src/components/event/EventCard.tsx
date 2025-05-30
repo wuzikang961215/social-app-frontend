@@ -22,7 +22,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
       case "checkedIn":
         return "已签到";
       case "pending":
-        return event.spotsLeft === 0 ? "候补中" : "等待审核";
+        return "等待通过";
       case "denied":
         return "报名被拒";
       case "noShow":
@@ -30,14 +30,16 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
       case "requestingCancellation":
         return "取消申请中";
       default:
-        return "立即报名";
+        return event.spotsLeft > 0 ? "立即报名" : "已满";
     }
   })();
 
   const disabled =
     event.isOrganizer ||
     (event.userCancelCount ?? 0) >= 2 ||
-    !["pending", "cancelled", null].includes(event.userStatus ?? null);
+    ["approved", "checkedIn", "requestingCancellation"].includes(event.userStatus) ||
+    event.userStatus === "pending" ||
+    event.spotsLeft <= 0;
 
   return (
     <Card
@@ -100,7 +102,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
                   ? "bg-gray-300 text-gray-800 cursor-default"
                   : (event.userCancelCount ?? 0) >= 2
                   ? "bg-red-100 text-red-600 cursor-default"
-                  : !event.userStatus || event.userStatus === "cancelled"
+                  : (!event.userStatus || event.userStatus === "cancelled") && event.spotsLeft > 0
                   ? "bg-indigo-500 hover:bg-indigo-600 text-white"
                   : event.userStatus === "approved"
                   ? "bg-emerald-500 text-white cursor-default"
@@ -109,9 +111,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
                   : event.userStatus === "pending"
                   ? "bg-gray-300 text-gray-800 hover:bg-gray-400"
                   : event.userStatus === "requestingCancellation"
-                  ? "bg-gray-300 text-gray-800"
+                  ? "bg-gray-300 text-gray-800 cursor-default"
                   : ["denied", "noShow"].includes(event.userStatus)
                   ? "bg-red-100 text-red-600 cursor-default"
+                  : event.spotsLeft <= 0
+                  ? "bg-gray-300 text-gray-800 cursor-default"
                   : ""
               }
             `}
@@ -128,6 +132,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
           >
             {buttonLabel}
           </Button>
+
         </div>
       </CardContent>
     </Card>

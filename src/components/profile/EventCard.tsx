@@ -32,7 +32,11 @@ export default function EventCard({
   };
 
   // ✅ 只展示 approved 用户
-  const approvedParticipants = event.participants?.filter((p) => p.status === "approved") || [];
+  // ✅ 根据是否已过期展示不同的参与者状态
+  const relevantParticipants = event.participants?.filter((p) =>
+    isPast ? p.status === "checkedIn" : p.status === "approved"
+  ) || [];
+
 
   return (
     <div className="p-4 bg-white text-sm relative">
@@ -65,10 +69,10 @@ export default function EventCard({
       <div className="text-gray-700 space-y-1 mt-2">
         <div className="flex items-center gap-1 text-sm text-gray-500 mb-1 mt-5 italic">
           <Users size={14} className="text-gray-400" />
-          已加入（{approvedParticipants.length}人）
+          {isPast ? "已签到" : "已加入"}（{relevantParticipants.length}人）
         </div>
         <div className="flex flex-wrap gap-2 pt-1">
-          {approvedParticipants.map((p) => (
+          {relevantParticipants.map((p) => (
             <span
               key={p.user.id}
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-gray-600 text-xs shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-100 transition"
@@ -94,6 +98,8 @@ export default function EventCard({
               ? "等待审核"
               : userStatus === "checkedIn"
               ? "已签到"
+              : userStatus === "noShow"
+              ? "未到场"
               : "取消申请中"}
           </Button>
         ) : (

@@ -253,7 +253,7 @@ export default function EventDetailModal({
                           ? "bg-gray-300 text-gray-800 cursor-default"
                           : (event.userCancelCount ?? 0) >= 2
                           ? "bg-red-100 text-red-600 cursor-default"
-                          : !event.userStatus || event.userStatus === "cancelled"
+                          : (!event.userStatus || event.userStatus === "cancelled") && event.spotsLeft > 0
                           ? "bg-indigo-500 hover:bg-indigo-600 text-white"
                           : event.userStatus === "approved"
                           ? "bg-emerald-500 text-white cursor-default"
@@ -262,16 +262,19 @@ export default function EventDetailModal({
                           : event.userStatus === "pending"
                           ? "bg-gray-300 text-gray-800 hover:bg-gray-400"
                           : event.userStatus === "requestingCancellation"
-                          ? "bg-gray-300 text-gray-800"
+                          ? "bg-gray-300 text-gray-800 cursor-default"
                           : ["denied", "noShow"].includes(event.userStatus)
                           ? "bg-red-100 text-red-600 cursor-default"
+                          : event.spotsLeft <= 0
+                          ? "bg-gray-300 text-gray-800 cursor-default"
                           : ""
                       }
                     `}
                     disabled={
                       event.isOrganizer ||
                       (event.userCancelCount ?? 0) >= 2 ||
-                      !["pending", "cancelled", null].includes(event.userStatus || null)
+                      !["pending", "cancelled", null].includes(event.userStatus || null) ||
+                      event.spotsLeft <= 0
                     }
                     onClick={(e) => {
                       e.stopPropagation();
@@ -299,9 +302,7 @@ export default function EventDetailModal({
                       : event.userStatus === "approved"
                       ? "已加入"
                       : event.userStatus === "pending"
-                      ? event.spotsLeft === 0
-                        ? "候补中"
-                        : "等待审核"
+                      ? "等待通过"
                       : event.userStatus === "denied"
                       ? "报名被拒"
                       : event.userStatus === "checkedIn"
@@ -310,6 +311,8 @@ export default function EventDetailModal({
                       ? "未到场"
                       : event.userStatus === "requestingCancellation"
                       ? "取消申请中"
+                      : event.spotsLeft <= 0
+                      ? "已满"
                       : "立即报名"}
                   </Button>
                 </div>
