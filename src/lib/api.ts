@@ -1,6 +1,5 @@
 // ✅ src/lib/api.ts
 import axios from "axios";
-import router from "next/router"; // ✅ 注意这是 client-only 路由跳转
 
 export const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
@@ -35,7 +34,7 @@ axiosInstance.interceptors.response.use(
 );
 
 
-export const getUser = () => axiosInstance.get("/api/auth/me");
+export const getUser = () => axiosInstance.get("/api/auth/users/me");
 export const getCreatedEvents = () => axiosInstance.get("/api/events/my-created");
 export const getJoinedEvents = () => axiosInstance.get("/api/events/my-participated");
 export const getEvents = () => axiosInstance.get("/api/events");
@@ -69,7 +68,7 @@ export const registerUser = (formData: any) => {
     willPromote: formData.willPromote === "是",
   });
 };
-export const getUserCount = () => axiosInstance.get("/api/auth/count").then(res => res.data);
+export const getUserCount = () => axiosInstance.get("/api/auth/users/count").then(res => res.data);
 
 
 
