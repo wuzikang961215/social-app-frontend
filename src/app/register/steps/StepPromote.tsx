@@ -7,9 +7,6 @@ import { registerUser } from "@/lib/api";
 
 export default function StepPromote({
   formData,
-  setFormData,
-  onError,
-  errors,
 }: StepProps) {
   const router = useRouter();
 
@@ -41,6 +38,10 @@ export default function StepPromote({
         在这里，大家都在认真交朋友。<br />
         欢迎你成为其中的一员。
       </div>
+
+      <p className="text-sm text-gray-500 mt-2 italic tracking-wide">
+        （点击这里提交注册）
+      </p>
 
       {/* 提交按钮 */}
       <button onClick={handleSubmit}>
