@@ -34,7 +34,7 @@ export default function Login() {
         {/* 顶部 */}
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-gray-600">欢迎回来！</h1>
-          <p className="text-sm text-gray-500 mt-1">帮你找到真正的朋友</p>
+          <p className="text-sm text-gray-500 mt-1">让认真交朋友的人相遇</p>
         </div>
 
         {/* 登录表单 */}

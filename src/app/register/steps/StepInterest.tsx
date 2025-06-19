@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { StepProps } from "../page";
-import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRightCircle } from "lucide-react";
 import MainInterestSelector from "@/components/register/MainInterestSelector";
 import SubInterestSelector from "@/components/register/SubInterestSelector";
@@ -29,8 +28,6 @@ export default function StepInterest({
 }: StepProps) {
   const [selectedMain, setSelectedMain] = useState("");
   const [customText, setCustomText] = useState("");
-  const [hasClickedIntro, setHasClickedIntro] = useState(false);
-  const [showMainContent, setShowMainContent] = useState(false);
 
   const selectedSubs = formData.interests || [];
 
@@ -61,103 +58,69 @@ export default function StepInterest({
   };
 
   return (
-    <div
-      className="w-full max-w-md h-[365px] flex flex-col justify-start items-center text-center px-4 pt-3 pb-6 gap-2"
-      onClick={() => {
-        if (!hasClickedIntro) {
-          setHasClickedIntro(true);
-          setTimeout(() => setShowMainContent(true), 1000);
-        }
-      }}
-    >
-      <div className="text-base font-medium text-gray-800 leading-relaxed">
-        我们想了解你的兴趣喜好，帮你找到更合拍的朋友。
+    <div className="w-full max-w-md max-h-[90vh] overflow-auto flex flex-col justify-start items-center text-center px-4 pt-3 pb-4 gap-2 text-sm leading-snug">
+      <div className="font-medium text-gray-800">
+        你的兴趣爱好有哪些？
       </div>
 
-      <AnimatePresence>
-        {hasClickedIntro && (
-          <motion.div
-            className="text-base text-gray-800 font-medium"
-            initial={{ opacity: 0, y: 0 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            你的爱好是？
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div className="w-full">
+        {!selectedMain ? (
+          <MainInterestSelector
+            options={mainOptions}
+            onSelect={handleMainSelect}
+            selected={selectedMain}
+          />
+        ) : (
+          <div className="w-full flex flex-col items-center gap-3">
+            <button
+              onClick={() => setSelectedMain("")}
+              className="text-xs text-gray-500 hover:text-indigo-500 transition underline self-start"
+            >
+              ← 返回
+            </button>
 
-      {hasClickedIntro && showMainContent && (
-        <div className="w-full">
-          <AnimatePresence mode="wait">
-            {!selectedMain ? (
-              <motion.div
-                key="main"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
-                <MainInterestSelector options={mainOptions} onSelect={handleMainSelect} selected={selectedMain} />
-              </motion.div>
+            {selectedMain === "其他" ? (
+              <CustomInterestInput
+                value={customText}
+                onChange={(val) => {
+                  setCustomText(val);
+                  onError?.("interests", "");
+                }}
+                onAdd={(val) => {
+                  const trimmed = val.trim();
+                  if (!trimmed || selectedSubs.includes(trimmed) || selectedSubs.length >= 7) return;
+                  setFormData({ interests: [...selectedSubs, trimmed] });
+                  setCustomText("");
+                  onError?.("interests", "");
+                }}
+                disabledAdd={
+                  !customText.trim() ||
+                  selectedSubs.includes(customText.trim()) ||
+                  selectedSubs.length >= 7
+                }
+                error={errors?.interests}
+              />
             ) : (
-              <motion.div
-                key="sub"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="w-full flex flex-col items-center gap-4"
-              >
-                <button
-                  onClick={() => setSelectedMain("")}
-                  className="text-sm text-gray-500 hover:text-indigo-500 transition underline mb-2"
-                >
-                  ← 返回
-                </button>
-
-                {selectedMain === "其他" ? (
-                  <CustomInterestInput
-                    value={customText}
-                    onChange={(val) => {
-                      setCustomText(val);
-                      onError?.("interests", "");
-                    }}
-                    onAdd={(val) => {
-                      const trimmed = val.trim();
-                      if (!trimmed || selectedSubs.includes(trimmed) || selectedSubs.length >= 7) return;
-                      setFormData({ interests: [...selectedSubs, trimmed] });
-                      setCustomText("");
-                      onError?.("interests", "");
-                    }}
-                    disabledAdd={
-                      !customText.trim() ||
-                      selectedSubs.includes(customText.trim()) ||
-                      selectedSubs.length >= 7
-                    }
-                    error={errors?.interests}
-                  />
-                ) : (
-                  <SubInterestSelector
-                    options={subOptionsMap[selectedMain] || []}
-                    selected={selectedSubs}
-                    onToggle={handleSubToggle}
-                  />
-                )}
-              </motion.div>
+              <SubInterestSelector
+                options={subOptionsMap[selectedMain] || []}
+                selected={selectedSubs}
+                onToggle={handleSubToggle}
+              />
             )}
-          </AnimatePresence>
+          </div>
+        )}
 
-          <SelectedTags items={selectedSubs} onRemove={handleSubToggle} />
+        <SelectedTags items={selectedSubs} onRemove={handleSubToggle} />
 
-          {errors?.interests && (
-            <p className="text-sm text-orange-500 mt-1">{errors.interests}</p>
-          )}
+        {errors?.interests && (
+          <p className="text-xs text-orange-500 mt-1">{errors.interests}</p>
+        )}
 
-          <button onClick={handleNext}>
-            <ArrowRightCircle className="w-8 h-8 text-indigo-500 hover:scale-110 transition mt-3" />
-          </button>
-        </div>
-      )}
+         {/* 按钮 */}
+        <button onClick={handleNext} className="mt-2">
+          <ArrowRightCircle className="w-8 h-8 text-indigo-500 hover:scale-110 transition mt-1" />
+        </button>
+      </div>
     </div>
   );
 }

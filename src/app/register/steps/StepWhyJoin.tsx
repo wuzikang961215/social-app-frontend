@@ -27,7 +27,7 @@ export default function StepWhyJoin({
       className="w-full max-w-md flex flex-col items-center text-center gap-6"
     >
       <div className="text-base font-semibold text-gray-800">
-        你为什么想要加入我们的高质量搭子社群？
+        你为什么想要加入我们？
       </div>
 
       <div className="w-full text-left">

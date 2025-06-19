@@ -18,27 +18,27 @@ export default function CustomInterestInput({
 }: Props) {
   return (
     <div className="w-full flex flex-col items-center gap-2">
-      <div className="flex items-center gap-2 w-[200px]">
+      <div className="flex items-center gap-2 w-[180px]">
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="请输入你的兴趣"
-          className="flex-1 px-4 py-2 border rounded-lg bg-gray-100 text-center shadow-inner"
+          placeholder="请输入兴趣"
+          className="flex-1 px-2 py-1 text-xs border rounded-md bg-gray-100 text-center shadow-inner"
         />
         <button
           onClick={() => onAdd(value.trim())}
           disabled={disabledAdd}
-          className={`p-2 rounded-full border transition ${
+          className={`p-1 rounded-full border transition ${
             disabledAdd
               ? "bg-gray-200 text-gray-400 cursor-not-allowed"
               : "bg-indigo-500 text-white hover:bg-indigo-600"
           }`}
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3 h-3" />
         </button>
       </div>
-      {error && <p className="text-sm text-orange-500 italic">{error}</p>}
+      {error && <p className="text-xs text-orange-500 italic">{error}</p>}
     </div>
   );
 }

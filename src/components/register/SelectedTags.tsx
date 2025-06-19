@@ -10,17 +10,17 @@ export default function SelectedTags({ items, onRemove }: Props) {
   if (items.length === 0) return null;
 
   return (
-    <div className="mt-3 text-sm text-gray-600">
+    <div className="mt-2 text-xs text-gray-600">
       已选兴趣（{items.length} / 7）:
-      <div className="flex flex-wrap justify-center mt-1 gap-2">
+      <div className="flex flex-wrap justify-center mt-1 gap-1.5">
         {items.map((item) => (
           <div
             key={item}
-            className="flex items-center gap-1 bg-gray-100 border border-gray-300 rounded-full px-3 py-1 text-sm"
+            className="flex items-center gap-1 bg-gray-100 border border-gray-300 rounded-full px-2 py-[3px] text-xs"
           >
             {item}
             <X
-              className="w-4 h-4 text-gray-500 cursor-pointer hover:text-black"
+              className="w-3.5 h-3.5 text-gray-500 cursor-pointer hover:text-black"
               onClick={() => onRemove(item)}
             />
           </div>

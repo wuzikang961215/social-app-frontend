@@ -9,14 +9,14 @@ interface Props {
 
 export default function SubInterestSelector({ options, selected, onToggle }: Props) {
   return (
-    <div className="flex flex-wrap gap-2 justify-center">
+    <div className="flex flex-wrap gap-1.5 justify-center">
       {options.map((item) => {
         const isSelected = selected.includes(item);
         return (
           <button
             key={item}
             onClick={() => onToggle(item)}
-            className={`relative px-3 py-2 text-sm border rounded-full transition-all
+            className={`relative px-2.5 py-[6px] text-xs border rounded-full transition-all
               ${
                 isSelected
                   ? "bg-indigo-500 text-white border-indigo-500"
@@ -26,7 +26,7 @@ export default function SubInterestSelector({ options, selected, onToggle }: Pro
             {item}
             {isSelected && (
               <X
-                className="absolute -top-2 -right-2 w-4 h-4 text-white bg-gray-600 rounded-full p-0.5"
+                className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 text-white bg-gray-600 rounded-full p-[1px]"
                 onClick={(e) => {
                   e.stopPropagation();
                   onToggle(item);

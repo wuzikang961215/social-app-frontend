@@ -1,7 +1,7 @@
 "use client";
 import { StepProps } from "../page";
 import { ArrowRightCircle } from "lucide-react";
-import { checkUsernameExists } from "@/lib/api"; // ✅ 引入封装的 axios 请求
+import { checkUsernameExists } from "@/lib/api";
 
 export default function StepUsername({
   formData,
@@ -32,7 +32,7 @@ export default function StepUsername({
   };
 
   return (
-    <div className="w-full max-w-sm flex flex-col items-center gap-2 text-center">
+    <div className="w-full max-w-sm flex flex-col items-center gap-2 text-center px-4">
       <label className="block font-medium text-gray-700 text-m">
         设置一个用户名
       </label>
@@ -44,8 +44,8 @@ export default function StepUsername({
           setFormData({ username: e.target.value });
           onError?.("username", ""); // ✅ 清除错误提示
         }}
-        placeholder="比如：peterWu"
-        className="w-55 px-4 py-2 rounded-xl bg-gray-100 shadow-inner text-center"
+        placeholder="例如：exampleUser"
+        className="w-full max-w-[220px] px-4 py-2 rounded-xl bg-gray-100 shadow-inner text-center"
       />
       {errors?.username && (
         <p className="text-sm text-orange-500 mt-2 italic tracking-wide">
