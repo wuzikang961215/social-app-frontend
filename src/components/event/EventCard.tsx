@@ -22,9 +22,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
       case "checkedIn":
         return "已签到";
       case "pending":
-        return "等待通过";
       case "denied":
-        return "报名被拒";
+        return "等待通过";
       case "noShow":
         return "未到场";
       case "requestingCancellation":
@@ -38,17 +37,12 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
     event.isOrganizer ||
     (event.userCancelCount ?? 0) >= 2 ||
     ["approved", "checkedIn", "requestingCancellation"].includes(event.userStatus) ||
-    event.userStatus === "pending" ||
-    event.spotsLeft <= 0;
+    (event.spotsLeft <= 0 && !["pending", "denied"].includes(event.userStatus));
 
   return (
     <Card
       onClick={onClick}
-      className={`
-        rounded-2xl border transition-shadow shadow-md hover:shadow-lg
-        hover:scale-[1.01] transition-transform cursor-pointer
-        ${event.isVipOrganizer ? "border-blue-300 bg-blue-50" : "border-gray-200 bg-white"}
-      `}
+      className="rounded-2xl border transition-shadow shadow-md hover:shadow-lg hover:scale-[1.01] transition-transform cursor-pointer border-gray-200 bg-white"
     >
       <CardContent className="p-7 space-y-4">
         {/* 标题 + 分类 */}
@@ -108,11 +102,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
                   ? "bg-emerald-500 text-white cursor-default"
                   : event.userStatus === "checkedIn"
                   ? "bg-cyan-500 text-white cursor-default"
-                  : event.userStatus === "pending"
+                  : event.userStatus === "pending" || event.userStatus === "denied"
                   ? "bg-gray-300 text-gray-800 hover:bg-gray-400"
                   : event.userStatus === "requestingCancellation"
                   ? "bg-gray-300 text-gray-800 cursor-default"
-                  : ["denied", "noShow"].includes(event.userStatus)
+                  : event.userStatus === "noShow"
                   ? "bg-red-100 text-red-600 cursor-default"
                   : event.spotsLeft <= 0
                   ? "bg-gray-300 text-gray-800 cursor-default"
@@ -125,7 +119,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
               if (disabled) return;
               if (!event.userStatus || event.userStatus === "cancelled") {
                 onJoinClick?.();
-              } else if (event.userStatus === "pending") {
+              } else if (event.userStatus === "pending" || event.userStatus === "denied") {
                 onCancelClick?.();
               }
             }}

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -11,19 +10,13 @@ import CancelModal from "@/components/event/CancelModal";
 import ReviewAndCheckinModal from "@/components/event/ReviewAndCheckinModal";
 import MyProfileModal from "@/components/profile/MyProfileModal";
 import EventCard from "@/components/event/EventCard";
+import NotificationBell from "@/components/notification/NotificationBell";
+import NotificationsModal from "@/components/notification/NotificationsModal";
 
-import {
-  getUser,
-  getCreatedEvents,
-  getJoinedEvents,
-  getEvents,
-  joinEvent,
-  cancelEvent,
-} from "@/lib/api";
-
-import { formatTimeRange } from "@/lib/format";
-
-
+import { useEvents } from "@/hooks/useEvents";
+import { useUserInfo } from "@/hooks/useUserInfo";
+import { useModals } from "@/hooks/useModals";
+import { api } from "@/lib/api";
 
 export interface Event {
   id: string;
@@ -52,7 +45,6 @@ export interface Event {
     user: {
       id: string;
       username: string;
-      score?: number;
     };
     status:
       | "pending"
@@ -65,7 +57,6 @@ export interface Event {
   }[];
   userStatus?: string | null;
   userCancelCount?: number;
-  isVipOrganizer: boolean;
   isOrganizer: boolean;
 }
 
@@ -75,28 +66,51 @@ interface UserInfo {
   idealBuddy?: string;
   interests?: string[];
   whyJoin?: string;
-  score?: number;
 }
 
 export default function HomePage() {
-  const router = useRouter();
-
-  const [events, setEvents] = useState<Event[]>([]);
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [createdEvents, setCreatedEvents] = useState<Event[]>([]);
-  const [joinedEvents, setJoinedEvents] = useState<Event[]>([]);
-
-  const [showModal, setShowModal] = useState(false);
-  const [showDetail, setShowDetail] = useState(false);
-  const [showReviewModal, setShowReviewModal] = useState(false);
-  const [showCancelModal, setShowCancelModal] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
-
+  const menuRef = useRef<HTMLDivElement>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("首页");
   const [showLaunchMenu, setShowLaunchMenu] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
 
+  // Use custom hooks
+  const { 
+    userInfo, 
+    createdEvents, 
+    joinedEvents, 
+    pendingReviewCount, 
+    pendingCheckinCount,
+    loading: userLoading,
+    logout,
+    checkPendingReviews,
+    refreshJoinedEvents 
+  } = useUserInfo();
+  
+  const { 
+    events, 
+    loading: eventsLoading, 
+    fetchEvents, 
+    joinEvent: joinEventAction, 
+    cancelEvent: cancelEventAction 
+  } = useEvents({ userId: userInfo?.id });
+  
+  const {
+    showModal,
+    showDetail,
+    showCancelModal,
+    showReviewModal,
+    showProfileModal,
+    showNotificationsModal,
+    setShowModal,
+    setShowDetail,
+    setShowCancelModal,
+    setShowReviewModal,
+    setShowProfileModal,
+    setShowNotificationsModal,
+  } = useModals();
+
+  // Handle click outside menu
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -118,136 +132,27 @@ export default function HomePage() {
   const uniqueCategories = Array.from(new Set(events.map((e) => e.category)));
   const categories = ["首页", ...uniqueCategories];
 
-  const canCreateEvent = userInfo?.score !== undefined && userInfo.score >= 30;
-  const isScoreLoaded = userInfo?.score !== undefined;
+  const canCreateEvent = true;
+  const isScoreLoaded = true;
 
   const filteredEvents =
     selectedCategory === "首页"
       ? events.filter((e) => !e.expired)
       : events.filter((e) => e.category === selectedCategory && !e.expired);
 
-  const getUserPriority = (event: Event): number => {
-    if (event.isOrganizer) return 3;
-    const status = event.userStatus;
-    if (!status || status === "cancelled") return 0;
-    if (status === "pending") return 1;
-    if (status === "approved" || status === "checkedIn") return 2;
-    return 4;
-  };
-
   const handleLaunchClick = () => {
-    if (!canCreateEvent) {
-      toast.error(`积分不足，还需 ${30 - (userInfo?.score || 0)} 分才可发起活动`);
-      return;
-    }
     setShowLaunchMenu((prev) => !prev);
   };
-
-
-  useEffect(() => {
-    const loadData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.replace("/login");
-        return;
-      }
-
-      try {
-        const [userRes, createdRes, joinedRes] = await Promise.all([
-          getUser(),
-          getCreatedEvents(),
-          getJoinedEvents(),
-        ]);        
-        setUserInfo(userRes.data);
-        setCreatedEvents(createdRes.data);
-        setJoinedEvents(joinedRes.data);
-
-        const eventsRes = await getEvents();
-        const now = new Date();
-        const currentUserId = userRes.data.id;
-
-        const transformed: Event[] = eventsRes.data.map((e: any): Event => {
-          const date = new Date(e.startTime);
-          const countdown = Math.floor((date.getTime() - now.getTime()) / 3600000);
-          const approvedCount = e.participants.filter((p: any) => p.status === "approved").length;
-          const currentUser = e.participants.find((p: any) => p.user.id === currentUserId);
-
-          return {
-            id: e.id,
-            title: e.title,
-            time: formatTimeRange(e.startTime, e.durationMinutes),
-            startTime: e.startTime,
-            durationMinutes: e.durationMinutes,
-            location: e.location,
-            category: e.category,
-            description: e.description,
-            tags: e.tags,
-            maxParticipants: e.maxParticipants,
-            spotsLeft: e.maxParticipants - approvedCount,
-            expired: e.expired,
-            countdown,
-            creator: e.creator,
-            organizer: {
-              name: e.creator?.username || "等待确认",
-              avatar: "/avatar1.png",
-              id: e.creator?.id || "unknown",
-            },
-            participants: (e.participants || []).map((p: any) => ({
-              user: {
-                id: p.user.id,
-                username: p.user.username,
-                score: p.user.score,
-              },
-              status: p.status,
-            })),
-            userStatus: currentUser?.status ?? null,
-            userCancelCount: currentUser?.cancelCount || 0,
-            isVipOrganizer: false,
-            isOrganizer: e.creator?.id === currentUserId,
-          };
-        });
-
-        transformed.sort((a, b) => {
-          const aPriority = getUserPriority(a);
-          const bPriority = getUserPriority(b);
-          if (aPriority !== bPriority) return aPriority - bPriority;
-
-          const aFull = a.spotsLeft <= 0;
-          const bFull = b.spotsLeft <= 0;
-          if (aFull && !bFull) return 1;
-          if (!aFull && bFull) return -1;
-
-          const aScore = a.countdown + a.spotsLeft * 2;
-          const bScore = b.countdown + b.spotsLeft * 2;
-          return aScore - bScore;
-        });
-
-        setEvents(transformed);
-      } catch (err) {
-        console.error("加载失败", err);
-      
-        if (err instanceof Error && err.message.includes("Token")) {
-          localStorage.removeItem("token");
-          router.replace("/login");
-        }
-      }      
-    };
-
-    loadData();
-  }, [router]);
 
   const handleConfirm = async () => {
     if (!selectedEvent) return;
     try {
-      const data = await joinEvent(selectedEvent.id);
+      const data = await joinEventAction(selectedEvent.id);
       toast.success(data.message || "报名成功！");
-      setEvents((prev) =>
-        prev.map((ev) =>
-          ev.id === selectedEvent.id ? { ...ev, userStatus: "pending" } : ev
-        )
-      );
       setShowModal(false);
       setShowDetail(false);
+      // Refresh joined events to update profile
+      await refreshJoinedEvents();
     } catch {
       toast.error("报名失败，请稍后再试");
     }
@@ -256,26 +161,16 @@ export default function HomePage() {
   const handleCancel = async () => {
     if (!selectedEvent) return;
     try {
-      const data = await cancelEvent(selectedEvent.id);
+      const data = await cancelEventAction(selectedEvent.id);
       toast.success(data.message || "取消成功");
-      setEvents((prev) =>
-        prev.map((ev) =>
-          ev.id === selectedEvent.id
-            ? {
-                ...ev,
-                userStatus: "cancelled",
-                userCancelCount: (ev.userCancelCount || 0) + 1,
-              }
-            : ev
-        )
-      );
       setShowCancelModal(false);
       setShowDetail(false);
+      // Refresh joined events to update profile
+      await refreshJoinedEvents();
     } catch {
       toast.error("取消失败，请稍后再试");
     }
   };
-  
 
   return (
     <div className="p-6 space-y-8">
@@ -301,20 +196,25 @@ export default function HomePage() {
         <div className="relative inline-block mt-4" ref={menuRef}>
           <button
             onClick={handleLaunchClick}
-            className={`flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-full transition ${
+            className={`flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-full transition relative ${
               canCreateEvent
                 ? "text-indigo-700 bg-indigo-100 hover:bg-indigo-200"
                 : "text-gray-400 bg-gray-200"
             }`}
           >
             <span className="text-lg">➕</span> 组织活动
+            {(pendingReviewCount > 0 || pendingCheckinCount > 0) && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold animate-pulse">
+                {pendingReviewCount + pendingCheckinCount}
+              </span>
+            )}
           </button>
 
           {showLaunchMenu && canCreateEvent && (
             <div className="absolute z-50 mt-2 left-0 bg-white rounded-lg shadow-lg border w-40">
               <button
                 onClick={() => {
-                  router.push("events/create");
+                  window.location.href = "events/create";
                   setShowLaunchMenu(false);
                 }}
                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -326,53 +226,84 @@ export default function HomePage() {
                   setShowReviewModal(true);
                   setShowLaunchMenu(false);
                 }}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 relative flex items-center justify-between"
               >
-                审核与签到
+                <span>审核与签到</span>
+                <div className="flex items-center gap-1">
+                  {pendingReviewCount > 0 && (
+                    <span className="bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                      {pendingReviewCount}
+                    </span>
+                  )}
+                  {pendingCheckinCount > 0 && (
+                    <span className="bg-green-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                      {pendingCheckinCount}
+                    </span>
+                  )}
+                </div>
               </button>
             </div>
           )}
         </div>
       )}
 
-      {/* 登出按钮 */}
+      {/* Header with notifications and logout */}
       <div className="flex justify-between items-center mb-6">
-        <LogOut
-          onClick={() => {
-            localStorage.removeItem("token");
-            router.push("/login");
-          }}
-          className="absolute top-4 right-4 w-5 h-5 text-gray-500 hover:text-gray-800 cursor-pointer"
-        />
+        <div className="absolute top-4 right-4 flex items-center gap-2">
+          <NotificationBell 
+            onClick={() => setShowNotificationsModal(true)} 
+          />
+          <LogOut
+            onClick={logout}
+            className="w-5 h-5 text-gray-500 hover:text-gray-800 cursor-pointer"
+          />
+        </div>
       </div>
 
       {/* 我的按钮 */}
       <button
         onClick={() => setShowProfileModal(true)}
-        className="absolute top-20 right-4 flex gap-1 px-3 py-1.5 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full transition"
+        disabled={!userInfo || userLoading}
+        className={`absolute top-20 right-4 flex gap-1 px-3 py-1.5 text-sm rounded-full transition ${
+          !userInfo || userLoading 
+            ? "text-gray-400 bg-gray-100 cursor-not-allowed" 
+            : "text-gray-700 bg-gray-100 hover:bg-gray-200"
+        }`}
       >
         <span className="text-base">👤</span> 我的
       </button>
 
       {/* 活动卡片 */}
-      {filteredEvents.map((event) => (
-        <EventCard
-          key={event.id}
-          event={event}
-          onClick={() => {
-            setSelectedEvent(event);
-            setShowDetail(true);
-          }}
-          onJoinClick={() => {
-            setSelectedEvent(event);
-            setShowModal(true); // 报名弹窗
-          }}
-          onCancelClick={() => {
-            setSelectedEvent(event);
-            setShowCancelModal(true); // 取消报名弹窗
-          }}
-        />      
-      ))}
+      <div className="space-y-4">
+        {eventsLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+          </div>
+        ) : filteredEvents.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            暂无活动
+          </div>
+        ) : (
+          filteredEvents.map((event, index) => (
+            <EventCard
+              key={event.id || `event-${index}`}
+              event={event}
+              onClick={() => {
+                setSelectedEvent(event);
+                setShowDetail(true);
+              }}
+              onJoinClick={() => {
+                setSelectedEvent(event);
+                setShowModal(true); // 报名弹窗
+              }}
+              onCancelClick={() => {
+                setSelectedEvent(event);
+                setShowCancelModal(true); // 取消报名弹窗
+              }}
+            />      
+          ))
+        )}
+      </div>
 
       {/* 弹窗区域 */}
       {selectedEvent && (
@@ -406,13 +337,51 @@ export default function HomePage() {
         </>
       )}
 
-      <ReviewAndCheckinModal open={showReviewModal} onClose={() => setShowReviewModal(false)} />
-      <MyProfileModal
-        open={showProfileModal}
-        onClose={() => setShowProfileModal(false)}
-        userInfo={userInfo!}
-        createdEvents={createdEvents}
-        joinedEvents={joinedEvents}
+      <ReviewAndCheckinModal 
+        open={showReviewModal} 
+        onClose={() => {
+          setShowReviewModal(false);
+          fetchEvents(); // Refresh events after closing modal
+          // Refresh pending count
+          checkPendingReviews();
+        }}
+        onUpdate={() => {
+          fetchEvents();
+          // Update pending count immediately
+          checkPendingReviews();
+        }}
+      />
+      {userInfo && (
+        <MyProfileModal
+          open={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          userInfo={userInfo}
+          createdEvents={createdEvents}
+          joinedEvents={joinedEvents}
+          onCancelEvent={async (eventId) => {
+            try {
+              const data = await cancelEventAction(eventId);
+              toast.success(data.message || "取消成功");
+              // Refresh joined events to update profile
+              await refreshJoinedEvents();
+            } catch {
+              toast.error("取消失败，请稍后再试");
+            }
+          }}
+          onUserUpdate={(updatedUser) => {
+            // Update userInfo state to reflect changes immediately
+            // This will re-render the modal with updated data
+            window.dispatchEvent(new Event('user-update'));
+          }}
+        />
+      )}
+      <NotificationsModal
+        open={showNotificationsModal}
+        onClose={() => setShowNotificationsModal(false)}
+        onUpdate={() => {
+          // Force refresh the notification bell count
+          window.dispatchEvent(new Event('notification-update'));
+        }}
       />
     </div>
   );

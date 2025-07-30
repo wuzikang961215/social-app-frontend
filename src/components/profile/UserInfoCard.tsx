@@ -1,42 +1,212 @@
-import { User, HeartHandshake, BadgeCheck } from "lucide-react";
+import { useState } from "react";
+import { User, HeartHandshake, BadgeCheck, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { api } from "@/lib/api";
+import toast from "react-hot-toast";
 
 export default function UserInfoCard({
   user,
+  onUpdate,
 }: {
   user: {
+    id: string;
     username: string;
     email?: string;
-    score?: number;
-    level?: number;
     idealBuddy?: string;
     whyJoin?: string;
     interests?: string[];
-    isVIP?: boolean;
   };
+  onUpdate?: (updatedUser: any) => void;
 }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    idealBuddy: user.idealBuddy || "",
+    whyJoin: user.whyJoin || "",
+    interests: user.interests || [],
+  });
+  const [interestInput, setInterestInput] = useState("");
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      const response = await api.user.update(user.id, formData);
+      toast.success("资料更新成功");
+      setIsEditing(false);
+      // Update the user object directly
+      Object.assign(user, formData);
+      if (onUpdate) {
+        onUpdate({ ...user, ...formData });
+      }
+    } catch (error) {
+      toast.error("更新失败，请稍后再试");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setFormData({
+      idealBuddy: user.idealBuddy || "",
+      whyJoin: user.whyJoin || "",
+      interests: user.interests || [],
+    });
+    setInterestInput("");
+    setIsEditing(false);
+  };
+
+  const addInterest = () => {
+    if (interestInput.trim() && !formData.interests.includes(interestInput.trim())) {
+      setFormData({
+        ...formData,
+        interests: [...formData.interests, interestInput.trim()],
+      });
+      setInterestInput("");
+    }
+  };
+
+  const removeInterest = (interest: string) => {
+    setFormData({
+      ...formData,
+      interests: formData.interests.filter((i) => i !== interest),
+    });
+  };
+
+  if (isEditing) {
+    return (
+      <div className="rounded-xl bg-white p-4 text-sm text-gray-700 space-y-3 border border-indigo-300 shadow-sm">
+        <div className="flex items-center gap-2 font-semibold">
+          <User size={18} className="text-gray-500" />
+          {user.username}
+        </div>
+        
+        <div className="space-y-2">
+          <label className="flex items-start gap-2">
+            <HeartHandshake size={16} className="text-indigo-400 mt-1" />
+            <div className="flex-1">
+              <span className="text-xs text-gray-600">想遇见的朋友：</span>
+              <input
+                type="text"
+                value={formData.idealBuddy}
+                onChange={(e) => setFormData({ ...formData, idealBuddy: e.target.value })}
+                className="w-full mt-1 px-2 py-1 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="描述你想认识什么样的朋友"
+              />
+            </div>
+          </label>
+          
+          <div>
+            <label className="flex items-start gap-2">
+              <BadgeCheck size={16} className="text-green-400 mt-1" />
+              <div className="flex-1">
+                <span className="text-xs text-gray-600">爱好：</span>
+                <div className="flex flex-wrap gap-1 mt-1 mb-2">
+                  {formData.interests.map((interest, index) => (
+                    <span
+                      key={`${interest}-${index}`}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-xs"
+                    >
+                      {interest}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          removeInterest(interest);
+                        }}
+                        className="text-gray-500 hover:text-red-500 ml-1"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-1">
+                  <input
+                    type="text"
+                    value={interestInput}
+                    onChange={(e) => setInterestInput(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addInterest())}
+                    className="flex-1 px-2 py-1 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="添加爱好，按回车确认"
+                  />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addInterest();
+                    }}
+                    className="px-2 py-1 text-xs bg-indigo-500 text-white rounded hover:bg-indigo-600"
+                  >
+                    添加
+                  </button>
+                </div>
+              </div>
+            </label>
+          </div>
+          
+          <div>
+            <span className="text-xs text-gray-600">为什么想加入：</span>
+            <textarea
+              value={formData.whyJoin}
+              onChange={(e) => setFormData({ ...formData, whyJoin: e.target.value })}
+              className="w-full mt-1 px-2 py-1 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              rows={3}
+              placeholder="分享你加入的原因"
+            />
+          </div>
+        </div>
+        
+        <div className="pt-2 flex justify-end gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-xs px-3 py-1 rounded-full"
+            onClick={handleCancel}
+            disabled={loading}
+          >
+            <X size={14} className="mr-1" /> 取消
+          </Button>
+          <Button
+            size="sm"
+            className="text-xs px-3 py-1 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white"
+            onClick={handleSave}
+            disabled={loading}
+          >
+            {loading ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <>
+                <Save size={14} className="mr-1" /> 保存
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-xl bg-white p-4 text-sm text-gray-700 space-y-2 border border-gray-200 shadow-sm">
       <div className="flex items-center gap-2 font-semibold">
         <User size={18} className="text-gray-500" />
         {user.username}
-        <span className="text-xs text-gray-500 ml-2">Lv.{user.level}</span>
       </div>
       <div className="flex items-start gap-2">
         <HeartHandshake size={16} className="text-indigo-400 mt-0.5" />
-        <span>想遇见的朋友：“{user.idealBuddy || "未填写"}”</span>
+        <span>想遇见的朋友：&ldquo;{user.idealBuddy || "未填写"}&rdquo;</span>
       </div>
       <div className="flex items-start gap-2">
         <BadgeCheck size={16} className="text-green-400 mt-0.5" />
         <span>爱好：{user.interests?.join("、") || "未填写"}</span>
       </div>
-      <p className="italic text-gray-500 text-sm">“{user.whyJoin || "TA 还没填写为什么想加入"}”</p>
+      <p className="italic text-gray-500 text-sm">&ldquo;{user.whyJoin || "TA 还没填写为什么想加入"}&rdquo;</p>
       <div className="pt-2 flex justify-end">
         <Button
           size="sm"
           variant="outline"
           className="text-xs px-3 py-1 rounded-full border-gray-300 text-gray-600 hover:bg-gray-100"
-          onClick={() => alert("弹出修改资料 Modal（待实现）")}
+          onClick={() => setIsEditing(true)}
         >
           ✏️ 修改资料
         </Button>

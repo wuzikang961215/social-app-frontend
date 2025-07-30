@@ -12,8 +12,9 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { getUserById } from "@/lib/api"; // ✅ 替代 axios + BASE_URL
+import { getUserById, api } from "@/lib/api"; // ✅ 替代 axios + BASE_URL
 import type { Event as AppEvent } from "@/app/page";
+import UserDetailPopover from "@/components/user/UserDetailPopover";
 
 type EventDetailModalProps = {
   open: boolean;
@@ -29,13 +30,11 @@ type EventDetailModalProps = {
     organizer?: {
       id?: string;
       name?: string;
-      level?: number;
     };
     participants?: {
       user: {
         id: string;
         username: string;
-        level?: number;
       };
       status: string;
       cancelCount?: number;
@@ -73,14 +72,12 @@ function toFullEvent(event: EventDetailModalProps["event"]): AppEvent {
       user: {
         id: p.user.id,
         username: p.user.username,
-        score: 0, // 补字段
       },
       status: p.status as any,
       cancelCount: p.cancelCount ?? 0,
     })) || [],
     userStatus: event.userStatus ?? null,
     userCancelCount: event.userCancelCount ?? 0,
-    isVipOrganizer: false,
     isOrganizer: event.isOrganizer ?? false,
   };
 }
@@ -97,18 +94,36 @@ export default function EventDetailModal({
     hobbies?: string[];
     whyJoin?: string;
   }>({});
+  
+  const [organizerStats, setOrganizerStats] = useState<{
+    createdCount: number;
+    participatedCount: number;
+    attendanceRate: number;
+  } | null>(null);
+  
+  const [selectedUser, setSelectedUser] = useState<{
+    id: string;
+    username: string;
+    element: HTMLElement | null;
+  } | null>(null);
 
   useEffect(() => {
     const fetchOrganizer = async () => {
       if (event.organizer?.id) {
         try {
           const token = localStorage.getItem("token");
-          const res = await getUserById(event.organizer.id);
+          const [userRes, statsRes] = await Promise.all([
+            getUserById(event.organizer.id),
+            api.user.getStats(event.organizer.id)
+          ]);
+          
           setOrganizerInfo({
-            idealBuddy: res.data.idealBuddy,
-            hobbies: res.data.interests,
-            whyJoin: res.data.whyJoin,
+            idealBuddy: userRes.data.idealBuddy,
+            hobbies: userRes.data.interests,
+            whyJoin: userRes.data.whyJoin,
           });
+          
+          setOrganizerStats(statsRes);
         } catch (err) {
           console.error("获取主办人信息失败", err);
         }
@@ -124,6 +139,7 @@ export default function EventDetailModal({
   const tags = event.tags || [];
 
   return (
+    <>
     <AnimatePresence>
       {open && (
         <motion.div
@@ -203,16 +219,49 @@ export default function EventDetailModal({
                   <User size={18} className="text-gray-500" />
                   主办人
                 </div>
-                <div>
-                  {event.organizer?.name || "未命名"}{" "}
-                  <span className="text-xs text-gray-500">
-                    Lv.{event.organizer?.level ?? "?"}
+                <div className="flex items-center gap-4">
+                  <span className="font-medium">
+                    {event.organizer?.name || "未命名"}
                   </span>
+                  {organizerStats && (
+                    <div className="flex items-center gap-3 text-xs">
+                      <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full">
+                        发起 {organizerStats.createdCount} 场
+                      </span>
+                    </div>
+                  )}
                 </div>
+                
+                {/* Attendance Rate Bar */}
+                {organizerStats && organizerStats.participatedCount > 0 && (
+                  <div className="bg-white/50 rounded-lg p-2">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-gray-600">到场率</span>
+                      <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${
+                        organizerStats.attendanceRate >= 90 ? "text-green-700 bg-green-100" :
+                        organizerStats.attendanceRate >= 70 ? "text-yellow-700 bg-yellow-100" : 
+                        "text-red-700 bg-red-100"
+                      }`}>
+                        {organizerStats.attendanceRate}%
+                      </span>
+                    </div>
+                    
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full transition-all duration-700 ${
+                          organizerStats.attendanceRate >= 90 ? "bg-green-500" :
+                          organizerStats.attendanceRate >= 70 ? "bg-yellow-500" : "bg-red-500"
+                        }`}
+                        style={{ width: `${organizerStats.attendanceRate}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+                
                 <div className="flex items-start gap-2">
                   <HeartHandshake size={16} className="text-indigo-400 mt-0.5" />
                   <span>
-                    想遇见的朋友：“{organizerInfo.idealBuddy || "未填写"}”
+                    想遇见的朋友：&ldquo;{organizerInfo.idealBuddy || "未填写"}&rdquo;
                   </span>
                 </div>
                 <div className="flex items-start gap-2">
@@ -236,8 +285,13 @@ export default function EventDetailModal({
                     <div
                       key={p.user.id}
                       className="px-3 py-1 rounded-lg text-sm text-gray-700 bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition cursor-pointer"
+                      onClick={(e) => setSelectedUser({ 
+                        id: p.user.id, 
+                        username: p.user.username,
+                        element: e.currentTarget
+                      })}
                     >
-                      {p.user.username} · Lv.{p.user.level}
+                      {p.user.username}
                     </div>
                   ))}
                 </div>
@@ -259,11 +313,11 @@ export default function EventDetailModal({
                           ? "bg-emerald-500 text-white cursor-default"
                           : event.userStatus === "checkedIn"
                           ? "bg-cyan-500 text-white cursor-default"
-                          : event.userStatus === "pending"
+                          : event.userStatus === "pending" || event.userStatus === "denied"
                           ? "bg-gray-300 text-gray-800 hover:bg-gray-400"
                           : event.userStatus === "requestingCancellation"
                           ? "bg-gray-300 text-gray-800 cursor-default"
-                          : ["denied", "noShow"].includes(event.userStatus ?? "")
+                          : event.userStatus === "noShow"
                           ? "bg-red-100 text-red-600 cursor-default"
                           : event.spotsLeft <= 0
                           ? "bg-gray-300 text-gray-800 cursor-default"
@@ -273,8 +327,8 @@ export default function EventDetailModal({
                     disabled={
                       event.isOrganizer ||
                       (event.userCancelCount ?? 0) >= 2 ||
-                      !["pending", "cancelled", null].includes(event.userStatus || null) ||
-                      event.spotsLeft <= 0
+                      !["pending", "denied", "cancelled", null].includes(event.userStatus || null) ||
+                      (event.spotsLeft <= 0 && !["pending", "denied"].includes(event.userStatus || ""))
                     }
                     onClick={(e) => {
                       e.stopPropagation();
@@ -282,7 +336,7 @@ export default function EventDetailModal({
                       if (
                         event.isOrganizer ||
                         (event.userCancelCount ?? 0) >= 2 ||
-                        !["pending", "cancelled", null].includes(event.userStatus || null)
+                        !["pending", "denied", "cancelled", null].includes(event.userStatus || null)
                       )
                         return;
 
@@ -290,7 +344,7 @@ export default function EventDetailModal({
 
                       if (!event.userStatus || event.userStatus === "cancelled") {
                         onJoinClick?.(fullEvent);
-                      } else if (event.userStatus === "pending") {
+                      } else if (event.userStatus === "pending" || event.userStatus === "denied") {
                         onCancelClick?.(fullEvent);
                       }
                     }}
@@ -301,10 +355,8 @@ export default function EventDetailModal({
                       ? "无法加入"
                       : event.userStatus === "approved"
                       ? "已加入"
-                      : event.userStatus === "pending"
+                      : event.userStatus === "pending" || event.userStatus === "denied"
                       ? "等待通过"
-                      : event.userStatus === "denied"
-                      ? "报名被拒"
                       : event.userStatus === "checkedIn"
                       ? "已签到"
                       : event.userStatus === "noShow"
@@ -322,5 +374,17 @@ export default function EventDetailModal({
         </motion.div>
       )}
     </AnimatePresence>
+    
+    {/* User Detail Popover - Outside AnimatePresence to avoid key conflicts */}
+    {selectedUser && (
+      <UserDetailPopover
+        open={!!selectedUser}
+        onClose={() => setSelectedUser(null)}
+        userId={selectedUser.id}
+        username={selectedUser.username}
+        anchorEl={selectedUser.element}
+      />
+    )}
+    </>
   );
 }

@@ -105,7 +105,7 @@ export default function RegisterPage() {
     setTimeout(() => {
       isTransitioningRef.current = false;
     }, 700);
-  }, [stepIndex]);
+  }, []);
   
   const CurrentStep = stepComponents[currentKey]; // 👈 加上这个
   

@@ -1,22 +1,42 @@
 export const formatTimeRange = (start: string, duration: number) => {
     const pad = (n: number) => n.toString().padStart(2, "0");
-    const format = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    const startDate = new Date(start);
+    
+    // Parse the time string treating it as Sydney local time
+    // Expected format: "YYYY-MM-DDTHH:mm"
+    const startDate = new Date(start + ':00+10:00'); // Assume AEST
     const endDate = new Date(startDate.getTime() + duration * 60000);
+    
+    // Extract time parts directly
+    const formatTime = (d: Date) => {
+      const hours = d.getHours();
+      const minutes = d.getMinutes();
+      return `${pad(hours)}:${pad(minutes)}`;
+    };
   
+    // Get date prefix
     const now = new Date();
-    const startStr = startDate.toDateString();
-    const nowStr = now.toDateString();
+    const startDateOnly = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const dayDiff = Math.floor((startDateOnly.getTime() - nowDateOnly.getTime()) / 86400000);
   
-    const prefix =
-      startStr === nowStr
-        ? "今天"
-        : startStr === new Date(now.getTime() + 86400000).toDateString()
-        ? "明天"
-        : startStr === new Date(now.getTime() + 2 * 86400000).toDateString()
-        ? "后天"
-        : startDate.toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" });
+    // Chinese weekday names
+    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    const weekday = weekdays[startDate.getDay()];
   
-    return `${prefix} ${format(startDate)} - ${format(endDate)}`;
+    let prefix;
+    if (dayDiff === 0) {
+      prefix = "今天";
+    } else if (dayDiff === 1) {
+      prefix = "明天";
+    } else if (dayDiff === 2) {
+      prefix = "后天";
+    } else {
+      // Chinese format: MM月DD日 周X
+      const month = startDate.getMonth() + 1;
+      const day = startDate.getDate();
+      prefix = `${month}月${day}日 ${weekday}`;
+    }
+  
+    return `${prefix} ${formatTime(startDate)} - ${formatTime(endDate)}`;
   };
   

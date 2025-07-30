@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { User, Users, CalendarIcon } from "lucide-react";
+import { useState, useEffect } from "react";
+import { User, Users, CalendarIcon, BarChart3 } from "lucide-react";
 import SectionHeader from "@/components/profile/SectionHeader";
 import UserInfoCard from "@/components/profile/UserInfoCard";
 import CollapsibleList from "@/components/profile/CollapsibleList";
 import EventCard from "@/components/profile/EventCard";
+import CancelModal from "@/components/event/CancelModal";
+import UserStats from "@/components/profile/UserStats";
+import { api } from "@/lib/api";
 
 export default function MyProfileModal({
   open,
@@ -13,18 +16,20 @@ export default function MyProfileModal({
   userInfo,
   createdEvents,
   joinedEvents,
+  onCancelEvent,
+  onUserUpdate,
 }: {
   open: boolean;
   onClose: () => void;
   userInfo: {
     id: string;
     username: string;
-    isVIP?: boolean;
-    score?: number;
     idealBuddy?: string;
     whyJoin?: string;
     interests?: string[];
   };
+  onCancelEvent?: (eventId: string) => void;
+  onUserUpdate?: (updatedUser: any) => void;
   
   createdEvents: {
     id: string;
@@ -66,6 +71,19 @@ export default function MyProfileModal({
     joinedUpcoming: false,
     joinedPast: false,
   });
+  
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [userStats, setUserStats] = useState<any>(null);
+
+  // Fetch user statistics when modal opens
+  useEffect(() => {
+    if (open && userInfo?.id) {
+      api.user.getStats(userInfo.id)
+        .then(stats => setUserStats(stats))
+        .catch(err => console.error('Failed to fetch user stats:', err));
+    }
+  }, [open, userInfo?.id]);
 
   if (!open) return null;
 
@@ -88,10 +106,16 @@ export default function MyProfileModal({
   const enrichedCreated = enrichEvents(createdEvents, userInfo?.id);
   const enrichedJoined = enrichEvents(joinedEvents, userInfo?.id);
 
-  const upcomingCreated = enrichedCreated.filter((e) => !e.expired);
-  const pastCreated = enrichedCreated.filter((e) => e.expired);
-  const upcomingJoined = enrichedJoined.filter((e) => !e.expired);
-  const pastJoined = enrichedJoined.filter((e) => e.expired);
+  const upcomingCreated = enrichedCreated.filter((e) => !e.expired)
+    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+  const pastCreated = enrichedCreated.filter((e) => e.expired)
+    .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
+  
+  // Include all non-expired events in upcoming (including pending/rejected)
+  const upcomingJoined = enrichedJoined.filter((e) => !e.expired)
+    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+  const pastJoined = enrichedJoined.filter((e) => e.expired)
+    .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
 
   const toggle = (key: keyof typeof collapsed) =>
     setCollapsed((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -108,7 +132,18 @@ export default function MyProfileModal({
 
         {/* 👤 用户信息 */}
         <SectionHeader icon={<User className="text-indigo-500" size={20} />} title="我的个人资料" />
-        <UserInfoCard user={userInfo} />
+        <UserInfoCard 
+          user={userInfo} 
+          onUpdate={(updatedUser) => {
+            if (onUserUpdate) {
+              onUserUpdate(updatedUser);
+            }
+          }}
+        />
+
+        {/* 📊 活动统计 */}
+        <SectionHeader icon={<BarChart3 className="text-purple-500" size={20} />} title="活动统计" />
+        {userStats && <UserStats stats={userStats} />}
 
         {/* 📆 我发起的活动 */}
         <SectionHeader icon={<CalendarIcon className="text-yellow-500" size={20} />} title="我发起的活动" />
@@ -122,9 +157,6 @@ export default function MyProfileModal({
             <EventCard
               key={e.id}
               event={e}
-              showAction
-              actionLabel="审核申请"
-              onAction={() => alert(`审核活动：${e.title}（待实现）`)}
               userStatus={e.userStatus}
             />
           ))}
@@ -139,9 +171,6 @@ export default function MyProfileModal({
             <EventCard
               key={e.id}
               event={e}
-              showAction
-              actionLabel="管理签到"
-              onAction={() => alert(`签到管理：${e.title}（待实现）`)}
               userStatus={e.userStatus}
             />
           ))}
@@ -156,7 +185,15 @@ export default function MyProfileModal({
           onToggle={() => toggle("joinedUpcoming")}
         >
           {upcomingJoined.map((e) => (
-            <EventCard key={e.id} event={e} userStatus={e.userStatus} />
+            <EventCard 
+              key={e.id} 
+              event={e} 
+              userStatus={e.userStatus}
+              onCancel={() => {
+                setSelectedEvent(e);
+                setShowCancelModal(true);
+              }}
+            />
           ))}
         </CollapsibleList>
 
@@ -170,6 +207,26 @@ export default function MyProfileModal({
           ))}
         </CollapsibleList>
       </div>
+      
+      {/* Cancel Modal */}
+      {selectedEvent && (
+        <CancelModal
+          open={showCancelModal}
+          onClose={() => {
+            setShowCancelModal(false);
+            setSelectedEvent(null);
+          }}
+          onConfirm={() => {
+            if (onCancelEvent && selectedEvent) {
+              onCancelEvent(selectedEvent.id);
+              setShowCancelModal(false);
+              setSelectedEvent(null);
+            }
+          }}
+          title={selectedEvent.title}
+        />
+      )}
+      
     </div>
   );
 }

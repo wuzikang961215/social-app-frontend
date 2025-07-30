@@ -42,12 +42,11 @@ export default function CreateEvent() {
 
   const handleSubmit = async () => {
     try {
-      const localTime = new Date(formData.startTime);
-      const isoTime = localTime.toISOString();
-  
+      // Keep the local time string as-is (YYYY-MM-DDTHH:mm format)
+      // This preserves the exact time the organizer entered
       await createEvent({
         ...formData,
-        startTime: isoTime,
+        startTime: formData.startTime, // Send as local time string
         maxParticipants: parseInt(formData.maxParticipants),
         durationMinutes: parseInt(formData.durationMinutes),
       });

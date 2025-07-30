@@ -1,28 +1,40 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { ArrowRightCircle } from "lucide-react";
 import { login } from "@/lib/api";
+import toast from "react-hot-toast";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      toast.error("请填写所有字段");
+      return;
+    }
+
+    setLoading(true);
     try {
       const response = await login(email, password);
       const { token } = response.data;
       localStorage.setItem("token", token);
+      toast.success("登录成功！");
       router.push("/");
     } catch (err: unknown) {
       if (err instanceof Error) {
-        alert(err.message || "登录失败");
+        toast.error(err.message || "登录失败");
       } else {
-        alert("登录失败");
+        toast.error("登录失败");
       }
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -38,29 +50,50 @@ export default function Login() {
         </div>
 
         {/* 登录表单 */}
-        <div className="flex flex-col items-center space-y-4">
+        <form onSubmit={handleLogin} className="space-y-4">
           <input
             type="email"
             placeholder="邮箱"
-            className="w-64 max-w-full px-4 py-2 rounded-xl bg-gray-100 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-2 rounded-xl bg-gray-100 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-500"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
           />
+          
           <input
             type="password"
             placeholder="密码"
-            className="w-64 max-w-full px-4 py-2 rounded-xl bg-gray-100 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-2 rounded-xl bg-gray-100 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-500"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
           />
-        </div>
 
-        {/* Button */}
-        <div className="flex justify-center mt-6">
-          <button onClick={handleLogin}>
-            <ArrowRightCircle className="w-8 h-8 text-indigo-500 hover:scale-110 transition" />
-          </button>
-        </div>
+          {/* 忘记密码 */}
+          <div className="text-xs text-gray-500 text-right">
+            <span
+              onClick={() => router.push("/forgot-password")}
+              className="hover:text-indigo-600 cursor-pointer hover:underline"
+            >
+              忘记密码？
+            </span>
+          </div>
+
+          {/* Button */}
+          <div className="flex justify-center mt-6">
+            <button 
+              type="submit"
+              disabled={loading}
+              className="disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <ArrowRightCircle className="w-8 h-8 text-indigo-500 hover:scale-110 transition" />
+              )}
+            </button>
+          </div>
+        </form>
 
         {/* 注册提示 */}
         <p className="text-center text-sm text-gray-500 mt-4 font-semibold tracking-wide">

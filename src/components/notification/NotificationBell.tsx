@@ -1,0 +1,62 @@
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import { Bell } from "lucide-react";
+import { getUnreadCount } from "@/lib/api";
+
+interface NotificationBellProps {
+  onClick: () => void;
+}
+
+export default function NotificationBell({ onClick }: NotificationBellProps) {
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchUnreadCount = useCallback(async () => {
+    try {
+      console.log('[polling] checking notification count');
+      const { count } = await getUnreadCount();
+      setUnreadCount(prevCount => {
+        // Only trigger refresh if there are NEW notifications (not just unread ones)
+        // and only if the count actually increased
+        if (prevCount !== undefined && count > prevCount && count > 0) {
+          console.log('[notification] New notifications detected, triggering event refresh');
+          window.dispatchEvent(new Event('refresh-events'));
+        }
+        return count;
+      });
+    } catch (error) {
+      console.error("Failed to fetch unread count", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Fetch initial count
+    fetchUnreadCount();
+
+    // Poll every 30 seconds
+    const interval = setInterval(fetchUnreadCount, 30000);
+    
+    // Listen for manual refresh events
+    const handleUpdate = () => fetchUnreadCount();
+    window.addEventListener('notification-update', handleUpdate);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('notification-update', handleUpdate);
+    };
+  }, [fetchUnreadCount]);
+
+  return (
+    <button
+      onClick={onClick}
+      className="relative p-2 hover:scale-110 transition-transform duration-200"
+    >
+      <Bell className="w-5 h-5 text-gray-600 hover:text-gray-800" />
+      {unreadCount > 0 && (
+        <span className="absolute -top-2 -right-2 bg-indigo-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold shadow-sm animate-pulse">
+          {unreadCount > 99 ? "99+" : unreadCount}
+        </span>
+      )}
+    </button>
+  );
+}
