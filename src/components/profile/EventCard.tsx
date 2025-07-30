@@ -38,7 +38,7 @@ export default function EventCard({
 
   // ✅ 只展示 approved 用户
   // ✅ 根据是否已过期展示不同的参与者状态
-  const relevantParticipants = event.participants?.filter((p) =>
+  const relevantParticipants = event.participants?.filter((p: any) =>
     isPast ? p.status === "checkedIn" : p.status === "approved"
   ) || [];
 
@@ -82,7 +82,7 @@ export default function EventCard({
           {isPast ? "已签到" : "已加入"}（{relevantParticipants.length}人）
         </div>
         <div className="flex flex-wrap gap-2 pt-1">
-          {relevantParticipants.map((p) => (
+          {relevantParticipants.map((p: any) => (
             <span
               key={p.user.id}
               className="inline-flex items-center px-2.5 py-1 rounded-full text-gray-600 text-xs shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-100 transition"
