@@ -7,6 +7,7 @@ import UserInfoCard from "@/components/profile/UserInfoCard";
 import CollapsibleList from "@/components/profile/CollapsibleList";
 import EventCard from "@/components/profile/EventCard";
 import CancelModal from "@/components/event/CancelModal";
+import EditEventModal from "@/components/event/EditEventModal";
 import UserStats from "@/components/profile/UserStats";
 import { api } from "@/lib/api";
 
@@ -73,6 +74,7 @@ export default function MyProfileModal({
   });
   
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [userStats, setUserStats] = useState<any>(null);
 
@@ -158,6 +160,10 @@ export default function MyProfileModal({
               key={e.id}
               event={e}
               userStatus={e.userStatus}
+              onEdit={() => {
+                setSelectedEvent(e);
+                setShowEditModal(true);
+              }}
             />
           ))}
         </CollapsibleList>
@@ -224,6 +230,24 @@ export default function MyProfileModal({
             }
           }}
           title={selectedEvent.title}
+        />
+      )}
+
+      {/* Edit Modal */}
+      {selectedEvent && (
+        <EditEventModal
+          isOpen={showEditModal}
+          onClose={() => {
+            setShowEditModal(false);
+            setSelectedEvent(null);
+          }}
+          event={selectedEvent}
+          onEventUpdated={() => {
+            setShowEditModal(false);
+            setSelectedEvent(null);
+            // Trigger refresh to update the events list
+            window.dispatchEvent(new Event('refresh-events'));
+          }}
         />
       )}
       

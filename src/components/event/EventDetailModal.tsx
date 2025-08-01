@@ -45,6 +45,7 @@ type EventDetailModalProps = {
   };
   onJoinClick?: (event: AppEvent) => void;
   onCancelClick?: (event: AppEvent) => void;
+  onEditClick?: (event: AppEvent) => void;
 };
 
 // 🔧 封装轻量 event => AppEvent 的转换
@@ -88,6 +89,7 @@ export default function EventDetailModal({
   event,
   onJoinClick,
   onCancelClick,
+  onEditClick,
 }: EventDetailModalProps) {
   const [organizerInfo, setOrganizerInfo] = useState<{
     idealBuddy?: string;
@@ -297,14 +299,14 @@ export default function EventDetailModal({
                 </div>
               </div>
 
-              {(onJoinClick || onCancelClick) && (
+              {(onJoinClick || onCancelClick || onEditClick) && (
                 <div className="pt-2 flex justify-end">
                   <Button
                     className={`
                       rounded-full px-4 py-2 text-sm transition
                       ${
                         event.isOrganizer
-                          ? "bg-gray-300 text-gray-800 cursor-default"
+                          ? "bg-indigo-500 hover:bg-indigo-600 text-white"
                           : (event.userCancelCount ?? 0) >= 2
                           ? "bg-red-100 text-red-600 cursor-default"
                           : (!event.userStatus || event.userStatus === "cancelled") && event.spotsLeft > 0
@@ -325,22 +327,27 @@ export default function EventDetailModal({
                       }
                     `}
                     disabled={
-                      event.isOrganizer ||
-                      (event.userCancelCount ?? 0) >= 2 ||
-                      !["pending", "denied", "cancelled", null].includes(event.userStatus || null) ||
-                      (event.spotsLeft <= 0 && !["pending", "denied"].includes(event.userStatus || ""))
+                      event.isOrganizer ? false : (
+                        (event.userCancelCount ?? 0) >= 2 ||
+                        !["pending", "denied", "cancelled", null].includes(event.userStatus || null) ||
+                        (event.spotsLeft <= 0 && !["pending", "denied"].includes(event.userStatus || ""))
+                      )
                     }
                     onClick={(e) => {
                       e.stopPropagation();
+                      
+                      const fullEvent = toFullEvent(event);
+
+                      if (event.isOrganizer) {
+                        onEditClick?.(fullEvent);
+                        return;
+                      }
 
                       if (
-                        event.isOrganizer ||
                         (event.userCancelCount ?? 0) >= 2 ||
                         !["pending", "denied", "cancelled", null].includes(event.userStatus || null)
                       )
                         return;
-
-                      const fullEvent = toFullEvent(event);
 
                       if (!event.userStatus || event.userStatus === "cancelled") {
                         onJoinClick?.(fullEvent);
@@ -350,7 +357,7 @@ export default function EventDetailModal({
                     }}
                   >
                     {event.isOrganizer
-                      ? "你是主办人"
+                      ? "编辑活动"
                       : (event.userCancelCount ?? 0) >= 2
                       ? "无法加入"
                       : event.userStatus === "approved"

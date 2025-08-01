@@ -10,6 +10,7 @@ import CancelModal from "@/components/event/CancelModal";
 import ReviewAndCheckinModal from "@/components/event/ReviewAndCheckinModal";
 import MyProfileModal from "@/components/profile/MyProfileModal";
 import EventCard from "@/components/event/EventCard";
+import EditEventModal from "@/components/event/EditEventModal";
 import NotificationBell from "@/components/notification/NotificationBell";
 import NotificationsModal from "@/components/notification/NotificationsModal";
 
@@ -99,12 +100,14 @@ export default function HomePage() {
     showModal,
     showDetail,
     showCancelModal,
+    showEditModal,
     showReviewModal,
     showProfileModal,
     showNotificationsModal,
     setShowModal,
     setShowDetail,
     setShowCancelModal,
+    setShowEditModal,
     setShowReviewModal,
     setShowProfileModal,
     setShowNotificationsModal,
@@ -250,9 +253,11 @@ export default function HomePage() {
       {/* Header with notifications and logout */}
       <div className="flex justify-between items-center mb-6">
         <div className="absolute top-4 right-4 flex items-center gap-2">
-          <NotificationBell 
-            onClick={() => setShowNotificationsModal(true)} 
-          />
+          {userInfo && (
+            <NotificationBell 
+              onClick={() => setShowNotificationsModal(true)} 
+            />
+          )}
           <LogOut
             onClick={logout}
             className="w-5 h-5 text-gray-500 hover:text-gray-800 cursor-pointer"
@@ -300,6 +305,10 @@ export default function HomePage() {
                 setSelectedEvent(event);
                 setShowCancelModal(true); // 取消报名弹窗
               }}
+              onEditClick={() => {
+                setSelectedEvent(event);
+                setShowEditModal(true); // 编辑活动弹窗
+              }}
             />      
           ))
         )}
@@ -321,6 +330,16 @@ export default function HomePage() {
             onConfirm={handleCancel}
             title={selectedEvent.title}
           />
+          <EditEventModal
+            isOpen={showEditModal}
+            onClose={() => setShowEditModal(false)}
+            event={selectedEvent}
+            onEventUpdated={() => {
+              setShowEditModal(false);
+              fetchEvents();
+              toast.success("活动更新成功");
+            }}
+          />
           <EventDetailModal
             open={showDetail}
             onClose={() => setShowDetail(false)}
@@ -332,6 +351,10 @@ export default function HomePage() {
             onCancelClick={() => {
               setSelectedEvent(selectedEvent);
               setShowCancelModal(true);
+            }}
+            onEditClick={() => {
+              setShowDetail(false);
+              setShowEditModal(true);
             }}
           />
         </>

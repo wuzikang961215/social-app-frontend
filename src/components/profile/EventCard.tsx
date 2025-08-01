@@ -11,6 +11,7 @@ export default function EventCard({
   actionLabel,
   onAction,
   onCancel,
+  onEdit,
 }: {
   event: any; // Accept any event object since it comes from backend
   userStatus?: string;
@@ -18,6 +19,7 @@ export default function EventCard({
   actionLabel?: string;
   onAction?: () => void;
   onCancel?: () => void;
+  onEdit?: () => void;
 }) {
   const [selectedUser, setSelectedUser] = useState<{ id: string; username: string; el: HTMLElement } | null>(null);
   const isPast = event.expired;
@@ -101,7 +103,16 @@ export default function EventCard({
       </div>
 
       {/* 底部按钮 */}
-      <div className="flex justify-end pt-4">
+      <div className="flex justify-end gap-2 pt-4">
+        {onEdit && !isPast && (
+          <Button
+            size="sm"
+            className="text-xs px-3 py-1 rounded-full bg-indigo-500 text-white hover:bg-indigo-600"
+            onClick={onEdit}
+          >
+            编辑
+          </Button>
+        )}
         {userStatus ? (
           <Button
             size="sm"

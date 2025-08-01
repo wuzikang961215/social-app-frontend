@@ -13,6 +13,13 @@ export default function NotificationBell({ onClick }: NotificationBellProps) {
 
   const fetchUnreadCount = useCallback(async () => {
     try {
+      // Check if user is authenticated before making API call
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      if (!token) {
+        console.log('[notification] No auth token, skipping notification check');
+        return;
+      }
+      
       console.log('[polling] checking notification count');
       const { count } = await getUnreadCount();
       setUnreadCount(prevCount => {
@@ -20,7 +27,10 @@ export default function NotificationBell({ onClick }: NotificationBellProps) {
         // and only if the count actually increased
         if (prevCount !== undefined && count > prevCount && count > 0) {
           console.log('[notification] New notifications detected, triggering event refresh');
-          window.dispatchEvent(new Event('refresh-events'));
+          // Defer the event dispatch to avoid state update during render
+          setTimeout(() => {
+            window.dispatchEvent(new Event('refresh-events'));
+          }, 0);
         }
         return count;
       });

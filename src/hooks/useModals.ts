@@ -4,6 +4,7 @@ export type ModalType =
   | 'eventConfirm'
   | 'eventDetail' 
   | 'eventCancel'
+  | 'eventEdit'
   | 'reviewAndCheckin'
   | 'profile'
   | 'notifications'
@@ -46,6 +47,7 @@ export function useModals() {
     showModal: isModalOpen('eventConfirm'),
     showDetail: isModalOpen('eventDetail'),
     showCancelModal: isModalOpen('eventCancel'),
+    showEditModal: isModalOpen('eventEdit'),
     showReviewModal: isModalOpen('reviewAndCheckin'),
     showProfileModal: isModalOpen('profile'),
     showNotificationsModal: isModalOpen('notifications'),
@@ -56,6 +58,7 @@ export function useModals() {
     setShowModal: (show: boolean) => show ? openModal('eventConfirm') : closeModal(),
     setShowDetail: (show: boolean) => show ? openModal('eventDetail') : closeModal(),
     setShowCancelModal: (show: boolean) => show ? openModal('eventCancel') : closeModal(),
+    setShowEditModal: (show: boolean) => show ? openModal('eventEdit') : closeModal(),
     setShowReviewModal: (show: boolean) => show ? openModal('reviewAndCheckin') : closeModal(),
     setShowProfileModal: (show: boolean) => show ? openModal('profile') : closeModal(),
     setShowNotificationsModal: (show: boolean) => show ? openModal('notifications') : closeModal(),
