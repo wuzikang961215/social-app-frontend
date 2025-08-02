@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, HeartHandshake, BadgeCheck, Save, X } from "lucide-react";
+import { User, HeartHandshake, BadgeCheck, Save, X, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import toast from "react-hot-toast";
@@ -15,6 +15,7 @@ export default function UserInfoCard({
     idealBuddy?: string;
     whyJoin?: string;
     interests?: string[];
+    mbti?: string;
   };
   onUpdate?: (updatedUser: any) => void;
 }) {
@@ -24,6 +25,7 @@ export default function UserInfoCard({
     idealBuddy: user.idealBuddy || "",
     whyJoin: user.whyJoin || "",
     interests: user.interests || [],
+    mbti: user.mbti || "",
   });
   const [interestInput, setInterestInput] = useState("");
 
@@ -50,6 +52,7 @@ export default function UserInfoCard({
       idealBuddy: user.idealBuddy || "",
       whyJoin: user.whyJoin || "",
       interests: user.interests || [],
+      mbti: user.mbti || "",
     });
     setInterestInput("");
     setIsEditing(false);
@@ -81,6 +84,36 @@ export default function UserInfoCard({
         </div>
         
         <div className="space-y-2">
+          <label className="flex items-start gap-2">
+            <Brain size={16} className="text-purple-400 mt-1" />
+            <div className="flex-1">
+              <span className="text-xs text-gray-600">MBTI类型：</span>
+              <select
+                value={formData.mbti}
+                onChange={(e) => setFormData({ ...formData, mbti: e.target.value })}
+                className="w-full mt-1 px-2 py-1 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">选择你的MBTI类型</option>
+                <option value="INTJ">INTJ - 建筑师</option>
+                <option value="INTP">INTP - 逻辑学家</option>
+                <option value="ENTJ">ENTJ - 指挥官</option>
+                <option value="ENTP">ENTP - 辩论家</option>
+                <option value="INFJ">INFJ - 提倡者</option>
+                <option value="INFP">INFP - 调停者</option>
+                <option value="ENFJ">ENFJ - 主人公</option>
+                <option value="ENFP">ENFP - 竞选者</option>
+                <option value="ISTJ">ISTJ - 物流师</option>
+                <option value="ISFJ">ISFJ - 守卫者</option>
+                <option value="ESTJ">ESTJ - 总经理</option>
+                <option value="ESFJ">ESFJ - 执政官</option>
+                <option value="ISTP">ISTP - 鉴赏家</option>
+                <option value="ISFP">ISFP - 探险家</option>
+                <option value="ESTP">ESTP - 企业家</option>
+                <option value="ESFP">ESFP - 表演者</option>
+              </select>
+            </div>
+          </label>
+          
           <label className="flex items-start gap-2">
             <HeartHandshake size={16} className="text-indigo-400 mt-1" />
             <div className="flex-1">
@@ -191,6 +224,10 @@ export default function UserInfoCard({
       <div className="flex items-center gap-2 font-semibold">
         <User size={18} className="text-gray-500" />
         {user.username}
+      </div>
+      <div className="flex items-start gap-2">
+        <Brain size={16} className="text-purple-400 mt-0.5" />
+        <span>MBTI：{user.mbti || "未填写"}</span>
       </div>
       <div className="flex items-start gap-2">
         <HeartHandshake size={16} className="text-indigo-400 mt-0.5" />

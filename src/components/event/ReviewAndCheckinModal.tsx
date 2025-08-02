@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, HeartHandshake, BadgeCheck, Calendar, Users } from "lucide-react";
+import { X, HeartHandshake, BadgeCheck, Calendar, Users, Brain } from "lucide-react";
 import { getManageEvents, reviewParticipant, markAttendance, api } from "@/lib/api";
 import { formatTimeRange } from "@/lib/format";
 import { hasEventStarted } from "@/lib/dateUtils";
@@ -19,6 +19,7 @@ type Participant = {
     idealBuddy?: string;
     interests?: string[];
     whyJoin?: string;
+    mbti?: string;
   };
   status: string;
 };
@@ -208,6 +209,10 @@ export default function ReviewAndCheckinModal({
                       </div>
                     )}
                     <div className="flex items-start gap-2">
+                      <Brain size={16} className="text-purple-400 mt-0.5" />
+                      MBTI：{p.user.mbti || "未填写"}
+                    </div>
+                    <div className="flex items-start gap-2">
                       <HeartHandshake size={16} className="text-indigo-400 mt-0.5" />
                       想遇见的朋友：&ldquo;{p.user.idealBuddy || "未填写"}&rdquo;
                     </div>
@@ -316,6 +321,10 @@ export default function ReviewAndCheckinModal({
                         )}
                       </div>
                     )}
+                    <div className="flex items-start gap-2">
+                      <Brain size={16} className="text-purple-400 mt-0.5" />
+                      MBTI：{p.user.mbti || "未填写"}
+                    </div>
                     <div className="flex items-start gap-2">
                       <HeartHandshake size={16} className="text-indigo-400 mt-0.5" />
                       想遇见的朋友：&ldquo;{p.user.idealBuddy || "未填写"}&rdquo;

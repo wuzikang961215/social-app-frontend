@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
-import { X, Calendar, Users, HeartHandshake, BadgeCheck } from "lucide-react";
+import { X, Calendar, Users, HeartHandshake, BadgeCheck, Brain } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getUserById, api } from "@/lib/api";
 
@@ -179,6 +179,14 @@ export default function UserDetailPopover({
 
               {/* User Info */}
               <div className="space-y-2 text-xs">
+                <div className="flex items-start gap-1.5">
+                  <Brain size={12} className="text-purple-400 mt-0.5" />
+                  <div>
+                    <span className="text-gray-500">MBTI:</span>
+                    <span className="text-gray-700 ml-1">{userInfo?.mbti || "未填写"}</span>
+                  </div>
+                </div>
+
                 {userInfo?.idealBuddy && (
                   <div className="flex items-start gap-1.5">
                     <HeartHandshake size={12} className="text-indigo-400 mt-0.5" />

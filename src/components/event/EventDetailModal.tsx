@@ -9,6 +9,7 @@ import {
   HeartHandshake,
   BadgeCheck,
   X,
+  Brain,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -95,6 +96,7 @@ export default function EventDetailModal({
     idealBuddy?: string;
     hobbies?: string[];
     whyJoin?: string;
+    mbti?: string;
   }>({});
   
   const [organizerStats, setOrganizerStats] = useState<{
@@ -123,6 +125,7 @@ export default function EventDetailModal({
             idealBuddy: userRes.data.idealBuddy,
             hobbies: userRes.data.interests,
             whyJoin: userRes.data.whyJoin,
+            mbti: userRes.data.mbti,
           });
           
           setOrganizerStats(statsRes);
@@ -260,6 +263,10 @@ export default function EventDetailModal({
                   </div>
                 )}
                 
+                <div className="flex items-start gap-2">
+                  <Brain size={16} className="text-purple-400 mt-0.5" />
+                  <span>MBTI：{organizerInfo.mbti || "未填写"}</span>
+                </div>
                 <div className="flex items-start gap-2">
                   <HeartHandshake size={16} className="text-indigo-400 mt-0.5" />
                   <span>

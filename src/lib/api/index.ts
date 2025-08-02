@@ -53,7 +53,7 @@ export const api = {
         username: data.username,
         email: data.email,
         password: data.password,
-        personality: data.personality,
+        mbti: data.mbti,
         interests: data.interests,
         tags: data.tags,
         whyJoin: data.whyJoin,

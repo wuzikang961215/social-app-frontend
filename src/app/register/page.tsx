@@ -9,7 +9,7 @@ import StepWelcome from "./steps/StepWelcome";
 import StepUsername from "./steps/StepUsername";
 import StepEmail from "./steps/StepEmail";
 import StepPassword from "./steps/StepPassword";
-import StepPersonality from "./steps/StepPersonality";
+import StepMBTI from "./steps/StepMBTI";
 import StepLookingForBuddy from "./steps/StepLookingForBuddy";
 import StepExpectHighQualityBuddy from "./steps/StepExpectHighQualityBuddy";
 import StepInterest from "./steps/StepInterest";
@@ -23,7 +23,7 @@ const steps = [
   "username",
   "email",
   "password",
-  "personality",
+  "mbti",
   "lookingForBuddy",
   "expectingHighQualityBuddy",
   "interest",
@@ -38,7 +38,7 @@ export interface FormDataType {
   username: string;
   email: string;
   password: string;
-  personality: string;
+  mbti: string;
   lookingForBuddy: string;
   expectingHighQualityBuddy: string;
   interests: string[];
@@ -66,7 +66,7 @@ const stepComponents: Record<StepKey, React.FC<StepProps>> = {
   username: StepUsername,
   email: StepEmail,
   password: StepPassword,
-  personality: StepPersonality,
+  mbti: StepMBTI,
   lookingForBuddy: StepLookingForBuddy,
   expectingHighQualityBuddy: StepExpectHighQualityBuddy,
   interest: StepInterest,
@@ -81,7 +81,7 @@ export default function RegisterPage() {
     username: "",
     email: "",
     password: "",
-    personality: "",
+    mbti: "",
     lookingForBuddy: "",
     expectingHighQualityBuddy: "",
     interests: [],
@@ -162,7 +162,7 @@ export default function RegisterPage() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="w-full"
+                className="w-full flex justify-center"
               >
                 <CurrentStep
                   formData={formData}
