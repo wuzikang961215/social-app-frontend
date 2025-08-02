@@ -4,9 +4,12 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createEvent } from "@/lib/api"; // ✅ 添加
+import CreatorDisclaimerModal from "@/components/CreatorDisclaimerModal";
 
 export default function CreateEvent() {
   const router = useRouter();
+  const [showDisclaimerModal, setShowDisclaimerModal] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const categories = [
     "运动与户外", "音乐与影视", "美食与社交",
@@ -40,7 +43,40 @@ export default function CreateEvent() {
     }));
   };
 
-  const handleSubmit = async () => {
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.title.trim()) {
+      newErrors.title = "请输入活动名称";
+    }
+    if (!formData.location.trim()) {
+      newErrors.location = "请输入活动地点";
+    }
+    if (!formData.startTime) {
+      newErrors.startTime = "请选择开始时间";
+    }
+    if (!formData.category) {
+      newErrors.category = "请选择活动分类";
+    }
+    if (!formData.maxParticipants || parseInt(formData.maxParticipants) < 1) {
+      newErrors.maxParticipants = "参与人数至少为1人";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = () => {
+    // Validate form first
+    if (!validateForm()) {
+      return;
+    }
+    
+    // Show disclaimer modal if validation passes
+    setShowDisclaimerModal(true);
+  };
+
+  const handleCreateEvent = async () => {
     try {
       // Keep the local time string as-is (YYYY-MM-DDTHH:mm format)
       // This preserves the exact time the organizer entered
@@ -76,35 +112,53 @@ export default function CreateEvent() {
 
         {/* 标题 */}
         <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-6">
-          📝 创建新活动
+          🎯 发个邀约
         </h2>
 
         {/* 活动名 */}
-        <div className="text-sm font-semibold text-gray-700 mb-2">活动名</div>
+        <div className="text-sm font-semibold text-gray-700 mb-2">想干啥？</div>
         <input
           placeholder="如：密室逃脱 / 排球social / KTV"
           value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          className="w-full mb-4 px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
+          onChange={(e) => {
+            setFormData({ ...formData, title: e.target.value });
+            if (errors.title) setErrors({ ...errors, title: "" });
+          }}
+          className={`w-full mb-1 px-4 py-2 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm ${
+            errors.title ? "border-red-300" : "border-gray-200"
+          }`}
         />
+        {errors.title && <p className="text-xs text-red-500 mb-3">{errors.title}</p>}
 
         {/* 活动地点 */}
-        <div className="text-sm font-semibold text-gray-700 mb-2">活动地点</div>
+        <div className="text-sm font-semibold text-gray-700 mb-2">在哪儿见？</div>
         <input
           placeholder="如：BE Escape Room, 746-748 George St, Haymarket NSW 2000"
           value={formData.location}
-          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-          className="w-full mb-4 px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
+          onChange={(e) => {
+            setFormData({ ...formData, location: e.target.value });
+            if (errors.location) setErrors({ ...errors, location: "" });
+          }}
+          className={`w-full mb-1 px-4 py-2 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm ${
+            errors.location ? "border-red-300" : "border-gray-200"
+          }`}
         />
+        {errors.location && <p className="text-xs text-red-500 mb-3">{errors.location}</p>}
 
         {/* 开始时间 */}
-        <div className="text-sm font-semibold text-gray-700 mb-2">开始时间</div>
+        <div className="text-sm font-semibold text-gray-700 mb-2">什么时候？</div>
         <input
           type="datetime-local"
           value={formData.startTime}
-          onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-          className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm mb-4"
+          onChange={(e) => {
+            setFormData({ ...formData, startTime: e.target.value });
+            if (errors.startTime) setErrors({ ...errors, startTime: "" });
+          }}
+          className={`w-full px-4 py-2 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm mb-1 ${
+            errors.startTime ? "border-red-300" : "border-gray-200"
+          }`}
         />
+        {errors.startTime && <p className="text-xs text-red-500 mb-3">{errors.startTime}</p>}
 
         {/* 活动时长 */}
         <div className="mb-4">
@@ -130,11 +184,15 @@ export default function CreateEvent() {
         {/* 活动分类 */}
         <div className="mb-4">
           <div className="text-sm font-semibold text-gray-700 mb-2">活动分类</div>
+          {errors.category && <p className="text-xs text-red-500 mb-2">{errors.category}</p>}
           <div className="flex flex-wrap gap-2">
             {categories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setFormData({ ...formData, category: cat })}
+                onClick={() => {
+                  setFormData({ ...formData, category: cat });
+                  if (errors.category) setErrors({ ...errors, category: "" });
+                }}
                 className={`px-4 py-1 rounded-full text-sm transition ${
                   formData.category === cat
                     ? "bg-indigo-600 text-white"
@@ -170,29 +228,42 @@ export default function CreateEvent() {
         {/* 参与人数 */}
         <div className="mb-4">
           <label className="text-sm font-semibold text-gray-700 block mb-1">
-            预计最多参与人数
+            想找几个人？
           </label>
           <input
             type="number"
             min={1}
+            placeholder="如：6"
             value={formData.maxParticipants}
-            onChange={(e) => setFormData({ ...formData, maxParticipants: e.target.value })}
-            className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
+            onChange={(e) => {
+              setFormData({ ...formData, maxParticipants: e.target.value });
+              if (errors.maxParticipants) setErrors({ ...errors, maxParticipants: "" });
+            }}
+            className={`w-full px-4 py-2 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm ${
+              errors.maxParticipants ? "border-red-300" : "border-gray-200"
+            }`}
           />
+          {errors.maxParticipants && <p className="text-xs text-red-500 mt-1">{errors.maxParticipants}</p>}
         </div>
 
         {/* 活动描述 */}
         <div className="mb-6">
           <label className="text-sm font-semibold text-gray-700 block mb-1">
-            写点介绍，让别人了解你的活动
+            跟大家说说这个活动（可选）
           </label>
           <textarea
             rows={3}
             placeholder="活动形式？节奏？需要提前准备什么？"
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm resize-none"
+            onChange={(e) => {
+              setFormData({ ...formData, description: e.target.value });
+              if (errors.description) setErrors({ ...errors, description: "" });
+            }}
+            className={`w-full px-4 py-2 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm resize-none ${
+              errors.description ? "border-red-300" : "border-gray-200"
+            }`}
           />
+          {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
         </div>
 
         {/* 提交按钮 */}
@@ -200,9 +271,18 @@ export default function CreateEvent() {
           onClick={handleSubmit}
           className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-full transition text-sm font-semibold"
         >
-          创建活动
+          发布邀约 🚀
         </button>
       </div>
+      
+      <CreatorDisclaimerModal
+        isOpen={showDisclaimerModal}
+        onClose={() => setShowDisclaimerModal(false)}
+        onAgree={() => {
+          setShowDisclaimerModal(false);
+          handleCreateEvent();
+        }}
+      />
     </div>
   );
 }

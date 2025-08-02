@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import DisclaimerModal from "@/components/DisclaimerModal";
 
 export default function ConfirmModal({
   open,
@@ -13,6 +14,8 @@ export default function ConfirmModal({
   title: string;
   spotsLeft: number;
 }) {
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  
   if (!open) return null;
 
   return (
@@ -23,6 +26,19 @@ export default function ConfirmModal({
         </h2>
         <p className="text-sm text-gray-600">
           报名即表示你会参加。被主办人确认后，原则上无法取消，感谢理解！
+        </p>
+        
+        {/* 温馨提示 */}
+        <p className="text-xs text-gray-500">
+          报名即表示您已知悉并理解
+          <button 
+            type="button"
+            onClick={() => setShowDisclaimer(true)}
+            className="underline hover:text-gray-700 mx-1"
+          >
+            免责声明
+          </button>
+          ，请注意活动安全。
         </p>
         <div className="flex justify-end gap-3 pt-4">
           <button
@@ -39,6 +55,11 @@ export default function ConfirmModal({
           </button>
         </div>
       </div>
+      
+      <DisclaimerModal
+        isOpen={showDisclaimer}
+        onClose={() => setShowDisclaimer(false)}
+      />
     </div>
   );
 }

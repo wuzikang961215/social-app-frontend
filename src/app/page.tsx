@@ -13,6 +13,7 @@ import EventCard from "@/components/event/EventCard";
 import EditEventModal from "@/components/event/EditEventModal";
 import NotificationBell from "@/components/notification/NotificationBell";
 import NotificationsModal from "@/components/notification/NotificationsModal";
+import DisclaimerModal from "@/components/DisclaimerModal";
 
 import { useEvents } from "@/hooks/useEvents";
 import { useUserInfo } from "@/hooks/useUserInfo";
@@ -74,6 +75,7 @@ export default function HomePage() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("首页");
   const [showLaunchMenu, setShowLaunchMenu] = useState(false);
+  const [showDisclaimerModal, setShowDisclaimerModal] = useState(false);
 
   // Use custom hooks
   const { 
@@ -205,7 +207,7 @@ export default function HomePage() {
                 : "text-gray-400 bg-gray-200"
             }`}
           >
-            <span className="text-lg">➕</span> 组织活动
+            <span className="text-lg">🎉</span> 找人一起
             {(pendingReviewCount > 0 || pendingCheckinCount > 0) && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold animate-pulse">
                 {pendingReviewCount + pendingCheckinCount}
@@ -222,7 +224,7 @@ export default function HomePage() {
                 }}
                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
-                创建新活动
+                发个邀约 🎯
               </button>
               <button
                 onClick={() => {
@@ -231,7 +233,7 @@ export default function HomePage() {
                 }}
                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 relative flex items-center justify-between"
               >
-                <span>审核与签到</span>
+                <span>看看谁来了 👀</span>
                 <div className="flex items-center gap-1">
                   {pendingReviewCount > 0 && (
                     <span className="bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
@@ -406,6 +408,21 @@ export default function HomePage() {
           window.dispatchEvent(new Event('notification-update'));
         }}
       />
+      
+      <DisclaimerModal
+        isOpen={showDisclaimerModal}
+        onClose={() => setShowDisclaimerModal(false)}
+      />
+      
+      {/* 免责声明链接 - Sticky Bottom */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 text-center">
+        <button
+          onClick={() => setShowDisclaimerModal(true)}
+          className="text-sm text-gray-500 hover:text-gray-700 underline"
+        >
+          免责声明 | Disclaimer
+        </button>
+      </div>
     </div>
   );
 }

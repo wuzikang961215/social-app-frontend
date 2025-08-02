@@ -4,11 +4,15 @@ import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/lib/api";
+import { useState } from "react";
+import DisclaimerModal from "@/components/DisclaimerModal";
 
 export default function StepPromote({
   formData,
 }: StepProps) {
   const router = useRouter();
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
 
   const handleSubmit = async () => {
     try {
@@ -21,12 +25,13 @@ export default function StepPromote({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 0 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="w-full max-w-md flex flex-col items-center text-center gap-6 px-4 pt-6 pb-10"
-    >
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 0 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md flex flex-col items-center text-center gap-6 px-4 pt-6 pb-10"
+      >
       {/* 标题 */}
       <div className="text-xl font-semibold text-gray-800">
         一切准备就绪
@@ -39,14 +44,51 @@ export default function StepPromote({
         欢迎你成为其中的一员。
       </div>
 
-      <p className="text-sm text-gray-500 mt-2 italic tracking-wide">
-        （点击这里提交注册）
-      </p>
+      {/* 条款同意 */}
+      <div className="flex items-start gap-2 text-sm">
+        <input
+          type="checkbox"
+          id="terms"
+          checked={agreedToTerms}
+          onChange={(e) => setAgreedToTerms(e.target.checked)}
+          className="mt-0.5 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
+        />
+        <div className="text-gray-600 leading-relaxed">
+          <span>我已阅读并同意</span>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              setShowDisclaimer(true);
+            }}
+            className="text-indigo-600 hover:text-indigo-500 underline font-medium mx-1"
+          >
+            免责声明
+          </button>
+          <br />
+          <span className="text-xs">I have read and agree to the disclaimer</span>
+        </div>
+      </div>
 
       {/* 提交按钮 */}
-      <button onClick={handleSubmit}>
-        <CheckCircle className="w-8 h-8 text-green-500 hover:scale-110 transition mt-1" />
-      </button>
-    </motion.div>
+      <div className="flex flex-col items-center gap-3 mt-2">
+        <button 
+          onClick={handleSubmit}
+          disabled={!agreedToTerms}
+          className={`group ${!agreedToTerms ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+        >
+          <CheckCircle className={`w-12 h-12 ${agreedToTerms ? 'text-green-500 group-hover:scale-110' : 'text-gray-400'} transition-all duration-200`} />
+        </button>
+        <p className="text-xs text-gray-500 italic">
+          {agreedToTerms ? '点击提交注册' : '请先勾选同意条款'}
+        </p>
+      </div>
+      </motion.div>
+      
+      <DisclaimerModal
+        isOpen={showDisclaimer}
+        onClose={() => setShowDisclaimer(false)}
+      />
+    </>
   );
 }
