@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { X, Calendar, Users, HeartHandshake, BadgeCheck, Brain } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getUserById, api } from "@/lib/api";
+import { getMBTIDisplay } from "@/lib/mbtiConstants";
 
 interface UserDetailPopoverProps {
   open: boolean;
@@ -183,7 +184,7 @@ export default function UserDetailPopover({
                   <Brain size={12} className="text-purple-400 mt-0.5" />
                   <div>
                     <span className="text-gray-500">MBTI:</span>
-                    <span className="text-gray-700 ml-1">{userInfo?.mbti || "未填写"}</span>
+                    <span className="text-gray-700 ml-1">{getMBTIDisplay(userInfo?.mbti)}</span>
                   </div>
                 </div>
 

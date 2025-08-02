@@ -5,6 +5,7 @@ import { X, HeartHandshake, BadgeCheck, Calendar, Users, Brain } from "lucide-re
 import { getManageEvents, reviewParticipant, markAttendance, api } from "@/lib/api";
 import { formatTimeRange } from "@/lib/format";
 import { hasEventStarted } from "@/lib/dateUtils";
+import { getMBTIDisplay } from "@/lib/mbtiConstants";
 
 type ReviewAndCheckinModalProps = {
   open: boolean;
@@ -210,7 +211,7 @@ export default function ReviewAndCheckinModal({
                     )}
                     <div className="flex items-start gap-2">
                       <Brain size={16} className="text-purple-400 mt-0.5" />
-                      MBTI：{p.user.mbti || "未填写"}
+                      MBTI：{getMBTIDisplay(p.user.mbti)}
                     </div>
                     <div className="flex items-start gap-2">
                       <HeartHandshake size={16} className="text-indigo-400 mt-0.5" />
@@ -323,7 +324,7 @@ export default function ReviewAndCheckinModal({
                     )}
                     <div className="flex items-start gap-2">
                       <Brain size={16} className="text-purple-400 mt-0.5" />
-                      MBTI：{p.user.mbti || "未填写"}
+                      MBTI：{getMBTIDisplay(p.user.mbti)}
                     </div>
                     <div className="flex items-start gap-2">
                       <HeartHandshake size={16} className="text-indigo-400 mt-0.5" />

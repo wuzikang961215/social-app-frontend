@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { getUserById, api } from "@/lib/api"; // ✅ 替代 axios + BASE_URL
 import type { Event as AppEvent } from "@/app/page";
 import UserDetailPopover from "@/components/user/UserDetailPopover";
+import { getMBTIDisplay } from "@/lib/mbtiConstants";
 
 type EventDetailModalProps = {
   open: boolean;
@@ -265,7 +266,7 @@ export default function EventDetailModal({
                 
                 <div className="flex items-start gap-2">
                   <Brain size={16} className="text-purple-400 mt-0.5" />
-                  <span>MBTI：{organizerInfo.mbti || "未填写"}</span>
+                  <span>MBTI：{getMBTIDisplay(organizerInfo.mbti)}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <HeartHandshake size={16} className="text-indigo-400 mt-0.5" />

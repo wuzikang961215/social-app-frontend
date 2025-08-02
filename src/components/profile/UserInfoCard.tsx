@@ -3,6 +3,7 @@ import { User, HeartHandshake, BadgeCheck, Save, X, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import toast from "react-hot-toast";
+import { getMBTIDisplay, mbtiTypes } from "@/lib/mbtiConstants";
 
 export default function UserInfoCard({
   user,
@@ -94,22 +95,9 @@ export default function UserInfoCard({
                 className="w-full mt-1 px-2 py-1 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="">选择你的MBTI类型</option>
-                <option value="INTJ">INTJ - 建筑师</option>
-                <option value="INTP">INTP - 逻辑学家</option>
-                <option value="ENTJ">ENTJ - 指挥官</option>
-                <option value="ENTP">ENTP - 辩论家</option>
-                <option value="INFJ">INFJ - 提倡者</option>
-                <option value="INFP">INFP - 调停者</option>
-                <option value="ENFJ">ENFJ - 主人公</option>
-                <option value="ENFP">ENFP - 竞选者</option>
-                <option value="ISTJ">ISTJ - 物流师</option>
-                <option value="ISFJ">ISFJ - 守卫者</option>
-                <option value="ESTJ">ESTJ - 总经理</option>
-                <option value="ESFJ">ESFJ - 执政官</option>
-                <option value="ISTP">ISTP - 鉴赏家</option>
-                <option value="ISFP">ISFP - 探险家</option>
-                <option value="ESTP">ESTP - 企业家</option>
-                <option value="ESFP">ESFP - 表演者</option>
+                {mbtiTypes.map(({ type, name }) => (
+                  <option key={type} value={type}>{type} - {name}</option>
+                ))}
               </select>
             </div>
           </label>
@@ -227,7 +215,7 @@ export default function UserInfoCard({
       </div>
       <div className="flex items-start gap-2">
         <Brain size={16} className="text-purple-400 mt-0.5" />
-        <span>MBTI：{user.mbti || "未填写"}</span>
+        <span>MBTI：{getMBTIDisplay(user.mbti)}</span>
       </div>
       <div className="flex items-start gap-2">
         <HeartHandshake size={16} className="text-indigo-400 mt-0.5" />

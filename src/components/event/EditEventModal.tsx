@@ -242,7 +242,10 @@ const EditEventModal: React.FC<EditEventModalProps> = ({
                   min={2}
                   max={50}
                   value={formData.maxParticipants}
-                  onChange={(e) => setFormData({ ...formData, maxParticipants: parseInt(e.target.value) })}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    setFormData({ ...formData, maxParticipants: isNaN(value) ? 2 : value });
+                  }}
                   className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
                   required
                 />
