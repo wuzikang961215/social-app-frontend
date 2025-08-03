@@ -46,23 +46,23 @@ export default function EventCard({
 
 
   return (
-    <div className="p-4 bg-white text-sm relative">
-      <div className="font-bold text-gray-800">{event.title}</div>
-      <div className="text-gray-500 italic">
+    <div className="p-2.5 bg-white text-[11px] relative">
+      <div className="font-bold text-gray-800 text-[11px]">{event.title}</div>
+      <div className="text-gray-500 italic text-[9px]">
         🕒 {formatSimpleDate(event.startTime)} ｜ 📍{event.location}
         {event.spotsLeft != null && !isPast && ` ｜ 剩余名额：${event.spotsLeft}人`}
       </div>
 
       {/* 发起人 */}
       {userStatus && event.creator?.username && (
-        <div className="text-gray-700 space-y-1 mt-4">
-          <div className="flex items-center gap-1 text-sm text-gray-500 italic">
-            <User size={14} className="text-gray-400" />
+        <div className="text-gray-700 space-y-0.5 mt-3">
+          <div className="flex items-center gap-1 text-[9px] text-gray-500 italic">
+            <User size={11} className="text-gray-400" />
             发起人
           </div>
-          <div className="flex flex-wrap gap-2 pt-1">
+          <div className="flex flex-wrap gap-1.5 pt-0.5">
             <span
-              className="inline-flex items-center px-2.5 py-1 rounded-full text-gray-600 text-xs shadow-sm border border-gray-200 cursor-pointer"
+              className="inline-flex items-center px-1.5 py-0.5 rounded-full text-gray-600 text-[9px] shadow-sm border border-gray-200 cursor-pointer"
               onClick={(e) => {
                 setSelectedUser({ 
                   id: event.creator.id || event.creator._id, 
@@ -78,16 +78,16 @@ export default function EventCard({
       )}
 
       {/* 参与者 */}
-      <div className="text-gray-700 space-y-1 mt-2">
-        <div className="flex items-center gap-1 text-sm text-gray-500 mb-1 mt-5 italic">
-          <Users size={14} className="text-gray-400" />
+      <div className="text-gray-700 space-y-0.5 mt-2">
+        <div className="flex items-center gap-1 text-[10px] text-gray-500 mb-0.5 mt-3 italic">
+          <Users size={11} className="text-gray-400" />
           {isPast ? "已签到" : "已加入"}（{relevantParticipants.length}人）
         </div>
-        <div className="flex flex-wrap gap-2 pt-1">
+        <div className="flex flex-wrap gap-1.5 pt-0.5">
           {relevantParticipants.map((p: any) => (
             <span
               key={p.user.id}
-              className="inline-flex items-center px-2.5 py-1 rounded-full text-gray-600 text-xs shadow-sm border border-gray-200 cursor-pointer"
+              className="inline-flex items-center px-1.5 py-0.5 rounded-full text-gray-600 text-[9px] shadow-sm border border-gray-200 cursor-pointer"
               onClick={(e) => {
                 setSelectedUser({ 
                   id: p.user.id || p.user._id, 
@@ -103,11 +103,11 @@ export default function EventCard({
       </div>
 
       {/* 底部按钮 */}
-      <div className="flex justify-end gap-2 pt-4">
+      <div className="flex justify-end gap-1 pt-2">
         {onEdit && !isPast && (
           <Button
             size="sm"
-            className="text-xs px-3 py-1 rounded-full bg-indigo-500 text-white"
+            className="text-[9px] px-2 py-0.5 rounded-full bg-indigo-500 text-white"
             onClick={onEdit}
           >
             编辑
@@ -116,7 +116,7 @@ export default function EventCard({
         {userStatus ? (
           <Button
             size="sm"
-            className={`text-xs px-3 py-1 rounded-full ${getStatusStyle(userStatus)}`}
+            className={`text-[10px] px-2.5 py-0.5 rounded-full ${getStatusStyle(userStatus)}`}
             onClick={(userStatus === "pending" || userStatus === "denied") && onCancel ? onCancel : undefined}
             disabled={!((userStatus === "pending" || userStatus === "denied") && onCancel)}
           >
@@ -136,7 +136,7 @@ export default function EventCard({
           showAction && (
             <Button
               size="sm"
-              className="text-xs px-3 py-1 rounded-full bg-indigo-500 text-white"
+              className="text-[9px] px-2 py-0.5 rounded-full bg-indigo-500 text-white"
               onClick={onAction}
             >
               {actionLabel}

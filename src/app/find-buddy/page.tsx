@@ -130,19 +130,19 @@ export default function FindBuddyPage() {
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* 发起活动菜单 - Sticky Header */}
       {isScoreLoaded && (
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 z-30">
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-2 z-30">
           <div className="relative inline-block" ref={menuRef}>
           <button
             onClick={handleLaunchClick}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-full transition-all relative ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full transition-all relative ${
               canCreateEvent
                 ? "text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-200 hover:border-indigo-300"
                 : "text-gray-400 bg-gray-100 border-2 border-gray-200"
             }`}
           >
-            <span className="text-lg font-bold">+</span> 找人一起
+            <span className="text-sm font-bold">+</span> 找人一起
             {(pendingReviewCount > 0 || pendingCheckinCount > 0) && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-semibold">
                 {pendingReviewCount + pendingCheckinCount}
               </span>
             )}
@@ -169,12 +169,12 @@ export default function FindBuddyPage() {
                 <span>👥 看看谁来了</span>
                 <div className="flex items-center gap-1">
                   {pendingReviewCount > 0 && (
-                    <span className="bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                    <span className="bg-orange-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-semibold">
                       {pendingReviewCount}
                     </span>
                   )}
                   {pendingCheckinCount > 0 && (
-                    <span className="bg-green-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                    <span className="bg-green-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-semibold">
                       {pendingCheckinCount}
                     </span>
                   )}
@@ -291,10 +291,10 @@ export default function FindBuddyPage() {
       />
       
       {/* 免责声明 - Subtle sticky footer */}
-      <div className="fixed bottom-16 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-gray-100 px-6 py-3 z-20">
+      <div className="fixed bottom-12 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-gray-100 px-6 py-1.5 z-20">
         <button
           onClick={() => setShowDisclaimerModal(true)}
-          className="w-full text-xs text-gray-500 hover:text-gray-700 transition-colors text-center"
+          className="w-full text-[10px] text-gray-500 hover:text-gray-700 transition-colors text-center"
         >
           免责声明 | Disclaimer
         </button>

@@ -42,38 +42,38 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
   return (
     <Card
       onClick={onClick}
-      className="rounded-2xl border shadow-md cursor-pointer border-gray-200 bg-white"
+      className="rounded-xl border shadow-sm cursor-pointer border-gray-200 bg-white"
     >
-      <CardContent className="p-7 space-y-4">
+      <CardContent className="p-4 space-y-3">
         {/* 标题 + 分类 */}
         <div>
-          <h2 className="text-lg font-extrabold text-gray-800">{event.title}</h2>
-          <p className="text-sm text-gray-500 mt-1 italic">{event.category}</p>
+          <h2 className="text-base font-bold text-gray-800">{event.title}</h2>
+          <p className="text-xs text-gray-500 mt-0.5 italic">{event.category}</p>
         </div>
 
         {/* 描述 */}
         {event.description && (
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-sm text-gray-700 line-clamp-2">
+          <div className="bg-gray-50 rounded-lg p-2">
+            <p className="text-xs text-gray-700 line-clamp-2">
               {event.description}
             </p>
           </div>
         )}
 
         {/* 地点、时间、剩余名额 */}
-        <div className="text-sm text-gray-600 space-y-2">
+        <div className="text-xs text-gray-600 space-y-1.5">
           <div className="flex items-center gap-2">
-            <MapPin size={16} className="text-gray-400" />
+            <MapPin size={14} className="text-gray-400" />
             <span>{event.location}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Clock size={16} className="text-gray-400" />
+            <Clock size={14} className="text-gray-400" />
             <span className={event.time?.startsWith("今天") ? "font-semibold" : ""}>
               {formatTimeRange(event.startTime, event.durationMinutes)}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Users size={16} className="text-gray-400" />
+            <Users size={14} className="text-gray-400" />
             <span>
               剩余名额：
               <span className={event.spotsLeft <= 2 ? "font-semibold" : ""}>
@@ -84,15 +84,15 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
         </div>
 
         {/* 发起人 + 按钮 */}
-        <div className="flex justify-between items-center pt-4 mt-2">
+        <div className="flex justify-between items-center pt-2 mt-1">
           <Link
             href={`/profile/${event.organizer.id}`}
             onClick={(e) => e.stopPropagation()}
             className="flex items-center gap-2"
           >
-            <div className="text-sm text-gray-700">
+            <div className="text-xs text-gray-700">
               <div className="font-medium">{event.organizer.name}</div>
-              <div className="text-xs text-gray-500">发起人</div>
+              <div className="text-[10px] text-gray-500">发起人</div>
             </div>
           </Link>
 

@@ -151,26 +151,26 @@ export default function EventDetailModal({
       <div className="fixed inset-0 z-50 flex items-center justify-center">
         <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
-        <div className="relative bg-white rounded-xl shadow-lg w-[90%] max-w-2xl p-6 z-10 max-h-[90vh] overflow-y-auto">
+        <div className="relative bg-white rounded-xl shadow-lg w-[90%] max-w-2xl p-4 z-10 max-h-[90vh] overflow-y-auto">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-700"
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-700"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
 
-          <div className="space-y-6">
-              <h2 className="text-xl font-bold text-gray-800">{event.title}</h2>
-              <p className="italic text-sm text-gray-600 whitespace-pre-line">
+          <div className="space-y-4">
+              <h2 className="text-base font-bold text-gray-800">{event.title}</h2>
+              <p className="italic text-xs text-gray-600 whitespace-pre-line">
                 {event.description || "（暂无介绍）"}
               </p>
 
               {tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {tags.map((tag) => (
                     <span
                       key={tag}
-                      className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full"
+                      className="bg-gray-100 text-gray-600 text-[10px] px-2 py-0.5 rounded-full"
                     >
                       #{tag}
                     </span>
@@ -178,19 +178,19 @@ export default function EventDetailModal({
                 </div>
               )}
 
-              <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-700 space-y-2">
+              <div className="rounded-lg bg-gray-50 p-3 text-xs text-gray-700 space-y-1.5">
                 <div className="flex items-center gap-2">
-                  <MapPin size={16} className="text-gray-400" />
+                  <MapPin size={14} className="text-gray-400" />
                   <span className="font-medium">地点：</span>
                   <span>{event.location}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock size={16} className="text-gray-400" />
+                  <Clock size={14} className="text-gray-400" />
                   <span className="font-medium">时间：</span>
                   <span>{event.time}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Users size={16} className="text-gray-400" />
+                  <Users size={14} className="text-gray-400" />
                   <p>
                     <span className="font-medium">剩余名额：</span>
                     {event.spotsLeft > 0 ? (
@@ -202,18 +202,18 @@ export default function EventDetailModal({
                 </div>
               </div>
 
-              <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-700 space-y-2">
-                <div className="flex items-center gap-2 font-semibold">
-                  <User size={18} className="text-gray-500" />
+              <div className="rounded-lg bg-gray-50 p-3 text-xs text-gray-700 space-y-1.5">
+                <div className="flex items-center gap-1.5 font-semibold">
+                  <User size={14} className="text-gray-500" />
                   发起人
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   <span className="font-medium">
                     {event.organizer?.name || "未命名"}
                   </span>
                   {organizerStats && (
-                    <div className="flex items-center gap-3 text-xs">
-                      <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full">
+                    <div className="flex items-center gap-2 text-[10px]">
+                      <span className="px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded-full">
                         发起 {organizerStats.createdCount} 场
                       </span>
                     </div>
@@ -222,10 +222,10 @@ export default function EventDetailModal({
                 
                 {/* Attendance Rate Bar */}
                 {organizerStats && organizerStats.participatedCount > 0 && (
-                  <div className="bg-white/50 rounded-lg p-2">
+                  <div className="bg-white/50 rounded-lg p-1.5">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-gray-600">到场率</span>
-                      <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${
+                      <span className="text-[10px] text-gray-600">到场率</span>
+                      <span className={`text-[10px] font-bold px-1 py-0.5 rounded-full ${
                         organizerStats.attendanceRate >= 90 ? "text-green-700 bg-green-100" :
                         organizerStats.attendanceRate >= 70 ? "text-yellow-700 bg-yellow-100" : 
                         "text-red-700 bg-red-100"
@@ -234,9 +234,9 @@ export default function EventDetailModal({
                       </span>
                     </div>
                     
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-gray-200 rounded-full h-1.5">
                       <div 
-                        className={`h-2 rounded-full transition-all duration-700 ${
+                        className={`h-1.5 rounded-full transition-all duration-700 ${
                           organizerStats.attendanceRate >= 90 ? "bg-green-500" :
                           organizerStats.attendanceRate >= 70 ? "bg-yellow-500" : "bg-red-500"
                         }`}
@@ -246,37 +246,37 @@ export default function EventDetailModal({
                   </div>
                 )}
                 
-                <div className="flex items-start gap-2">
-                  <Brain size={16} className="text-purple-400 mt-0.5" />
+                <div className="flex items-start gap-1.5">
+                  <Brain size={14} className="text-purple-400 mt-0.5" />
                   <span>MBTI：{getMBTIDisplay(organizerInfo.mbti)}</span>
                 </div>
-                <div className="flex items-start gap-2">
-                  <HeartHandshake size={16} className="text-indigo-400 mt-0.5" />
+                <div className="flex items-start gap-1.5">
+                  <HeartHandshake size={14} className="text-indigo-400 mt-0.5" />
                   <span>
                     想遇见的朋友：&ldquo;{organizerInfo.idealBuddy || "未填写"}&rdquo;
                   </span>
                 </div>
-                <div className="flex items-start gap-2">
-                  <BadgeCheck size={16} className="text-green-400 mt-0.5" />
+                <div className="flex items-start gap-1.5">
+                  <BadgeCheck size={14} className="text-green-400 mt-0.5" />
                   <span>
                     爱好：{organizerInfo.hobbies?.join("、") || "未填写"}
                   </span>
                 </div>
-                <p className="italic text-gray-500 text-sm">
-                  “{organizerInfo.whyJoin || "TA 还没填写为什么想加入"}”
+                <p className="italic text-gray-500 text-[10px]">
+                  "{organizerInfo.whyJoin || "TA 还没填写为什么想加入"}"
                 </p>
               </div>
 
-              <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-700 space-y-2">
-                <div className="flex items-center gap-2 font-semibold">
-                  <Users size={18} className="text-gray-500" />
+              <div className="rounded-lg bg-gray-50 p-3 text-xs text-gray-700 space-y-1.5">
+                <div className="flex items-center gap-1.5 font-semibold">
+                  <Users size={14} className="text-gray-500" />
                   已加入（{approvedParticipants.length} 人）
                 </div>
-                <div className="flex flex-wrap gap-2 pt-1">
+                <div className="flex flex-wrap gap-1.5 pt-1">
                   {approvedParticipants.map((p) => (
                     <div
                       key={p.user.id}
-                      className="px-3 py-1 rounded-lg text-sm text-gray-700 bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition cursor-pointer"
+                      className="px-2.5 py-0.5 rounded-lg text-xs text-gray-700 bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition cursor-pointer"
                       onClick={(e) => setSelectedUser({ 
                         id: p.user.id, 
                         username: p.user.username,
@@ -290,10 +290,10 @@ export default function EventDetailModal({
               </div>
 
               {(onJoinClick || onCancelClick || onEditClick) && (
-                <div className="pt-2 flex justify-end">
+                <div className="pt-1 flex justify-end">
                   <Button
                     className={`
-                      rounded-full px-4 py-2 text-sm transition
+                      rounded-full px-3 py-1.5 text-xs transition
                       ${
                         event.isOrganizer
                           ? "bg-indigo-500 hover:bg-indigo-600 text-white"

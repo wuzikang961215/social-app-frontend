@@ -180,27 +180,27 @@ export default function NotificationsModal({
       >
         <div className="p-4">
           <div className="flex items-start gap-3">
-            <div className={`w-10 h-10 ${style.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-              <span className="text-lg">{style.icon}</span>
+            <div className={`w-9 h-9 ${style.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+              <span className="text-base">{style.icon}</span>
             </div>
             
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1">
                   <div className="flex items-start gap-2">
-                    <h3 className={`font-medium text-sm ${!notification.read ? 'text-gray-900 font-semibold' : 'text-gray-700'}`}>
+                    <h3 className={`font-medium text-xs ${!notification.read ? 'text-gray-900 font-semibold' : 'text-gray-700'}`}>
                       {notification.title}
                     </h3>
                     {!notification.read && (
-                      <span className="bg-indigo-500 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                      <span className="bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-medium">
                         新
                       </span>
                     )}
                   </div>
-                  <p className={`text-sm mt-1 ${!notification.read ? 'text-gray-700' : 'text-gray-600'}`}>
+                  <p className={`text-xs mt-1 ${!notification.read ? 'text-gray-700' : 'text-gray-600'}`}>
                     {notification.message}
                   </p>
-                  <p className="text-xs text-gray-400 mt-2">
+                  <p className="text-[10px] text-gray-400 mt-1.5">
                     {formatDistanceToNow(new Date(notification.createdAt), {
                       addSuffix: true,
                       locale: zhCN
@@ -231,19 +231,19 @@ export default function NotificationsModal({
       <div className="bg-white min-h-screen">
         {/* Bulk Actions */}
         {notifications.length > 0 && (
-          <div className="sticky top-12 bg-white border-b border-gray-100 px-4 py-3 flex justify-between items-center z-10">
+          <div className="sticky top-12 bg-white border-b border-gray-100 px-4 py-2.5 flex justify-between items-center z-10">
             <button
               onClick={handleMarkAllRead}
-              className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1"
+              className="text-xs text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1"
             >
-              <CheckCheck size={16} />
+              <CheckCheck size={14} />
               全部标记已读
             </button>
             <button
               onClick={handleDeleteAll}
-              className="text-sm text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1"
+              className="text-xs text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1"
             >
-              <Trash2 size={16} />
+              <Trash2 size={14} />
               删除全部
             </button>
           </div>
@@ -253,10 +253,10 @@ export default function NotificationsModal({
         <div className="p-4">
           {notifications.length === 0 ? (
             <div className="text-center py-16">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Bell className="w-8 h-8 text-gray-400" />
+              <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Bell className="w-7 h-7 text-gray-400" />
               </div>
-              <p className="text-gray-500 text-sm">暂无新通知</p>
+              <p className="text-gray-500 text-xs">暂无新通知</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -272,7 +272,7 @@ export default function NotificationsModal({
               <button
                 onClick={() => fetchNotifications()}
                 disabled={loading}
-                className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 disabled:opacity-50"
+                className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 disabled:opacity-50"
               >
                 {loading ? "加载中..." : "加载更多"}
               </button>
@@ -288,13 +288,13 @@ export default function NotificationsModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       
-      <div className="relative bg-white rounded-3xl shadow-2xl w-[90%] max-w-2xl max-h-[85vh] overflow-hidden z-10">
+      <div className="relative bg-white rounded-2xl shadow-2xl w-[90%] max-w-2xl max-h-[85vh] overflow-hidden z-10">
           {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-gray-900">通知中心</h2>
+          <div className="sticky top-0 bg-white border-b border-gray-100 px-5 py-3 flex items-center justify-between">
+            <h2 className="text-base font-bold text-gray-900">通知中心</h2>
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+              className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100"
             >
               <X className="w-4 h-4 text-gray-500" />
             </button>
@@ -302,19 +302,19 @@ export default function NotificationsModal({
 
           {/* Bulk Actions */}
           {notifications.length > 0 && (
-            <div className="bg-gray-50 border-b border-gray-100 px-6 py-3 flex justify-between items-center">
+            <div className="bg-gray-50 border-b border-gray-100 px-5 py-2.5 flex justify-between items-center">
               <button
                 onClick={handleMarkAllRead}
-                className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1"
+                className="text-xs text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1"
               >
-                <CheckCheck size={16} />
+                <CheckCheck size={14} />
                 全部标记已读
               </button>
               <button
                 onClick={handleDeleteAll}
-                className="text-sm text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1"
+                className="text-xs text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1"
               >
-                <Trash2 size={16} />
+                <Trash2 size={14} />
                 删除全部
               </button>
             </div>
@@ -344,7 +344,7 @@ export default function NotificationsModal({
               <button
                 onClick={() => fetchNotifications()}
                 disabled={loading}
-                className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 disabled:opacity-50"
+                className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 disabled:opacity-50"
               >
                 {loading ? "加载中..." : "加载更多"}
               </button>

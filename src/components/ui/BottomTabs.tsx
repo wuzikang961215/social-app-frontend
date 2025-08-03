@@ -60,24 +60,24 @@ export default function BottomTabs() {
   const tabs: TabItem[] = [
     {
       href: "/find-buddy",
-      icon: <Users size={24} />,
+      icon: <Users size={20} />,
       label: "找搭子"
     },
     {
       href: "/notifications",
-      icon: <Bell size={24} />,
+      icon: <Bell size={20} />,
       label: "消息"
     },
     {
       href: "/profile",
-      icon: <User size={24} />,
+      icon: <User size={20} />,
       label: "我的"
     }
   ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30">
-      <div className="grid grid-cols-3 h-16">
+      <div className="grid grid-cols-3 h-12">
         {tabs.map((tab) => {
           const isActive = pathname === tab.href;
 
@@ -85,21 +85,21 @@ export default function BottomTabs() {
             <Link
               key={tab.href}
               href={tab.href}
-              className={`flex flex-col items-center justify-center gap-1 relative ${
+              className={`flex flex-col items-center justify-center gap-0.5 relative ${
                 isActive
                   ? "text-indigo-600"
                   : "text-gray-400 hover:text-gray-600"
               }`}
             >
               {tab.icon}
-              <span className="text-xs font-medium">{tab.label}</span>
+              <span className="text-[10px] font-medium">{tab.label}</span>
               {tab.href === "/find-buddy" && totalPendingCount > 0 && (
-                <span className="absolute top-0 right-6 bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center font-semibold">
+                <span className="absolute top-0 right-6 bg-red-500 text-white text-[10px] rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center font-semibold">
                   {totalPendingCount}
                 </span>
               )}
               {tab.href === "/notifications" && unreadNotifications > 0 && (
-                <span className="absolute top-0 right-6 bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center font-semibold">
+                <span className="absolute top-0 right-6 bg-red-500 text-white text-[10px] rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center font-semibold">
                   {unreadNotifications > 99 ? "99+" : unreadNotifications}
                 </span>
               )}

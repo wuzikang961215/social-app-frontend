@@ -99,25 +99,25 @@ export default function CreateEvent() {
   
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white px-4 py-12">
-      <div className="relative bg-white border border-gray-200 w-full max-w-2xl p-10 rounded-2xl shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-white px-4 py-8">
+      <div className="relative bg-white border border-gray-200 w-full max-w-2xl p-6 rounded-xl shadow-lg">
 
         {/* 关闭按钮 */}
         <button
           onClick={() => router.back()}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700"
+          className="absolute top-3 right-3 text-gray-400 hover:text-gray-700"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
         {/* 标题 */}
-        <h2 className="text-xl font-bold text-gray-800 mb-8">
+        <h2 className="text-base font-bold text-gray-800 mb-4">
           发个邀约
         </h2>
 
         {/* 活动名 */}
-        <div className="mb-6">
-          <div className="text-sm font-semibold text-gray-700 mb-2">想干啥？</div>
+        <div className="mb-4">
+          <div className="text-xs font-semibold text-gray-700 mb-1.5">想干啥？</div>
           <input
           placeholder="如：密室逃脱 / 排球social / KTV"
           value={formData.title}
@@ -125,16 +125,16 @@ export default function CreateEvent() {
             setFormData({ ...formData, title: e.target.value });
             if (errors.title) setErrors({ ...errors, title: "" });
           }}
-          className={`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm ${
+          className={`w-full px-3 py-2 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 text-xs ${
             errors.title ? "border-red-300" : "border-gray-200"
           }`}
           />
-          {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
+          {errors.title && <p className="text-[10px] text-red-500 mt-0.5">{errors.title}</p>}
         </div>
 
         {/* 活动地点 */}
-        <div className="mb-6">
-          <div className="text-sm font-semibold text-gray-700 mb-2">在哪儿见？</div>
+        <div className="mb-4">
+          <div className="text-xs font-semibold text-gray-700 mb-1.5">在哪儿见？</div>
           <input
           placeholder="如：BE Escape Room, 746-748 George St, Haymarket NSW 2000"
           value={formData.location}
@@ -142,16 +142,16 @@ export default function CreateEvent() {
             setFormData({ ...formData, location: e.target.value });
             if (errors.location) setErrors({ ...errors, location: "" });
           }}
-          className={`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm ${
+          className={`w-full px-3 py-2 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 text-xs ${
             errors.location ? "border-red-300" : "border-gray-200"
           }`}
           />
-          {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
+          {errors.location && <p className="text-[10px] text-red-500 mt-0.5">{errors.location}</p>}
         </div>
 
         {/* 开始时间 */}
-        <div className="mb-6">
-          <div className="text-sm font-semibold text-gray-700 mb-2">什么时候？</div>
+        <div className="mb-4">
+          <div className="text-xs font-semibold text-gray-700 mb-1.5">什么时候？</div>
           <input
           type="datetime-local"
           value={formData.startTime}
@@ -159,16 +159,16 @@ export default function CreateEvent() {
             setFormData({ ...formData, startTime: e.target.value });
             if (errors.startTime) setErrors({ ...errors, startTime: "" });
           }}
-          className={`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm ${
+          className={`w-full px-3 py-2 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 text-xs ${
             errors.startTime ? "border-red-300" : "border-gray-200"
           }`}
           />
-          {errors.startTime && <p className="text-xs text-red-500 mt-1">{errors.startTime}</p>}
+          {errors.startTime && <p className="text-[10px] text-red-500 mt-0.5">{errors.startTime}</p>}
         </div>
 
         {/* 活动时长 */}
-        <div className="mb-6">
-          <div className="text-sm font-semibold text-gray-700 mb-2">活动时长</div>
+        <div className="mb-4">
+          <div className="text-xs font-semibold text-gray-700 mb-1.5">活动时长</div>
           <div className="flex items-center">
             <input
               type="number"
@@ -179,19 +179,19 @@ export default function CreateEvent() {
                 setFormData({ ...formData, durationMinutes: e.target.value })
               }
               placeholder="活动时长"
-              className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
+              className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 text-xs"
             />
-            <span className="px-3 py-3 bg-gray-100 border border-l-0 border-gray-200 rounded-r-xl text-sm text-gray-600">
+            <span className="px-2.5 py-2 bg-gray-100 border border-l-0 border-gray-200 rounded-r-lg text-xs text-gray-600">
               分钟
             </span>
           </div>
         </div>
 
         {/* 活动分类 */}
-        <div className="mb-6">
-          <div className="text-sm font-semibold text-gray-700 mb-2">活动分类</div>
-          {errors.category && <p className="text-xs text-red-500 mb-2">{errors.category}</p>}
-          <div className="flex flex-wrap gap-2">
+        <div className="mb-4">
+          <div className="text-xs font-semibold text-gray-700 mb-1.5">活动分类</div>
+          {errors.category && <p className="text-[10px] text-red-500 mb-1">{errors.category}</p>}
+          <div className="flex flex-wrap gap-1.5">
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -199,7 +199,7 @@ export default function CreateEvent() {
                   setFormData({ ...formData, category: cat });
                   if (errors.category) setErrors({ ...errors, category: "" });
                 }}
-                className={`px-4 py-1 rounded-full text-sm transition ${
+                className={`px-3 py-0.5 rounded-full text-[10px] transition ${
                   formData.category === cat
                     ? "bg-indigo-600 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -212,14 +212,14 @@ export default function CreateEvent() {
         </div>
 
         {/* 标签 */}
-        <div className="mb-6">
-          <div className="text-sm font-semibold text-gray-700 mb-2">标签（可多选）</div>
-          <div className="flex flex-wrap gap-2">
+        <div className="mb-4">
+          <div className="text-xs font-semibold text-gray-700 mb-1.5">标签（可多选）</div>
+          <div className="flex flex-wrap gap-1.5">
             {tagList.map((tag) => (
               <button
                 key={tag}
                 onClick={() => toggleTag(tag)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition ${
+                className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium transition ${
                   formData.tags.includes(tag)
                     ? "bg-indigo-500 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -232,8 +232,8 @@ export default function CreateEvent() {
         </div>
 
         {/* 参与人数 */}
-        <div className="mb-6">
-          <label className="text-sm font-semibold text-gray-700 block mb-1">
+        <div className="mb-4">
+          <label className="text-xs font-semibold text-gray-700 block mb-1">
             想找几个人？
           </label>
           <input
@@ -245,16 +245,16 @@ export default function CreateEvent() {
               setFormData({ ...formData, maxParticipants: e.target.value });
               if (errors.maxParticipants) setErrors({ ...errors, maxParticipants: "" });
             }}
-            className={`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm ${
+            className={`w-full px-3 py-2 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 text-xs ${
               errors.maxParticipants ? "border-red-300" : "border-gray-200"
             }`}
           />
-          {errors.maxParticipants && <p className="text-xs text-red-500 mt-1">{errors.maxParticipants}</p>}
+          {errors.maxParticipants && <p className="text-[10px] text-red-500 mt-0.5">{errors.maxParticipants}</p>}
         </div>
 
         {/* 活动描述 */}
-        <div className="mb-8">
-          <label className="text-sm font-semibold text-gray-700 block mb-1">
+        <div className="mb-5">
+          <label className="text-xs font-semibold text-gray-700 block mb-1">
             跟大家说说这个活动（可选）
           </label>
           <textarea
@@ -265,17 +265,17 @@ export default function CreateEvent() {
               setFormData({ ...formData, description: e.target.value });
               if (errors.description) setErrors({ ...errors, description: "" });
             }}
-            className={`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm resize-none ${
+            className={`w-full px-3 py-2 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 text-xs resize-none ${
               errors.description ? "border-red-300" : "border-gray-200"
             }`}
           />
-          {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
+          {errors.description && <p className="text-[10px] text-red-500 mt-0.5">{errors.description}</p>}
         </div>
 
         {/* 提交按钮 */}
         <button
           onClick={handleSubmit}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-full transition text-sm font-semibold"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-full transition text-xs font-semibold"
         >
           发布邀约
         </button>

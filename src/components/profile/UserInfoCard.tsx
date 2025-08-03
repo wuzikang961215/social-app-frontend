@@ -78,21 +78,21 @@ export default function UserInfoCard({
 
   if (isEditing) {
     return (
-      <div className="rounded-xl bg-white p-4 text-sm text-gray-700 space-y-3 border border-indigo-300 shadow-sm">
-        <div className="flex items-center gap-2 font-semibold">
-          <User size={18} className="text-gray-500" />
+      <div className="rounded-lg bg-gradient-to-br from-indigo-50 to-white p-4 text-[13px] text-gray-700 space-y-2.5 border border-indigo-300 shadow-sm">
+        <div className="flex items-center gap-1.5 font-semibold">
+          <User size={14} className="text-gray-500" />
           {user.username}
         </div>
         
-        <div className="space-y-2">
-          <label className="flex items-start gap-2">
-            <Brain size={16} className="text-purple-400 mt-1" />
+        <div className="space-y-1.5">
+          <label className="flex items-start gap-1.5">
+            <Brain size={16} className="text-purple-400 mt-0.5" />
             <div className="flex-1">
-              <span className="text-xs text-gray-600">MBTI类型：</span>
+              <span className="text-[10px] text-gray-600">MBTI类型：</span>
               <select
                 value={formData.mbti}
                 onChange={(e) => setFormData({ ...formData, mbti: e.target.value })}
-                className="w-full mt-1 px-2 py-1 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full mt-0.5 px-2 py-1 text-[10px] border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="">选择你的MBTI类型</option>
                 {mbtiTypes.map(({ type, name }) => (
@@ -102,30 +102,30 @@ export default function UserInfoCard({
             </div>
           </label>
           
-          <label className="flex items-start gap-2">
-            <HeartHandshake size={16} className="text-indigo-400 mt-1" />
+          <label className="flex items-start gap-1.5">
+            <HeartHandshake size={16} className="text-indigo-400 mt-0.5" />
             <div className="flex-1">
-              <span className="text-xs text-gray-600">想遇见的朋友：</span>
+              <span className="text-[10px] text-gray-600">想遇见的朋友：</span>
               <input
                 type="text"
                 value={formData.idealBuddy}
                 onChange={(e) => setFormData({ ...formData, idealBuddy: e.target.value })}
-                className="w-full mt-1 px-2 py-1 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full mt-0.5 px-2 py-1 text-[10px] border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 placeholder="描述你想认识什么样的朋友"
               />
             </div>
           </label>
           
           <div>
-            <label className="flex items-start gap-2">
-              <BadgeCheck size={16} className="text-green-400 mt-1" />
+            <label className="flex items-start gap-1.5">
+              <BadgeCheck size={16} className="text-green-400 mt-0.5" />
               <div className="flex-1">
-                <span className="text-xs text-gray-600">爱好：</span>
-                <div className="flex flex-wrap gap-1 mt-1 mb-2">
+                <span className="text-[10px] text-gray-600">爱好：</span>
+                <div className="flex flex-wrap gap-1 mt-0.5 mb-1">
                   {formData.interests.map((interest, index) => (
                     <span
                       key={`${interest}-${index}`}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-xs"
+                      className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-gray-100 rounded-full text-[10px]"
                     >
                       {interest}
                       <button
@@ -135,7 +135,7 @@ export default function UserInfoCard({
                           e.stopPropagation();
                           removeInterest(interest);
                         }}
-                        className="text-gray-500 hover:text-red-500 ml-1"
+                        className="text-gray-500 hover:text-red-500 ml-0.5"
                       >
                         ×
                       </button>
@@ -148,7 +148,7 @@ export default function UserInfoCard({
                     value={interestInput}
                     onChange={(e) => setInterestInput(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addInterest())}
-                    className="flex-1 px-2 py-1 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="flex-1 px-2 py-1 text-[10px] border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     placeholder="添加爱好，按回车确认"
                   />
                   <button
@@ -157,7 +157,7 @@ export default function UserInfoCard({
                       e.preventDefault();
                       addInterest();
                     }}
-                    className="px-2 py-1 text-xs bg-indigo-500 text-white rounded hover:bg-indigo-600"
+                    className="px-1.5 py-1 text-[10px] bg-indigo-500 text-white rounded hover:bg-indigo-600"
                   >
                     添加
                   </button>
@@ -167,38 +167,38 @@ export default function UserInfoCard({
           </div>
           
           <div>
-            <span className="text-xs text-gray-600">为什么想加入：</span>
+            <span className="text-[10px] text-gray-600">为什么想加入：</span>
             <textarea
               value={formData.whyJoin}
               onChange={(e) => setFormData({ ...formData, whyJoin: e.target.value })}
-              className="w-full mt-1 px-2 py-1 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full mt-0.5 px-2 py-1 text-[10px] border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
               rows={3}
               placeholder="分享你加入的原因"
             />
           </div>
         </div>
         
-        <div className="pt-2 flex justify-end gap-2">
+        <div className="pt-1 flex justify-end gap-1.5">
           <Button
             size="sm"
             variant="outline"
-            className="text-xs px-3 py-1 rounded-full"
+            className="text-[10px] px-2.5 py-0.5 rounded-full"
             onClick={handleCancel}
             disabled={loading}
           >
-            <X size={14} className="mr-1" /> 取消
+            <X size={12} className="mr-0.5" /> 取消
           </Button>
           <Button
             size="sm"
-            className="text-xs px-3 py-1 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white"
+            className="text-[10px] px-2.5 py-0.5 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white"
             onClick={handleSave}
             disabled={loading}
           >
             {loading ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
               <>
-                <Save size={14} className="mr-1" /> 保存
+                <Save size={12} className="mr-0.5" /> 保存
               </>
             )}
           </Button>
@@ -208,29 +208,29 @@ export default function UserInfoCard({
   }
 
   return (
-    <div className="rounded-xl bg-white p-4 text-sm text-gray-700 space-y-2 border border-gray-200 shadow-sm">
+    <div className="rounded-lg bg-gradient-to-br from-white to-gray-50 p-4 text-[13px] text-gray-700 space-y-2 border border-gray-200 shadow-sm">
       <div className="flex items-center gap-2 font-semibold">
-        <User size={18} className="text-gray-500" />
+        <User size={16} className="text-gray-500" />
         {user.username}
       </div>
-      <div className="flex items-start gap-2">
-        <Brain size={16} className="text-purple-400 mt-0.5" />
+      <div className="flex items-start gap-1.5">
+        <Brain size={14} className="text-purple-400 mt-0.5" />
         <span>MBTI：{getMBTIDisplay(user.mbti)}</span>
       </div>
-      <div className="flex items-start gap-2">
-        <HeartHandshake size={16} className="text-indigo-400 mt-0.5" />
+      <div className="flex items-start gap-1.5">
+        <HeartHandshake size={14} className="text-indigo-400 mt-0.5" />
         <span>想遇见的朋友：&ldquo;{user.idealBuddy || "未填写"}&rdquo;</span>
       </div>
-      <div className="flex items-start gap-2">
-        <BadgeCheck size={16} className="text-green-400 mt-0.5" />
+      <div className="flex items-start gap-1.5">
+        <BadgeCheck size={14} className="text-green-400 mt-0.5" />
         <span>爱好：{user.interests?.join("、") || "未填写"}</span>
       </div>
-      <p className="italic text-gray-500 text-sm">&ldquo;{user.whyJoin || "TA 还没填写为什么想加入"}&rdquo;</p>
-      <div className="pt-2 flex justify-end">
+      <p className="italic text-gray-500 text-[11px]">&ldquo;{user.whyJoin || "TA 还没填写为什么想加入"}&rdquo;</p>
+      <div className="pt-1 flex justify-end">
         <Button
           size="sm"
           variant="outline"
-          className="text-xs px-3 py-1 rounded-full border-gray-300 text-gray-600 hover:bg-gray-100"
+          className="text-[10px] px-2.5 py-0.5 rounded-full border-gray-300 text-gray-600 hover:bg-gray-100"
           onClick={() => setIsEditing(true)}
         >
           ✏️ 修改资料

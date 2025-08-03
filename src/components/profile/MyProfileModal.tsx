@@ -136,15 +136,15 @@ export default function MyProfileModal({
     <div className={embedMode ? "min-h-screen bg-gray-50 pb-20" : "space-y-6"}>
       {/* Header for embed mode */}
       {embedMode && (
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 z-10">
-          <h1 className="text-xl font-bold text-center">我的</h1>
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 z-10 shadow-sm">
+          <h1 className="text-base font-bold text-center text-gray-900">我的</h1>
         </div>
       )}
       
-      <div className={embedMode ? "p-6 space-y-6" : ""}>
+      <div className={embedMode ? "px-4 py-4 space-y-6" : ""}>
         {!embedMode && (
           <button
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
             onClick={onClose}
           >
             ✕
@@ -152,91 +152,99 @@ export default function MyProfileModal({
         )}
 
         {/* 👤 用户信息 */}
-        <SectionHeader icon={<User className="text-indigo-500" size={20} />} title="我的个人资料" />
-        <UserInfoCard 
-          user={userInfo} 
-          onUpdate={handleUserUpdate}
-        />
+        <div className="bg-white rounded-xl p-5 shadow-sm space-y-4">
+          <SectionHeader icon={<User className="text-indigo-500" size={16} />} title="我的个人资料" />
+          <UserInfoCard 
+            user={userInfo} 
+            onUpdate={handleUserUpdate}
+          />
+        </div>
 
         {/* 📊 活动统计 */}
-        <SectionHeader icon={<BarChart3 className="text-purple-500" size={20} />} title="活动统计" />
-        {userStats && <UserStats stats={userStats} />}
+        <div className="bg-white rounded-xl p-5 shadow-sm space-y-4">
+          <SectionHeader icon={<BarChart3 className="text-purple-500" size={16} />} title="活动统计" />
+          {userStats && <UserStats stats={userStats} />}
+        </div>
 
         {/* 📆 我发起的活动 */}
-        <SectionHeader icon={<CalendarIcon className="text-yellow-500" size={20} />} title="我发起的活动" />
+        <div className="bg-white rounded-xl p-5 shadow-sm space-y-4">
+          <SectionHeader icon={<CalendarIcon className="text-yellow-500" size={16} />} title="我发起的活动" />
 
-        <CollapsibleList
-          title="即将到来"
-          collapsed={collapsed.createdUpcoming}
-          onToggle={() => toggle("createdUpcoming")}
-        >
-          {upcomingCreated.map((e) => (
-            <EventCard
-              key={e.id}
-              event={e}
-              userStatus={e.userStatus}
-              onEdit={() => {
-                setSelectedEvent(e);
-                setShowEditModal(true);
-              }}
-            />
-          ))}
-        </CollapsibleList>
+          <CollapsibleList
+            title="即将到来"
+            collapsed={collapsed.createdUpcoming}
+            onToggle={() => toggle("createdUpcoming")}
+          >
+            {upcomingCreated.map((e) => (
+              <EventCard
+                key={e.id}
+                event={e}
+                userStatus={e.userStatus}
+                onEdit={() => {
+                  setSelectedEvent(e);
+                  setShowEditModal(true);
+                }}
+              />
+            ))}
+          </CollapsibleList>
 
-        <CollapsibleList
-          title="已结束"
-          collapsed={collapsed.createdPast}
-          onToggle={() => toggle("createdPast")}
-        >
-          {pastCreated.map((e) => (
-            <EventCard
-              key={e.id}
-              event={e}
-              userStatus={e.userStatus}
-            />
-          ))}
-        </CollapsibleList>
+          <CollapsibleList
+            title="已结束"
+            collapsed={collapsed.createdPast}
+            onToggle={() => toggle("createdPast")}
+          >
+            {pastCreated.map((e) => (
+              <EventCard
+                key={e.id}
+                event={e}
+                userStatus={e.userStatus}
+              />
+            ))}
+          </CollapsibleList>
+        </div>
 
         {/* 👥 我参与的活动 */}
-        <SectionHeader icon={<Users className="text-green-500" size={20} />} title="我参与的活动" />
+        <div className="bg-white rounded-xl p-5 shadow-sm space-y-4">
+          <SectionHeader icon={<Users className="text-green-500" size={16} />} title="我参与的活动" />
 
-        <CollapsibleList
-          title="即将到来"
-          collapsed={collapsed.joinedUpcoming}
-          onToggle={() => toggle("joinedUpcoming")}
-        >
-          {upcomingJoined.map((e) => (
-            <EventCard 
-              key={e.id} 
-              event={e} 
-              userStatus={e.userStatus}
-              onCancel={() => {
-                setSelectedEvent(e);
-                setShowCancelModal(true);
-              }}
-            />
-          ))}
-        </CollapsibleList>
+          <CollapsibleList
+            title="即将到来"
+            collapsed={collapsed.joinedUpcoming}
+            onToggle={() => toggle("joinedUpcoming")}
+          >
+            {upcomingJoined.map((e) => (
+              <EventCard 
+                key={e.id} 
+                event={e} 
+                userStatus={e.userStatus}
+                onCancel={() => {
+                  setSelectedEvent(e);
+                  setShowCancelModal(true);
+                }}
+              />
+            ))}
+          </CollapsibleList>
 
-        <CollapsibleList
-          title="已结束"
-          collapsed={collapsed.joinedPast}
-          onToggle={() => toggle("joinedPast")}
-        >
-          {pastJoined.map((e) => (
-            <EventCard key={e.id} event={e} userStatus={e.userStatus} />
-          ))}
-        </CollapsibleList>
+          <CollapsibleList
+            title="已结束"
+            collapsed={collapsed.joinedPast}
+            onToggle={() => toggle("joinedPast")}
+          >
+            {pastJoined.map((e) => (
+              <EventCard key={e.id} event={e} userStatus={e.userStatus} />
+            ))}
+          </CollapsibleList>
+        </div>
         
         {/* Logout button for embed mode */}
         {embedMode && onLogout && (
-          <div className="mt-8">
+          <div className="mt-6">
             <button
               onClick={onLogout}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
             >
-              <LogOut size={20} />
-              <span className="font-medium">退出登录</span>
+              <LogOut size={18} />
+              <span className="text-[13px] font-medium">退出登录</span>
             </button>
           </div>
         )}
@@ -293,7 +301,7 @@ export default function MyProfileModal({
   // For modal mode, wrap in modal container
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex justify-end">
-      <div className="w-full max-w-md h-full bg-white p-6 overflow-y-auto relative shadow-xl">
+      <div className="w-full max-w-md h-full bg-white p-4 overflow-y-auto relative shadow-xl">
         {profileContent}
         
         {/* Cancel Modal */}
