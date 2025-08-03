@@ -193,7 +193,7 @@ export default function FindBuddyPage() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
           </div>
         ) : filteredEvents.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-gray-500 text-sm">
             暂无活动
           </div>
         ) : (

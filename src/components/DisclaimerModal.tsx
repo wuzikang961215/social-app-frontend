@@ -35,8 +35,9 @@ const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ isOpen, onClose }) =>
 
             <h3 className="text-sm font-bold mb-1.5 text-gray-800">活动性质说明</h3>
             <ul className="list-disc pl-4 mb-3 space-y-1 text-xs text-gray-700 leading-relaxed">
-                  <li>平台仅作为信息分享与联络工具，<strong className="font-semibold text-gray-900">不参与任何活动的策划、组织、管理或监督</strong>。</li>
-                  <li>所有活动均由用户个人或团体发起，<strong className="font-semibold text-gray-900">平台无法验证其真实性、合法性或安全性</strong>。</li>
+                  <li>除标有官方认证标识的 Yodda 官方活动外，平台仅作为信息分享与联络工具，<strong className="font-semibold text-gray-900">不参与其他用户活动的策划、组织、管理或监督</strong>。</li>
+                  <li>非官方活动均由用户个人或团体发起，<strong className="font-semibold text-gray-900">平台无法验证其真实性、合法性或安全性</strong>。</li>
+                  <li>Yodda 官方活动会在发起人名称旁显示<strong className="font-semibold text-gray-900">官方认证标识</strong>。</li>
                 </ul>
 
             <h3 className="text-sm font-bold mb-1.5 text-gray-800">风险与责任</h3>
@@ -69,8 +70,9 @@ const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ isOpen, onClose }) =>
 
             <h3 className="text-sm font-bold mb-1.5 text-gray-800">Event Nature</h3>
             <ul className="list-disc pl-4 mb-3 space-y-1 text-xs text-gray-700 leading-relaxed">
-                  <li>The platform only provides information sharing and registration functions. <strong className="font-semibold text-gray-900">We do not participate in the planning, organization, management, or supervision of any event.</strong></li>
-                  <li>All events are initiated by individual users or groups. <strong className="font-semibold text-gray-900">We do not verify the authenticity, legality, or safety of any event.</strong></li>
+                  <li>Except for official Yodda events marked with an official badge, the platform only provides information sharing and registration functions. <strong className="font-semibold text-gray-900">We do not participate in the planning, organization, management, or supervision of other user events.</strong></li>
+                  <li>Non-official events are initiated by individual users or groups. <strong className="font-semibold text-gray-900">We do not verify the authenticity, legality, or safety of such events.</strong></li>
+                  <li>Official Yodda events display an <strong className="font-semibold text-gray-900">official verification badge</strong> next to the organizer's name.</li>
                 </ul>
 
             <h3 className="text-sm font-bold mb-1.5 text-gray-800">Risk and Liability</h3>

@@ -1,9 +1,10 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Clock, Users } from "lucide-react";
+import { MapPin, Clock, Users, CheckCircle } from "lucide-react";
 import { formatTimeRange } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { isOfficialAccount } from "@/lib/constants";
 
 interface EventCardProps {
   event: any;
@@ -91,7 +92,15 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
             className="flex items-center gap-2"
           >
             <div className="text-xs text-gray-700">
-              <div className="font-medium">{event.organizer.name}</div>
+              <div className="font-medium flex items-center gap-1">
+                {event.organizer.name}
+                {isOfficialAccount(event.organizer.id) && (
+                  <svg className="w-3 h-3" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="10" fill="#3B82F6"/>
+                    <path d="M14.5 7L8.5 13L5.5 10" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </div>
               <div className="text-[10px] text-gray-500">发起人</div>
             </div>
           </Link>

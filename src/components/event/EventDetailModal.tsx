@@ -8,6 +8,7 @@ import {
   User,
   HeartHandshake,
   BadgeCheck,
+  CheckCircle,
   X,
   Brain,
 } from "lucide-react";
@@ -15,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { getUserById, api } from "@/lib/api"; // ✅ 替代 axios + BASE_URL
 import UserDetailPopover from "@/components/user/UserDetailPopover";
 import { getMBTIDisplay } from "@/lib/mbtiConstants";
+import { isOfficialAccount } from "@/lib/constants";
 
 import type { Event as AppEvent } from "@/types/event";
 
@@ -208,8 +210,14 @@ export default function EventDetailModal({
                   发起人
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-medium">
+                  <span className="font-medium flex items-center gap-1">
                     {event.organizer?.name || "未命名"}
+                    {isOfficialAccount(event.organizer?.id) && (
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none">
+                        <circle cx="10" cy="10" r="10" fill="#3B82F6"/>
+                        <path d="M14.5 7L8.5 13L5.5 10" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
                   </span>
                   {organizerStats && (
                     <div className="flex items-center gap-2 text-[10px]">

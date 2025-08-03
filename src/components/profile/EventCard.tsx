@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { User, Users } from "lucide-react";
+import { User, Users, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatSimpleDate } from "@/lib/formatSimple";
 import UserDetailPopover from "@/components/user/UserDetailPopover";
+import { isOfficialAccount } from "@/lib/constants";
 
 export default function EventCard({
   event,
@@ -62,7 +63,7 @@ export default function EventCard({
           </div>
           <div className="flex flex-wrap gap-1.5 pt-0.5">
             <span
-              className="inline-flex items-center px-1.5 py-0.5 rounded-full text-gray-600 text-[9px] shadow-sm border border-gray-200 cursor-pointer"
+              className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-gray-600 text-[9px] shadow-sm border border-gray-200 cursor-pointer"
               onClick={(e) => {
                 setSelectedUser({ 
                   id: event.creator.id || event.creator._id, 
@@ -72,6 +73,12 @@ export default function EventCard({
               }}
             >
               {event.creator?.username}
+              {isOfficialAccount(event.creator?.id || event.creator?._id) && (
+                <svg className="w-2.5 h-2.5" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="10" fill="#3B82F6"/>
+                  <path d="M14.5 7L8.5 13L5.5 10" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
             </span>
           </div>
         </div>
