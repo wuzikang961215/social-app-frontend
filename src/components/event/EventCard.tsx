@@ -30,7 +30,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
       case "requestingCancellation":
         return "取消申请中";
       default:
-        return event.spotsLeft > 0 ? "立即报名" : "已满";
+        return event.spotsLeft > 0 ? "我想加入" : "已满";
     }
   })();
 
@@ -42,7 +42,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
   return (
     <Card
       onClick={onClick}
-      className="rounded-2xl border transition-shadow shadow-md hover:shadow-lg hover:scale-[1.01] transition-transform cursor-pointer border-gray-200 bg-white"
+      className="rounded-2xl border shadow-md cursor-pointer border-gray-200 bg-white"
     >
       <CardContent className="p-7 space-y-4">
         {/* 标题 + 分类 */}
@@ -83,16 +83,16 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
           </div>
         </div>
 
-        {/* 主办人 + 按钮 */}
+        {/* 发起人 + 按钮 */}
         <div className="flex justify-between items-center pt-4 mt-2">
           <Link
             href={`/profile/${event.organizer.id}`}
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-2 hover:underline"
+            className="flex items-center gap-2"
           >
             <div className="text-sm text-gray-700">
               <div className="font-medium">{event.organizer.name}</div>
-              <div className="text-xs text-gray-500">主办人</div>
+              <div className="text-xs text-gray-500">发起人</div>
             </div>
           </Link>
 
@@ -102,17 +102,17 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
               rounded-full px-4 py-2 text-sm transition
               ${
                 event.isOrganizer
-                  ? "bg-indigo-500 hover:bg-indigo-600 text-white"
+                  ? "bg-indigo-500 text-white"
                   : (event.userCancelCount ?? 0) >= 2
                   ? "bg-red-100 text-red-600 cursor-default"
                   : (!event.userStatus || event.userStatus === "cancelled") && event.spotsLeft > 0
-                  ? "bg-indigo-500 hover:bg-indigo-600 text-white"
+                  ? "bg-indigo-500 text-white"
                   : event.userStatus === "approved"
                   ? "bg-emerald-500 text-white cursor-default"
                   : event.userStatus === "checkedIn"
                   ? "bg-cyan-500 text-white cursor-default"
                   : event.userStatus === "pending" || event.userStatus === "denied"
-                  ? "bg-gray-300 text-gray-800 hover:bg-gray-400"
+                  ? "bg-gray-300 text-gray-800"
                   : event.userStatus === "requestingCancellation"
                   ? "bg-gray-300 text-gray-800 cursor-default"
                   : event.userStatus === "noShow"

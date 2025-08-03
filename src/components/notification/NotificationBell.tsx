@@ -16,17 +16,14 @@ export default function NotificationBell({ onClick }: NotificationBellProps) {
       // Check if user is authenticated before making API call
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       if (!token) {
-        console.log('[notification] No auth token, skipping notification check');
         return;
       }
       
-      console.log('[polling] checking notification count');
       const { count } = await getUnreadCount();
       setUnreadCount(prevCount => {
         // Only trigger refresh if there are NEW notifications (not just unread ones)
         // and only if the count actually increased
         if (prevCount !== undefined && count > prevCount && count > 0) {
-          console.log('[notification] New notifications detected, triggering event refresh');
           // Defer the event dispatch to avoid state update during render
           setTimeout(() => {
             window.dispatchEvent(new Event('refresh-events'));
@@ -63,7 +60,7 @@ export default function NotificationBell({ onClick }: NotificationBellProps) {
     >
       <Bell className="w-5 h-5 text-gray-600 hover:text-gray-800" />
       {unreadCount > 0 && (
-        <span className="absolute -top-2 -right-2 bg-indigo-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold shadow-sm animate-pulse">
+        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold shadow-sm">
           {unreadCount > 99 ? "99+" : unreadCount}
         </span>
       )}

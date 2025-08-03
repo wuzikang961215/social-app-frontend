@@ -44,19 +44,29 @@ const EditEventModal: React.FC<EditEventModalProps> = ({
 
   // Initialize form data when event changes
   useEffect(() => {
-    if (event) {
-      const startDate = parseISO(event.startTime);
-      
-      setFormData({
-        title: event.title || "",
-        location: event.location || "",
-        startTime: format(startDate, "yyyy-MM-dd'T'HH:mm"),
-        durationMinutes: String(event.durationMinutes || 90),
-        description: event.description || "",
-        maxParticipants: event.maxParticipants || 2,
-        category: event.category || "",
-        tags: event.tags || []
-      });
+    if (event && event.startTime) {
+      try {
+        const startDate = parseISO(event.startTime);
+        
+        // Check if the date is valid
+        if (isNaN(startDate.getTime())) {
+          console.error('Invalid startTime:', event.startTime);
+          return;
+        }
+        
+        setFormData({
+          title: event.title || "",
+          location: event.location || "",
+          startTime: format(startDate, "yyyy-MM-dd'T'HH:mm"),
+          durationMinutes: String(event.durationMinutes || 90),
+          description: event.description || "",
+          maxParticipants: event.maxParticipants || 2,
+          category: event.category || "",
+          tags: event.tags || []
+        });
+      } catch (error) {
+        console.error('Error parsing event data:', error);
+      }
     }
   }, [event]);
 

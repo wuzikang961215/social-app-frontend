@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { X, CheckCheck, Trash2, Calendar, MapPin, Bell } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { 
   getNotifications, 
   markNotificationsAsRead, 
@@ -39,21 +38,26 @@ interface Notification {
 interface NotificationsModalProps {
   open: boolean;
   onClose: () => void;
-  onUpdate?: () => void; // Callback to update unread count
+  userId: string;
+  onUpdate?: () => void;
+  embedMode?: boolean;
 }
 
-export default function NotificationsModal({ open, onClose, onUpdate }: NotificationsModalProps) {
+export default function NotificationsModal({
+  open,
+  onClose,
+  userId,
+  onUpdate,
+  embedMode = false,
+}: NotificationsModalProps) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const fetchingRef = useRef(false);
 
   const fetchNotifications = async (reset = false) => {
-    // Prevent concurrent fetches
-    if (fetchingRef.current) return;
-    if (!reset && (loading || !hasMore)) return;
-    
+    if (fetchingRef.current || (!reset && !hasMore)) return;
     fetchingRef.current = true;
     setLoading(true);
     
@@ -102,6 +106,7 @@ export default function NotificationsModal({ open, onClose, onUpdate }: Notifica
       // Then fetch fresh data
       fetchNotifications(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const handleMarkAllRead = async () => {
@@ -109,9 +114,24 @@ export default function NotificationsModal({ open, onClose, onUpdate }: Notifica
       await markAllNotificationsAsRead();
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
       onUpdate?.();
+      // Trigger notification count update
+      window.dispatchEvent(new Event('notification-update'));
       toast.success("已全部标记为已读");
     } catch (error) {
       toast.error("操作失败");
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    try {
+      // Delete all notifications one by one
+      await Promise.all(notifications.map(n => deleteNotification(n.id)));
+      setNotifications([]);
+      // Trigger notification count update
+      window.dispatchEvent(new Event('notification-update'));
+      toast.success("已删除所有通知");
+    } catch (error) {
+      toast.error("删除失败");
     }
   };
 
@@ -120,7 +140,10 @@ export default function NotificationsModal({ open, onClose, onUpdate }: Notifica
       await deleteNotification(id);
       setNotifications(prev => prev.filter(n => n.id !== id));
       toast.success("已删除");
+      // Trigger notification count update
+      window.dispatchEvent(new Event('notification-update'));
     } catch (error) {
+      console.error("Delete notification error:", error);
       toast.error("删除失败");
     }
   };
@@ -128,71 +151,177 @@ export default function NotificationsModal({ open, onClose, onUpdate }: Notifica
   const getNotificationStyle = (type: string) => {
     switch (type) {
       case "event_approved":
-        return { icon: "🎉", bgColor: "bg-emerald-50", iconBg: "bg-emerald-100" };
+        return { icon: "✅", bgColor: "bg-gray-50", iconBg: "bg-green-100" };
       case "event_denied":
-        return { icon: "😔", bgColor: "bg-red-50", iconBg: "bg-red-100" };
+        return { icon: "❌", bgColor: "bg-gray-50", iconBg: "bg-red-100" };
       case "event_join_request":
-        return { icon: "✋", bgColor: "bg-indigo-50", iconBg: "bg-indigo-100" };
+        return { icon: "🙋", bgColor: "bg-gray-50", iconBg: "bg-blue-100" };
       case "event_cancelled":
-        return { icon: "🚫", bgColor: "bg-gray-50", iconBg: "bg-gray-100" };
+        return { icon: "⚠️", bgColor: "bg-gray-50", iconBg: "bg-yellow-100" };
       case "event_checkin":
-        return { icon: "📍", bgColor: "bg-cyan-50", iconBg: "bg-cyan-100" };
+        return { icon: "✨", bgColor: "bg-gray-50", iconBg: "bg-purple-100" };
       default:
-        return { icon: "📬", bgColor: "bg-gray-50", iconBg: "bg-gray-100" };
+        return { icon: "💬", bgColor: "bg-gray-50", iconBg: "bg-gray-100" };
     }
   };
 
   if (!open) return null;
 
-  return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center"
+  const NotificationItem = ({ notification }: { notification: Notification }) => {
+    const style = getNotificationStyle(notification.type);
+    
+    return (
+      <div
+        className={`group rounded-lg border-2 ${
+          !notification.read 
+            ? "border-indigo-300 bg-indigo-50 shadow-sm" 
+            : "border-gray-100 bg-white"
+        } overflow-hidden`}
       >
-        <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-        
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.95, opacity: 0, y: 10 }}
-          transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-          className="relative bg-white rounded-3xl shadow-2xl w-[90%] max-w-2xl max-h-[85vh] overflow-hidden z-10"
-        >
-          {/* Header */}
-          <div className="sticky top-0 bg-gradient-to-b from-white to-gray-50/80 backdrop-blur-sm border-b border-gray-100 px-6 py-5 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-indigo-100 rounded-2xl flex items-center justify-center">
-                <Bell className="w-5 h-5 text-indigo-600" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-gray-900">通知中心</h2>
-                <p className="text-xs text-gray-500">查看你的所有通知</p>
-              </div>
+        <div className="p-4">
+          <div className="flex items-start gap-3">
+            <div className={`w-10 h-10 ${style.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+              <span className="text-lg">{style.icon}</span>
             </div>
-            <div className="flex items-center gap-3">
-              {notifications.some(n => !n.read) && (
+            
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1">
+                  <div className="flex items-start gap-2">
+                    <h3 className={`font-medium text-sm ${!notification.read ? 'text-gray-900 font-semibold' : 'text-gray-700'}`}>
+                      {notification.title}
+                    </h3>
+                    {!notification.read && (
+                      <span className="bg-indigo-500 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                        新
+                      </span>
+                    )}
+                  </div>
+                  <p className={`text-sm mt-1 ${!notification.read ? 'text-gray-700' : 'text-gray-600'}`}>
+                    {notification.message}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-2">
+                    {formatDistanceToNow(new Date(notification.createdAt), {
+                      addSuffix: true,
+                      locale: zhCN
+                    })}
+                  </p>
+                </div>
+                
                 <button
-                  onClick={handleMarkAllRead}
-                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-full hover:bg-indigo-100 transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(notification.id);
+                  }}
+                  className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-gray-100 rounded-lg"
                 >
-                  <CheckCheck className="w-3.5 h-3.5" />
-                  全部已读
+                  <Trash2 className="w-4 h-4 text-gray-400" />
                 </button>
-              )}
-              <button
-                onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
-              >
-                <X className="w-4 h-4 text-gray-500" />
-              </button>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
+    );
+  };
+
+  // For embed mode, render without modal wrapper
+  if (embedMode) {
+    return (
+      <div className="bg-white min-h-screen">
+        {/* Bulk Actions */}
+        {notifications.length > 0 && (
+          <div className="sticky top-12 bg-white border-b border-gray-100 px-4 py-3 flex justify-between items-center z-10">
+            <button
+              onClick={handleMarkAllRead}
+              className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1"
+            >
+              <CheckCheck size={16} />
+              全部标记已读
+            </button>
+            <button
+              onClick={handleDeleteAll}
+              className="text-sm text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1"
+            >
+              <Trash2 size={16} />
+              删除全部
+            </button>
+          </div>
+        )}
+        
+        {/* Notifications List */}
+        <div className="p-4">
+          {notifications.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Bell className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500 text-sm">暂无新通知</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {notifications.map((notification) => (
+                <NotificationItem key={notification.id} notification={notification} />
+              ))}
+            </div>
+          )}
+          
+          {/* Load More */}
+          {hasMore && notifications.length > 0 && (
+            <div className="py-6 text-center">
+              <button
+                onClick={() => fetchNotifications()}
+                disabled={loading}
+                className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 disabled:opacity-50"
+              >
+                {loading ? "加载中..." : "加载更多"}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Original modal mode
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      
+      <div className="relative bg-white rounded-3xl shadow-2xl w-[90%] max-w-2xl max-h-[85vh] overflow-hidden z-10">
+          {/* Header */}
+          <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-gray-900">通知中心</h2>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+            >
+              <X className="w-4 h-4 text-gray-500" />
+            </button>
+          </div>
+
+          {/* Bulk Actions */}
+          {notifications.length > 0 && (
+            <div className="bg-gray-50 border-b border-gray-100 px-6 py-3 flex justify-between items-center">
+              <button
+                onClick={handleMarkAllRead}
+                className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1"
+              >
+                <CheckCheck size={16} />
+                全部标记已读
+              </button>
+              <button
+                onClick={handleDeleteAll}
+                className="text-sm text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1"
+              >
+                <Trash2 size={16} />
+                删除全部
+              </button>
+            </div>
+          )}
 
           {/* Notifications List */}
-          <div className="overflow-y-auto max-h-[calc(85vh-100px)] px-4 py-2">
+          <div className="overflow-y-auto max-h-[calc(85vh-140px)] p-4">
             {notifications.length === 0 ? (
               <div className="text-center py-16">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -202,97 +331,26 @@ export default function NotificationsModal({ open, onClose, onUpdate }: Notifica
               </div>
             ) : (
               <div className="space-y-3">
-                {notifications.map((notification) => {
-                  const style = getNotificationStyle(notification.type);
-                  return (
-                    <motion.div
-                      key={notification.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      whileHover={{ scale: 1.01 }}
-                      className={`group rounded-2xl border ${
-                        !notification.read 
-                          ? "border-indigo-200 shadow-sm" 
-                          : "border-gray-100"
-                      } overflow-hidden transition-all duration-200 cursor-pointer`}
-                    >
-                      <div className={`p-4 ${style.bgColor}`}>
-                        <div className="flex items-start gap-3">
-                          <div className={`w-10 h-10 ${style.iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}>
-                            <span className="text-xl">{style.icon}</span>
-                          </div>
-                      
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex-1">
-                                <h3 className="font-semibold text-gray-900 text-sm">
-                                  {notification.title}
-                                </h3>
-                                <p className="text-sm text-gray-600 mt-0.5">
-                                  {notification.message}
-                                </p>
-                                
-                                {notification.metadata && (notification.metadata.eventTime || notification.metadata.eventLocation) && (
-                                  <div className="mt-3 flex items-center gap-3 text-xs text-gray-500">
-                                    {notification.metadata.eventTime && (
-                                      <div className="flex items-center gap-1">
-                                        <Calendar className="w-3 h-3 text-gray-400" />
-                                        {new Date(notification.metadata.eventTime).toLocaleString("zh-CN", {
-                                          month: '2-digit',
-                                          day: '2-digit',
-                                          hour: '2-digit',
-                                          minute: '2-digit'
-                                        })}
-                                      </div>
-                                    )}
-                                    {notification.metadata.eventLocation && (
-                                      <div className="flex items-center gap-1">
-                                        <MapPin className="w-3 h-3 text-gray-400" />
-                                        {notification.metadata.eventLocation}
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
-                                
-                                <p className="text-xs text-gray-400 mt-2">
-                                  {formatDistanceToNow(new Date(notification.createdAt), {
-                                    addSuffix: true,
-                                    locale: zhCN
-                                  })}
-                                </p>
-                              </div>
-                              
-                              <button
-                                onClick={() => handleDelete(notification.id)}
-                                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
-                              >
-                                <Trash2 className="w-3.5 h-3.5 text-gray-400 hover:text-red-500" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            )}
-            
-            {/* Load More */}
-            {hasMore && notifications.length > 0 && (
-              <div className="py-6 text-center">
-                <button
-                  onClick={() => fetchNotifications()}
-                  disabled={loading}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors disabled:opacity-50"
-                >
-                  {loading ? "加载中..." : "查看更多"}
-                </button>
+                {notifications.map((notification) => (
+                  <NotificationItem key={notification.id} notification={notification} />
+                ))}
               </div>
             )}
           </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+
+          {/* Load More */}
+          {hasMore && notifications.length > 0 && (
+            <div className="py-4 text-center border-t border-gray-100">
+              <button
+                onClick={() => fetchNotifications()}
+                disabled={loading}
+                className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 disabled:opacity-50"
+              >
+                {loading ? "加载中..." : "加载更多"}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
   );
 }

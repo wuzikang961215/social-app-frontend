@@ -28,13 +28,13 @@ export default function EventCard({
     switch (status) {
       case "approved":
       case "checkedIn":
-        return "bg-emerald-500 text-white hover:bg-emerald-600";
+        return "bg-emerald-500 text-white";
       case "pending":
-        return "bg-gray-200 text-gray-800 hover:bg-gray-300";
+        return "bg-gray-200 text-gray-800";
       case "noShow":
       case "cancelled":
       default:
-        return "bg-gray-200 text-gray-800 hover:bg-gray-300";
+        return "bg-gray-200 text-gray-800";
     }
   };
 
@@ -53,16 +53,16 @@ export default function EventCard({
         {event.spotsLeft != null && !isPast && ` ｜ 剩余名额：${event.spotsLeft}人`}
       </div>
 
-      {/* 主办人 */}
+      {/* 发起人 */}
       {userStatus && event.creator?.username && (
         <div className="text-gray-700 space-y-1 mt-4">
           <div className="flex items-center gap-1 text-sm text-gray-500 italic">
             <User size={14} className="text-gray-400" />
-            主办人
+            发起人
           </div>
           <div className="flex flex-wrap gap-2 pt-1">
             <span
-              className="inline-flex items-center px-2.5 py-1 rounded-full text-gray-600 text-xs shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-100 transition"
+              className="inline-flex items-center px-2.5 py-1 rounded-full text-gray-600 text-xs shadow-sm border border-gray-200 cursor-pointer"
               onClick={(e) => {
                 setSelectedUser({ 
                   id: event.creator.id || event.creator._id, 
@@ -87,7 +87,7 @@ export default function EventCard({
           {relevantParticipants.map((p: any) => (
             <span
               key={p.user.id}
-              className="inline-flex items-center px-2.5 py-1 rounded-full text-gray-600 text-xs shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-100 transition"
+              className="inline-flex items-center px-2.5 py-1 rounded-full text-gray-600 text-xs shadow-sm border border-gray-200 cursor-pointer"
               onClick={(e) => {
                 setSelectedUser({ 
                   id: p.user.id || p.user._id, 
@@ -107,7 +107,7 @@ export default function EventCard({
         {onEdit && !isPast && (
           <Button
             size="sm"
-            className="text-xs px-3 py-1 rounded-full bg-indigo-500 text-white hover:bg-indigo-600"
+            className="text-xs px-3 py-1 rounded-full bg-indigo-500 text-white"
             onClick={onEdit}
           >
             编辑
@@ -136,7 +136,7 @@ export default function EventCard({
           showAction && (
             <Button
               size="sm"
-              className="text-xs px-3 py-1 rounded-full bg-indigo-500 text-white hover:bg-indigo-600"
+              className="text-xs px-3 py-1 rounded-full bg-indigo-500 text-white"
               onClick={onAction}
             >
               {actionLabel}

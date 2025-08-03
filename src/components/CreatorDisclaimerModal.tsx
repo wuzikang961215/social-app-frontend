@@ -33,7 +33,7 @@ const CreatorDisclaimerModal: React.FC<CreatorDisclaimerModalProps> = ({ isOpen,
               exit={{ scale: 0.95, opacity: 0 }}
             >
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold text-gray-800">主办人安全须知</h2>
+                <h2 className="text-lg font-bold text-gray-800">发起人安全须知</h2>
                 <button
                   onClick={onClose}
                   className="text-gray-400 hover:text-gray-600 p-1"

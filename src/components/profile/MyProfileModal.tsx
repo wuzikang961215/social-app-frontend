@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Users, CalendarIcon, BarChart3 } from "lucide-react";
+import { User, Users, CalendarIcon, BarChart3, LogOut } from "lucide-react";
 import SectionHeader from "@/components/profile/SectionHeader";
 import UserInfoCard from "@/components/profile/UserInfoCard";
 import CollapsibleList from "@/components/profile/CollapsibleList";
@@ -19,9 +19,12 @@ export default function MyProfileModal({
   joinedEvents,
   onCancelEvent,
   onUserUpdate,
+  embedMode = false,
+  onLogout,
 }: {
   open: boolean;
   onClose: () => void;
+  embedMode?: boolean;
   userInfo: {
     id: string;
     username: string;
@@ -31,6 +34,7 @@ export default function MyProfileModal({
   };
   onCancelEvent?: (eventId: string) => void;
   onUserUpdate?: (updatedUser: any) => void;
+  onLogout?: () => void;
   
   createdEvents: {
     id: string;
@@ -89,6 +93,12 @@ export default function MyProfileModal({
 
   if (!open) return null;
 
+  const handleUserUpdate = (updatedUser: any) => {
+    if (onUserUpdate) {
+      onUserUpdate(updatedUser);
+    }
+  };
+
   // ✅ 统一 enrich 所有活动
   const enrichEvents = (events: any[], userId: string) =>
     events.map((e) => {
@@ -122,25 +132,30 @@ export default function MyProfileModal({
   const toggle = (key: keyof typeof collapsed) =>
     setCollapsed((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex justify-end">
-      <div className="w-full max-w-md h-full bg-white p-6 overflow-y-auto relative space-y-6 shadow-xl">
-        <button
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-          onClick={onClose}
-        >
-          ✕
-        </button>
+  const profileContent = (
+    <div className={embedMode ? "min-h-screen bg-gray-50 pb-20" : "space-y-6"}>
+      {/* Header for embed mode */}
+      {embedMode && (
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 z-10">
+          <h1 className="text-xl font-bold text-center">我的</h1>
+        </div>
+      )}
+      
+      <div className={embedMode ? "p-6 space-y-6" : ""}>
+        {!embedMode && (
+          <button
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            onClick={onClose}
+          >
+            ✕
+          </button>
+        )}
 
         {/* 👤 用户信息 */}
         <SectionHeader icon={<User className="text-indigo-500" size={20} />} title="我的个人资料" />
         <UserInfoCard 
           user={userInfo} 
-          onUpdate={(updatedUser) => {
-            if (onUserUpdate) {
-              onUserUpdate(updatedUser);
-            }
-          }}
+          onUpdate={handleUserUpdate}
         />
 
         {/* 📊 活动统计 */}
@@ -212,7 +227,28 @@ export default function MyProfileModal({
             <EventCard key={e.id} event={e} userStatus={e.userStatus} />
           ))}
         </CollapsibleList>
+        
+        {/* Logout button for embed mode */}
+        {embedMode && onLogout && (
+          <div className="mt-8">
+            <button
+              onClick={onLogout}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+            >
+              <LogOut size={20} />
+              <span className="font-medium">退出登录</span>
+            </button>
+          </div>
+        )}
       </div>
+    </div>
+  );
+
+  // For embed mode, render content directly
+  if (embedMode) {
+    return (
+      <>
+        {profileContent}
       
       {/* Cancel Modal */}
       {selectedEvent && (
@@ -250,7 +286,53 @@ export default function MyProfileModal({
           }}
         />
       )}
-      
+      </>
+    );
+  }
+
+  // For modal mode, wrap in modal container
+  return (
+    <div className="fixed inset-0 z-50 bg-black/40 flex justify-end">
+      <div className="w-full max-w-md h-full bg-white p-6 overflow-y-auto relative shadow-xl">
+        {profileContent}
+        
+        {/* Cancel Modal */}
+        {selectedEvent && (
+          <CancelModal
+            open={showCancelModal}
+            onClose={() => {
+              setShowCancelModal(false);
+              setSelectedEvent(null);
+            }}
+            onConfirm={() => {
+              if (onCancelEvent && selectedEvent) {
+                onCancelEvent(selectedEvent.id);
+                setShowCancelModal(false);
+                setSelectedEvent(null);
+              }
+            }}
+            title={selectedEvent.title}
+          />
+        )}
+
+        {/* Edit Modal */}
+        {selectedEvent && (
+          <EditEventModal
+            isOpen={showEditModal}
+            onClose={() => {
+              setShowEditModal(false);
+              setSelectedEvent(null);
+            }}
+            event={selectedEvent}
+            onEventUpdated={() => {
+              setShowEditModal(false);
+              setSelectedEvent(null);
+              // Trigger refresh to update the events list
+              window.dispatchEvent(new Event('refresh-events'));
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 }

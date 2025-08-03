@@ -100,6 +100,8 @@ export default function ReviewAndCheckinModal({
       await reviewParticipant(eventId, userId, approve);
       await fetchData();
       onUpdate?.(); // Call the update callback if provided
+      // Trigger refresh for other components
+      window.dispatchEvent(new Event('refresh-events'));
     } finally {
       setLoadingMap((prev) => ({ ...prev, [userId + eventId]: false }));
     }
@@ -115,6 +117,9 @@ export default function ReviewAndCheckinModal({
       setLoadingMap((prev) => ({ ...prev, [userId + eventId]: true }));
       await markAttendance(eventId, userId, attended);
       await fetchData();
+      onUpdate?.(); // Call the update callback if provided
+      // Trigger refresh for other components
+      window.dispatchEvent(new Event('refresh-events'));
     } finally {
       setLoadingMap((prev) => ({ ...prev, [userId + eventId]: false }));
     }

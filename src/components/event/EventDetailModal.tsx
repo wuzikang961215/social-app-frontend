@@ -11,12 +11,12 @@ import {
   X,
   Brain,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { getUserById, api } from "@/lib/api"; // ✅ 替代 axios + BASE_URL
-import type { Event as AppEvent } from "@/app/page";
 import UserDetailPopover from "@/components/user/UserDetailPopover";
 import { getMBTIDisplay } from "@/lib/mbtiConstants";
+
+import type { Event as AppEvent } from "@/types/event";
 
 type EventDetailModalProps = {
   open: boolean;
@@ -131,7 +131,7 @@ export default function EventDetailModal({
           
           setOrganizerStats(statsRes);
         } catch (err) {
-          console.error("获取主办人信息失败", err);
+          console.error("获取发起人信息失败", err);
         }
       }
     };
@@ -144,40 +144,22 @@ export default function EventDetailModal({
   );
   const tags = event.tags || [];
 
+  if (!open) return null;
+
   return (
     <>
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center"
-        >
-          <div className="absolute inset-0 bg-black/40" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
-          <motion.div
-            initial={{ scale: 0.96, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="relative bg-white rounded-xl shadow-lg w-[90%] max-w-2xl p-6 z-10 max-h-[90vh] overflow-y-auto"
+        <div className="relative bg-white rounded-xl shadow-lg w-[90%] max-w-2xl p-6 z-10 max-h-[90vh] overflow-y-auto">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-700"
           >
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <X className="w-5 h-5" />
+          </button>
 
-            <motion.div
-              key="modal-content"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="space-y-6"
-            >
+          <div className="space-y-6">
               <h2 className="text-xl font-bold text-gray-800">{event.title}</h2>
               <p className="italic text-sm text-gray-600 whitespace-pre-line">
                 {event.description || "（暂无介绍）"}
@@ -223,7 +205,7 @@ export default function EventDetailModal({
               <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-700 space-y-2">
                 <div className="flex items-center gap-2 font-semibold">
                   <User size={18} className="text-gray-500" />
-                  主办人
+                  发起人
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="font-medium">
@@ -380,17 +362,15 @@ export default function EventDetailModal({
                       ? "取消申请中"
                       : event.spotsLeft <= 0
                       ? "已满"
-                      : "立即报名"}
+                      : "我想加入"}
                   </Button>
                 </div>
               )}
-            </motion.div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-    
-    {/* User Detail Popover - Outside AnimatePresence to avoid key conflicts */}
+            </div>
+          </div>
+        </div>
+      
+      {/* User Detail Popover */}
     {selectedUser && (
       <UserDetailPopover
         open={!!selectedUser}

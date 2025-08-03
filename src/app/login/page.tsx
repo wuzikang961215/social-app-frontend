@@ -3,14 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRightCircle } from "lucide-react";
-import { login } from "@/lib/api";
 import toast from "react-hot-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,9 +23,7 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const response = await login(email, password);
-      const { token } = response.data;
-      localStorage.setItem("token", token);
+      await login(email, password);
       toast.success("登录成功！");
       router.push("/");
     } catch (err: unknown) {

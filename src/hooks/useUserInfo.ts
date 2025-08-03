@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { hasEventStarted } from '@/lib/dateUtils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface UserInfo {
   id: string;
@@ -13,6 +14,7 @@ interface UserInfo {
 
 export function useUserInfo() {
   const router = useRouter();
+  const { user: authUser, token } = useAuth();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [createdEvents, setCreatedEvents] = useState<any[]>([]);
   const [joinedEvents, setJoinedEvents] = useState<any[]>([]);
@@ -23,7 +25,6 @@ export function useUserInfo() {
 
   // Fetch user data and related events
   const fetchUserData = useCallback(async () => {
-    const token = localStorage.getItem('token');
     if (!token) {
       router.replace('/login');
       return;
@@ -64,24 +65,23 @@ export function useUserInfo() {
       setError(err as Error);
       
       if (err instanceof Error && err.message.includes('Token')) {
-        localStorage.removeItem('token');
         router.replace('/login');
       }
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, [router, token]);
 
   // Check for pending reviews (with polling)
   const checkPendingReviews = useCallback(async () => {
     if (!userInfo?.id) return;
 
     try {
-      console.log('[polling] checking pending reviews');
       const res = await api.events.getManageable();
       const pendingCount = res.data.reduce((total: number, event: any) => {
         return total + event.participants.filter((p: any) => p.status === 'pending').length;
       }, 0);
+      const prevPendingCount = pendingReviewCount;
       setPendingReviewCount(pendingCount);
 
       // Also update check-in count
@@ -90,16 +90,25 @@ export function useUserInfo() {
           p.status === 'approved' && hasEventStarted(event.startTime)
         ).length;
       }, 0);
+      const prevCheckinCount = pendingCheckinCount;
       setPendingCheckinCount(checkinCount);
+      
+      // If counts changed, trigger refresh event to sync all components
+      if (prevPendingCount !== pendingCount || prevCheckinCount !== checkinCount) {
+        window.dispatchEvent(new Event('pending-counts-updated'));
+      }
     } catch (err) {
       console.error('Failed to fetch pending reviews:', err);
     }
-  }, [userInfo?.id]);
+  }, [userInfo?.id, pendingReviewCount, pendingCheckinCount]);
 
   // Initial fetch
   useEffect(() => {
+    if (authUser) {
+      setUserInfo(authUser as UserInfo);
+    }
     fetchUserData();
-  }, [fetchUserData]);
+  }, [fetchUserData, authUser]);
 
   // Poll for pending review updates
   useEffect(() => {

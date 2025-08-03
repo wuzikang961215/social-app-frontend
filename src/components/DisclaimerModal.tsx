@@ -41,7 +41,7 @@ const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ isOpen, onClose }) =>
               {/* Chinese Version */}
               <div className="mb-6 sm:mb-8">
                 <p className="mb-4 text-sm sm:text-base text-gray-700 leading-relaxed">
-                  本平台（以下简称"我们"）是一款供用户自由发起和报名参与活动的社交工具。为保障您在使用过程中的权益，请仔细阅读以下免责声明。继续使用本平台即代表您已阅读、理解并接受本声明的全部内容。
+                  本平台（以下简称&ldquo;我们&rdquo;）是一款供用户自由发起和报名参与活动的社交工具。为保障您在使用过程中的权益，请仔细阅读以下免责声明。继续使用本平台即代表您已阅读、理解并接受本声明的全部内容。
                 </p>
 
                 <h3 className="text-base sm:text-lg font-bold mb-2 text-gray-800">活动性质说明</h3>
@@ -59,7 +59,7 @@ const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ isOpen, onClose }) =>
 
                 <h3 className="text-base sm:text-lg font-bold mb-2 text-gray-800">安全提醒</h3>
                 <ul className="list-disc pl-4 sm:pl-5 mb-4 space-y-2 text-sm sm:text-base text-gray-700 leading-relaxed">
-                  <li>我们建议用户在参与任何线下活动前，充分了解活动内容、主办人背景与场地环境。</li>
+                  <li>我们建议用户在参与任何线下活动前，充分了解活动内容、发起人背景与场地环境。</li>
                   <li>谨慎对待陌生人邀请，注意自身安全，如有疑虑请勿参与。</li>
                 </ul>
 
@@ -75,7 +75,7 @@ const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ isOpen, onClose }) =>
               {/* English Version */}
               <div>
                 <p className="mb-4 text-sm sm:text-base text-gray-700 leading-relaxed">
-                  This platform (hereinafter referred to as "we" or "the platform") provides users with tools to publish and join events. Please read this disclaimer carefully before continuing to use the platform. By using our services, you acknowledge that you have read, understood, and agreed to the following terms.
+                  This platform (hereinafter referred to as &ldquo;we&rdquo; or &ldquo;the platform&rdquo;) provides users with tools to publish and join events. Please read this disclaimer carefully before continuing to use the platform. By using our services, you acknowledge that you have read, understood, and agreed to the following terms.
                 </p>
 
                 <h3 className="text-base sm:text-lg font-bold mb-2 text-gray-800">Event Nature</h3>
@@ -100,7 +100,7 @@ const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ isOpen, onClose }) =>
                 <h3 className="text-base sm:text-lg font-bold mb-2 text-gray-800">Governing Law</h3>
                 <ul className="list-disc pl-4 sm:pl-5 mb-4 space-y-2 text-sm sm:text-base text-gray-700 leading-relaxed">
                   <li>This disclaimer is governed by the laws of Australia.</li>
-                  <li>If a user violates local laws or this platform's terms, they are solely responsible for any resulting damages or consequences.</li>
+                  <li>If a user violates local laws or this platform&apos;s terms, they are solely responsible for any resulting damages or consequences.</li>
                 </ul>
               </div>
             </div>

@@ -22,15 +22,15 @@ export default function ConfirmModal({
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-xl shadow-lg w-[90%] max-w-md p-6 space-y-4 relative">
         <h2 className="text-lg font-semibold text-gray-800">
-          确认要报名「{title}」吗？
+          要一起参加「{title}」吗？
         </h2>
         <p className="text-sm text-gray-600">
-          报名即表示你会参加。被主办人确认后，原则上无法取消，感谢理解！
+          报名即表示你会参加。被发起人确认后，原则上无法取消，感谢理解！
         </p>
         
         {/* 温馨提示 */}
         <p className="text-xs text-gray-500">
-          报名即表示您已知悉并理解
+          点击确认即表示你已了解
           <button 
             type="button"
             onClick={() => setShowDisclaimer(true)}
@@ -51,7 +51,7 @@ export default function ConfirmModal({
             onClick={onConfirm}
             className="text-sm px-4 py-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition"
           >
-            确认报名
+            好的，加入
           </button>
         </div>
       </div>

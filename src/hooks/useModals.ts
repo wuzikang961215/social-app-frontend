@@ -6,8 +6,6 @@ export type ModalType =
   | 'eventCancel'
   | 'eventEdit'
   | 'reviewAndCheckin'
-  | 'profile'
-  | 'notifications'
   | null;
 
 interface ModalState {
@@ -49,8 +47,6 @@ export function useModals() {
     showCancelModal: isModalOpen('eventCancel'),
     showEditModal: isModalOpen('eventEdit'),
     showReviewModal: isModalOpen('reviewAndCheckin'),
-    showProfileModal: isModalOpen('profile'),
-    showNotificationsModal: isModalOpen('notifications'),
   };
 
   // Modal actions for backward compatibility
@@ -60,8 +56,6 @@ export function useModals() {
     setShowCancelModal: (show: boolean) => show ? openModal('eventCancel') : closeModal(),
     setShowEditModal: (show: boolean) => show ? openModal('eventEdit') : closeModal(),
     setShowReviewModal: (show: boolean) => show ? openModal('reviewAndCheckin') : closeModal(),
-    setShowProfileModal: (show: boolean) => show ? openModal('profile') : closeModal(),
-    setShowNotificationsModal: (show: boolean) => show ? openModal('notifications') : closeModal(),
   };
 
   return {

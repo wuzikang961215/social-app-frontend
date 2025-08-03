@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { formatTimeRange } from '@/lib/format';
-import type { Event } from '@/app/page';
+import type { Event } from '@/types/event';
 
 interface UseEventsProps {
   userId?: string;
