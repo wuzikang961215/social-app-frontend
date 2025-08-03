@@ -1,7 +1,6 @@
 // app/register/steps/StepWhyJoin.tsx
 "use client";
 import { StepProps } from "../page";
-import { motion } from "framer-motion";
 import { ArrowRightCircle } from "lucide-react";
 
 export default function StepWhyJoin({
@@ -20,38 +19,28 @@ export default function StepWhyJoin({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 0 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="w-full max-w-md flex flex-col items-center text-center gap-6"
-    >
-      <div className="text-base font-semibold text-gray-800">
+    <div className="w-full max-w-sm flex flex-col items-center text-center gap-1.5 px-4">
+      <label className="block font-medium text-gray-700 text-sm">
         你为什么想要加入我们？
-      </div>
+      </label>
 
-      <div className="w-full text-left">
-        <label className="text-sm text-gray-700 mb-2 block italic">
-          我想加入是因为……
-        </label>
-        <input
-          type="text"
-          value={formData.whyJoin}
-          onChange={(e) => {
-            setFormData({ whyJoin: e.target.value });
-            onError?.("whyJoin", "");
-          }}
-          placeholder="比如：在澳洲太无聊了，真的很想找到聊得来、有趣的人"
-          className="w-full px-4 py-2 rounded-xl bg-gray-100 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-        />
-        {errors?.whyJoin && (
-          <p className="text-sm text-orange-500 mt-2 italic tracking-wide">{errors.whyJoin}</p>
-        )}
-      </div>
+      <input
+        type="text"
+        value={formData.whyJoin}
+        onChange={(e) => {
+          setFormData({ whyJoin: e.target.value });
+          onError?.("whyJoin", "");
+        }}
+        placeholder="比如：在澳洲太无聊了"
+        className="w-full max-w-[200px] px-3 py-1.5 text-sm rounded-lg bg-gray-100 shadow-inner text-center"
+      />
+      {errors?.whyJoin && (
+        <p className="text-xs text-orange-500 mt-1 italic tracking-wide">{errors.whyJoin}</p>
+      )}
 
-      <button onClick={handleNext} className="mt-2">
-        <ArrowRightCircle className="w-8 h-8 text-indigo-500 hover:scale-110 transition mt-1" />
+      <button onClick={handleNext}>
+        <ArrowRightCircle className="w-6 h-6 text-indigo-500 hover:scale-110 transition" />
       </button>
-    </motion.div>
+    </div>
   );
 }

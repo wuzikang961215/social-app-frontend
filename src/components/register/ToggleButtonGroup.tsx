@@ -22,7 +22,7 @@ export default function ToggleButtonGroup({
         <button
           key={opt}
           onClick={() => onChange(opt)}
-          className={`w-1/2 py-2 text-sm font-medium transition-all
+          className={`w-1/2 py-1.5 text-xs font-medium transition-all
             ${
               value === opt
                 ? "bg-indigo-500 text-white"

@@ -58,8 +58,8 @@ export default function StepInterest({
   };
 
   return (
-    <div className="w-full max-w-md max-h-[90vh] overflow-auto flex flex-col justify-start items-center text-center px-4 pt-3 pb-4 gap-2 text-sm leading-snug">
-      <div className="font-medium text-gray-800">
+    <div className="w-full max-w-sm max-h-[80vh] overflow-auto flex flex-col justify-start items-center text-center px-4 pt-2 pb-3 gap-1.5 text-xs leading-snug">
+      <div className="font-medium text-gray-800 text-sm">
         你的兴趣爱好有哪些？
       </div>
 
@@ -74,7 +74,7 @@ export default function StepInterest({
           <div className="w-full flex flex-col items-center gap-3">
             <button
               onClick={() => setSelectedMain("")}
-              className="text-xs text-gray-500 hover:text-indigo-500 transition underline self-start"
+              className="text-[10px] text-gray-500 hover:text-indigo-500 transition underline self-start"
             >
               ← 返回
             </button>
@@ -118,7 +118,7 @@ export default function StepInterest({
 
          {/* 按钮 */}
         <button onClick={handleNext} className="mt-2">
-          <ArrowRightCircle className="w-8 h-8 text-indigo-500 hover:scale-110 transition mt-1" />
+          <ArrowRightCircle className="w-6 h-6 text-indigo-500 hover:scale-110 transition mt-1" />
         </button>
       </div>
     </div>

@@ -38,8 +38,8 @@ export default function StepEmail({
   };
 
   return (
-    <div className="w-full max-w-sm flex flex-col items-center gap-2 text-center">
-      <label className="block font-medium text-gray-700 text-m">
+    <div className="w-full max-w-sm flex flex-col items-center gap-1.5 text-center">
+      <label className="block font-medium text-gray-700 text-sm">
         你的邮箱地址是什么？
       </label>
       <input
@@ -51,15 +51,15 @@ export default function StepEmail({
             onError?.("email", ""); // ✅ 清除错误提示
           }}          
         placeholder="例如：your@email.com"
-        className="w-77 px-4 py-2 rounded-xl bg-gray-100 shadow-inner text-center"
+        className="w-full max-w-[220px] px-3 py-1.5 text-sm rounded-lg bg-gray-100 shadow-inner text-center"
       />
       {errors?.email && (
-        <p className="text-sm text-orange-500 mt-2 italic tracking-wide">
+        <p className="text-xs text-orange-500 mt-1 italic tracking-wide">
           {errors.email}
         </p>
       )}
       <button onClick={handleNext}>
-        <ArrowRightCircle className="w-8 h-8 text-indigo-500 hover:scale-110 transition" />
+        <ArrowRightCircle className="w-6 h-6 text-indigo-500 hover:scale-110 transition" />
       </button>
     </div>
   );

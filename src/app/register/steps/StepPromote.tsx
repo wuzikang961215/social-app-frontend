@@ -1,6 +1,5 @@
 "use client";
 import { StepProps } from "../page";
-import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/lib/api";
@@ -26,26 +25,21 @@ export default function StepPromote({
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 0 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-md flex flex-col items-center text-center gap-6 px-4 pt-6 pb-10"
-      >
+      <div className="w-full max-w-sm flex flex-col items-center text-center gap-1.5 px-4">
       {/* 标题 */}
-      <div className="text-xl font-semibold text-gray-800">
+      <div className="font-medium text-gray-700 text-sm">
         一切准备就绪
       </div>
 
       {/* 正文 */}
-      <div className="text-sm text-gray-700 leading-relaxed tracking-wide italic">
+      <div className="text-xs text-gray-700 leading-relaxed tracking-wide italic">
         我们正在构建一个真实连接的社交空间，<br />
         在这里，大家都在认真交朋友。<br />
         欢迎你成为其中的一员。
       </div>
 
       {/* 条款同意 */}
-      <div className="flex items-start gap-2 text-sm">
+      <div className="flex items-start gap-2 text-xs">
         <input
           type="checkbox"
           id="terms"
@@ -71,19 +65,19 @@ export default function StepPromote({
       </div>
 
       {/* 提交按钮 */}
-      <div className="flex flex-col items-center gap-3 mt-2">
+      <div className="flex flex-col items-center gap-1 mt-1">
         <button 
           onClick={handleSubmit}
           disabled={!agreedToTerms}
           className={`group ${!agreedToTerms ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         >
-          <CheckCircle className={`w-12 h-12 ${agreedToTerms ? 'text-green-500 group-hover:scale-110' : 'text-gray-400'} transition-all duration-200`} />
+          <CheckCircle className={`w-8 h-8 ${agreedToTerms ? 'text-green-500 group-hover:scale-110' : 'text-gray-400'} transition-all duration-200`} />
         </button>
         <p className="text-xs text-gray-500 italic">
           {agreedToTerms ? '点击提交注册' : '请先勾选同意条款'}
         </p>
       </div>
-      </motion.div>
+      </div>
       
       <DisclaimerModal
         isOpen={showDisclaimer}

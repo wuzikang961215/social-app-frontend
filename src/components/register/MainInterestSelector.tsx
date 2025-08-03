@@ -12,7 +12,7 @@ export default function MainInterestSelector({ options, selected, onSelect }: Pr
         <button
           key={opt}
           onClick={() => onSelect(opt)}
-          className={`w-full min-h-[32px] rounded-md border text-xs font-medium text-center transition
+          className={`w-full min-h-[28px] rounded-md border text-[11px] font-medium text-center transition
             ${selected === opt
               ? "bg-indigo-500 text-white border-indigo-500"
               : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"}

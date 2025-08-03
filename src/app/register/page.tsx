@@ -113,7 +113,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div
-        className="bg-white p-10 shadow-xl rounded-2xl w-full max-w-lg min-h-[650px] flex flex-col relative"
+        className="bg-white p-6 shadow-xl rounded-xl w-full max-w-lg min-h-[450px] flex flex-col relative"
       >
         {/* 🔒 顶部按钮浮动定位 */}
         <LogOut
@@ -121,13 +121,13 @@ export default function RegisterPage() {
             localStorage.removeItem("token");
             router.push("/login");
           }}
-          className="absolute top-4 right-4 w-5 h-5 text-gray-500 hover:text-gray-800 cursor-pointer hover:scale-110"
+          className="absolute top-3 right-3 w-4 h-4 text-gray-500 hover:text-gray-800 cursor-pointer hover:scale-110"
         />
 
         {stepIndex > 0 && (
           <button
             onClick={() => setStepIndex(stepIndex - 1)}
-            className="absolute top-4 left-4 text-gray-400 hover:text-indigo-500 transition text-lg hover:scale-110"
+            className="absolute top-3 left-3 text-gray-400 hover:text-indigo-500 transition text-base hover:scale-110"
             title="上一步"
           >
             ←
@@ -135,17 +135,17 @@ export default function RegisterPage() {
         )}
 
         {/* 🎯 顶部标题区域 */}
-        <div className="text-center mb-6">
-          <div className="h-6" /> {/* 留白占位，跟拒绝页统一 */}
+        <div className="text-center mb-4">
+          <div className="h-4" /> {/* 留白占位，跟拒绝页统一 */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-2xl font-bold text-gray-800">
+            <h1 className="text-lg font-bold text-gray-800">
               让认真交朋友的人相遇
             </h1>
-            <p className="text-sm text-gray-500 mt-2 italic tracking-wide">
+            <p className="text-xs text-gray-500 mt-1 italic tracking-wide">
               从兴趣出发，找到与你合拍的人
             </p>
           </motion.div>
@@ -177,14 +177,14 @@ export default function RegisterPage() {
           </div>
 
           {/* 🔄 底部进度条 */}
-          <motion.div className="mt-24" animate={{ opacity: 1 }}>
-            <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+          <motion.div className="mt-8" animate={{ opacity: 1 }}>
+            <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
               <div
-                className="bg-blue-400 h-2 rounded-full transition-all duration-700"
+                className="bg-blue-400 h-1.5 rounded-full transition-all duration-700"
                 style={{ width: `${((stepIndex + 1) / steps.length) * 100}%` }}
               />
             </div>
-            <p className="text-center text-xs text-gray-500 mt-2">
+            <p className="text-center text-[10px] text-gray-500 mt-1">
               <b>{stepIndex + 1}</b> / {steps.length}
             </p>
           </motion.div>

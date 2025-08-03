@@ -36,12 +36,12 @@ export default function StepMBTI({ formData, setFormData, onNext, onError }: Ste
   };
 
   return (
-    <div className="w-full max-w-sm flex flex-col items-center gap-4 text-center">
-      <label className="font-medium text-gray-700">
+    <div className="w-full max-w-sm flex flex-col items-center gap-2 text-center">
+      <label className="font-medium text-gray-700 text-sm">
         你的MBTI类型是？
       </label>
       
-      <p className="text-xs text-gray-500 -mt-2">
+      <p className="text-[10px] text-gray-500 -mt-1">
         不知道你的类型？
         <a 
           href="https://www.16personalities.com/ch" 
@@ -53,41 +53,41 @@ export default function StepMBTI({ formData, setFormData, onNext, onError }: Ste
         </a>
       </p>
       
-      <div className="h-5">
+      <div className="h-4">
         {formData.mbti && (
-          <div className="text-sm text-indigo-600 font-medium">
+          <div className="text-xs text-indigo-600 font-medium">
             已选择: {mbtiTypes.find(t => t.type === formData.mbti)?.type} - {mbtiTypes.find(t => t.type === formData.mbti)?.name}
           </div>
         )}
       </div>
       
-      <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto mx-auto">
+      <div className="grid grid-cols-2 gap-1.5 max-h-40 overflow-y-auto mx-auto">
         {mbtiTypes.map(({ type, name, description }) => (
           <button
             key={type}
             onClick={() => handleSelect(type)}
-            className={`text-left p-3 border rounded-lg transition-all ${
+            className={`text-left p-2 border rounded-lg transition-all ${
               formData.mbti === type 
                 ? 'border-indigo-400 bg-indigo-50' 
                 : 'border-gray-200 hover:border-indigo-400 hover:bg-indigo-50'
             }`}
           >
-            <div className="font-semibold text-sm text-gray-800">{type}</div>
-            <div className="text-xs text-gray-600">{name}</div>
-            <div className="text-xs text-gray-400 mt-0.5 line-clamp-1">{description}</div>
+            <div className="font-semibold text-xs text-gray-800">{type}</div>
+            <div className="text-[10px] text-gray-600">{name}</div>
+            <div className="text-[9px] text-gray-400 mt-0.5 line-clamp-1">{description}</div>
           </button>
         ))}
       </div>
 
       {formData.mbti ? (
         <button onClick={handleNext}>
-          <ArrowRightCircle className="w-8 h-8 text-indigo-500 hover:scale-110 transition" />
+          <ArrowRightCircle className="w-6 h-6 text-indigo-500 hover:scale-110 transition" />
         </button>
       ) : (
         <div className="flex items-center gap-4">
           <button
             onClick={handleNext}
-            className="text-sm text-gray-500 hover:text-gray-700 underline"
+            className="text-xs text-gray-500 hover:text-gray-700 underline"
           >
             跳过此步骤
           </button>

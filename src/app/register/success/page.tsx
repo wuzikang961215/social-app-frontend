@@ -25,14 +25,14 @@ export default function RegisterSuccessPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="bg-white p-10 shadow-xl rounded-2xl w-full max-w-lg min-h-[650px] flex flex-col relative">
+      <div className="bg-white p-6 shadow-xl rounded-xl w-full max-w-lg min-h-[450px] flex flex-col relative">
         {/* 顶部标题 */}
-        <div className="text-center mb-6">
-          <div className="h-6" />
-          <h1 className="text-2xl font-bold text-gray-800">
+        <div className="text-center mb-4">
+          <div className="h-4" />
+          <h1 className="text-lg font-bold text-gray-800">
             让认真交朋友的人相遇
           </h1>
-          <p className="text-sm text-gray-500 mt-2 italic tracking-wide">
+          <p className="text-xs text-gray-500 mt-1 italic tracking-wide">
             从兴趣出发，找到与你合拍的人
           </p>
         </div>
@@ -41,11 +41,11 @@ export default function RegisterSuccessPage() {
           initial={{ opacity: 0, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="flex flex-col items-center justify-center text-center gap-5 h-full pt-6"
+          className="flex flex-col items-center justify-center text-center gap-3 h-full pt-4"
         >
-          <h1 className="text-2xl font-bold text-gray-800">欢迎加入 Yodda</h1>
+          <h1 className="text-lg font-bold text-gray-800">欢迎加入 Yodda</h1>
 
-          <p className="text-sm text-gray-700 leading-relaxed max-w-md">
+          <p className="text-xs text-gray-700 leading-relaxed max-w-md">
             你的注册信息已成功提交。
             <br /><br />
             我们正在持续优化使用体验，让每一次连接都更真实、更轻松。
@@ -61,7 +61,7 @@ export default function RegisterSuccessPage() {
 
           <button
             onClick={() => router.push("/login")}
-            className="mt-10 text-sm text-gray-500 hover:text-indigo-500 flex items-center gap-1 transition"
+            className="mt-6 text-xs text-gray-500 hover:text-indigo-500 flex items-center gap-1 transition"
           >
             <LogOut className="w-4 h-4" />
             去登录

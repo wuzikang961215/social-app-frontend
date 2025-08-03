@@ -24,8 +24,8 @@ export default function StepLookingForBuddy({
   };
 
   return (
-    <div className="w-full max-w-sm flex flex-col items-center gap-4 text-center">
-      <label className="font-medium text-gray-700">你注册本软件，是想要找搭子吗？</label>
+    <div className="w-full max-w-sm flex flex-col items-center gap-2 text-center">
+      <label className="font-medium text-gray-700 text-sm">你注册本软件，是想要找搭子吗？</label>
 
       <ToggleButtonGroup
         options={["是", "否"]}
@@ -34,10 +34,10 @@ export default function StepLookingForBuddy({
       />
 
       {errors?.lookingForBuddy && (
-        <p className="text-sm text-orange-500 mt-1">{errors.lookingForBuddy}</p>
+        <p className="text-xs text-orange-500 mt-1">{errors.lookingForBuddy}</p>
       )}
       <button onClick={handleNext}>
-        <ArrowRightCircle className="w-8 h-8 text-indigo-500 hover:scale-110 transition" />
+        <ArrowRightCircle className="w-6 h-6 text-indigo-500 hover:scale-110 transition" />
       </button>
     </div>
   );

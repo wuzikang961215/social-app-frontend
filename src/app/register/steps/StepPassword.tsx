@@ -33,7 +33,7 @@ export default function StepPassword({
   };
 
   return (
-    <div className="w-full max-w-sm flex flex-col items-center gap-2 text-center px-4">
+    <div className="w-full max-w-sm flex flex-col items-center gap-1.5 text-center px-4">
       <label className="block font-medium text-gray-700 text-sm">
         设置一个密码
       </label>
@@ -48,7 +48,7 @@ export default function StepPassword({
           onError?.("password", "");
         }}
         placeholder="密码不少于6位"
-        className="w-full max-w-[220px] px-4 py-1.5 rounded-xl bg-gray-100 shadow-inner text-center text-sm"
+        className="w-full max-w-[200px] px-3 py-1.5 rounded-lg bg-gray-100 shadow-inner text-center text-sm"
       />
       {errors?.password && (
         <p className="text-xs text-orange-500 italic tracking-wide">
@@ -56,7 +56,7 @@ export default function StepPassword({
         </p>
       )}
 
-      <label className="block font-medium text-gray-700 text-sm mt-2">
+      <label className="block font-medium text-gray-700 text-sm mt-1">
         确认密码
       </label>
 
@@ -70,7 +70,7 @@ export default function StepPassword({
           onError?.("confirmPassword", "");
         }}
         placeholder="再次输入密码"
-        className="w-full max-w-[220px] px-4 py-1.5 rounded-xl bg-gray-100 shadow-inner text-center text-sm"
+        className="w-full max-w-[200px] px-3 py-1.5 rounded-lg bg-gray-100 shadow-inner text-center text-sm"
       />
       {errors?.confirmPassword && (
         <p className="text-xs text-orange-500 italic tracking-wide">
@@ -78,8 +78,8 @@ export default function StepPassword({
         </p>
       )}
 
-      <button onClick={handleNext} className="mt-2">
-        <ArrowRightCircle className="w-7 h-7 text-indigo-500 hover:scale-110 transition" />
+      <button onClick={handleNext} className="mt-1">
+        <ArrowRightCircle className="w-6 h-6 text-indigo-500 hover:scale-110 transition" />
       </button>
     </div>
   );
