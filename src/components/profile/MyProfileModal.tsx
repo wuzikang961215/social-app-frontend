@@ -137,7 +137,7 @@ export default function MyProfileModal({
       {/* Header for embed mode */}
       {embedMode && (
         <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 z-10 shadow-sm">
-          <h1 className="text-base font-bold text-center text-gray-900">我的</h1>
+          <h1 className="text-xl font-bold text-center text-gray-900">我的</h1>
         </div>
       )}
       

@@ -118,6 +118,15 @@ export const api = {
     delete: (id: string) => 
       client.delete(`/api/notifications/${id}`),
   },
+  
+  treeHole: {
+    getPosts: () => 
+      client.get('/api/tree-hole/posts'),
+    createPost: (data: { content: string }) => 
+      client.post('/api/tree-hole/posts', data),
+    toggleLike: (postId: string) => 
+      client.post(`/api/tree-hole/posts/${postId}/like`),
+  },
 };
 
 // Legacy function wrappers for backward compatibility
