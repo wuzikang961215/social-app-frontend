@@ -7,8 +7,8 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect to find-buddy page
-    router.replace("/find-buddy");
+    // Redirect to events (discover) page
+    router.replace("/events");
   }, [router]);
 
   return (

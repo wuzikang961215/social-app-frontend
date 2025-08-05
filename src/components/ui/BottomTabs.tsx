@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, Bell, User, MessageSquare } from "lucide-react";
+import { Users, Bell, User, MessageSquare, Compass, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePendingCounts } from "@/contexts/PendingCountsContext";
 import { api } from "@/lib/api";
@@ -57,7 +57,15 @@ export default function BottomTabs() {
   
   const totalPendingCount = pendingReviewCount + pendingCheckinCount;
 
+  // Check if current user is admin (you can change this ID to your admin user ID)
+  const isAdmin = user?.id === "67ece9e577fb0dd27c504083"; // Your official Yodda account
+  
   const tabs: TabItem[] = [
+    {
+      href: "/events",
+      icon: <Compass size={20} />,
+      label: "发现"
+    },
     {
       href: "/find-buddy",
       icon: <Users size={20} />,
@@ -77,12 +85,17 @@ export default function BottomTabs() {
       href: "/profile",
       icon: <User size={20} />,
       label: "我的"
-    }
+    },
+    ...(isAdmin ? [{
+      href: "/admin",
+      icon: <Settings size={20} />,
+      label: "管理"
+    }] : [])
   ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30">
-      <div className="grid grid-cols-4 h-12">
+      <div className={`grid ${isAdmin ? 'grid-cols-6' : 'grid-cols-5'} h-12`}>
         {tabs.map((tab) => {
           const isActive = pathname === tab.href;
 
