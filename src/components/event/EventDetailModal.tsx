@@ -17,6 +17,7 @@ import { getUserById, api } from "@/lib/api"; // ✅ 替代 axios + BASE_URL
 import UserDetailPopover from "@/components/user/UserDetailPopover";
 import { getMBTIDisplay } from "@/lib/mbtiConstants";
 import { isOfficialAccount } from "@/lib/constants";
+import { Linkify } from "@/lib/linkify";
 
 import type { Event as AppEvent } from "@/types/event";
 
@@ -164,7 +165,7 @@ export default function EventDetailModal({
           <div className="space-y-4">
               <h2 className="text-base font-bold text-gray-800">{event.title}</h2>
               <p className="italic text-xs text-gray-600 whitespace-pre-line">
-                {event.description || "（暂无介绍）"}
+                <Linkify>{event.description || "（暂无介绍）"}</Linkify>
               </p>
 
               {tags.length > 0 && (

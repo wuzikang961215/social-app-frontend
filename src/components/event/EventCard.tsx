@@ -5,6 +5,7 @@ import { formatTimeRange } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { isOfficialAccount } from "@/lib/constants";
+import { Linkify } from "@/lib/linkify";
 
 interface EventCardProps {
   event: any;
@@ -56,7 +57,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, onJoinClick, onCa
         {event.description && (
           <div className="bg-gray-50 rounded-lg p-2">
             <p className="text-xs text-gray-700 line-clamp-2">
-              {event.description}
+              <Linkify>{event.description}</Linkify>
             </p>
           </div>
         )}
