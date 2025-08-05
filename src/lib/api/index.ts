@@ -32,6 +32,31 @@ client.interceptors.request.use(
 client.interceptors.response.use(
   (response) => response,
   (error: AxiosError<ApiError>) => {
+    // Log detailed error info for debugging
+    console.error('API Error Details:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      headers: error.response?.headers,
+    });
+
+    // Handle specific error cases
+    if (error.response?.status === 429) {
+      const retryAfter = error.response.headers['retry-after'];
+      const message = `请求过于频繁，请${retryAfter ? `${retryAfter}秒` : '稍'}后再试`;
+      return Promise.reject(new Error(message));
+    }
+
+    if (error.response?.status === 403) {
+      return Promise.reject(new Error('无权限访问'));
+    }
+
+    if (!navigator.onLine) {
+      return Promise.reject(new Error('网络连接失败，请检查网络'));
+    }
+    
     const message = error.response?.data?.message || '请求失败，请稍后再试';
     
     if (typeof window !== 'undefined' && message.includes('Token')) {
@@ -40,7 +65,6 @@ client.interceptors.response.use(
       return new Promise(() => {}); // Prevent further execution
     }
     
-    console.error('API Error:', message);
     return Promise.reject(new Error(message));
   }
 );
