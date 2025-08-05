@@ -87,7 +87,7 @@ export default function CreateEvent() {
         durationMinutes: parseInt(formData.durationMinutes),
       });
   
-      router.push("/");
+      router.push("/find-buddy");
     } catch (error) {
       if (error instanceof Error) {
         alert(error.message || "创建失败，请重试");
