@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, Bell, User, MessageSquare, Compass, Settings } from "lucide-react";
+import { Users, Bell, User, MessageSquare, Compass, Settings, Calendar } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePendingCounts } from "@/contexts/PendingCountsContext";
 import { api } from "@/lib/api";
@@ -62,7 +62,7 @@ export default function BottomTabs() {
   
   const tabs: TabItem[] = [
     {
-      href: "/events",
+      href: "/discover",
       icon: <Compass size={20} />,
       label: "发现"
     },
@@ -70,11 +70,6 @@ export default function BottomTabs() {
       href: "/find-buddy",
       icon: <Users size={20} />,
       label: "找搭子"
-    },
-    {
-      href: "/tree-hole",
-      icon: <MessageSquare size={20} />,
-      label: "树洞"
     },
     {
       href: "/notifications",
@@ -95,7 +90,7 @@ export default function BottomTabs() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30">
-      <div className={`grid ${isAdmin ? 'grid-cols-6' : 'grid-cols-5'} h-12`}>
+      <div className={`grid ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'} h-12`}>
         {tabs.map((tab) => {
           const isActive = pathname === tab.href;
 

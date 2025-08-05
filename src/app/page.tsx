@@ -7,8 +7,8 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect to events (discover) page
-    router.replace("/events");
+    // Redirect to discover page
+    router.replace("/discover");
   }, [router]);
 
   return (

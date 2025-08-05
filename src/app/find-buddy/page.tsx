@@ -152,7 +152,7 @@ export default function FindBuddyPage() {
             <div className="absolute z-50 mt-2 left-0 bg-white rounded-lg shadow-lg border w-40">
               <button
                 onClick={() => {
-                  window.location.href = "/events/create";
+                  window.location.href = "/find-buddy/create";
                   setShowLaunchMenu(false);
                 }}
                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
