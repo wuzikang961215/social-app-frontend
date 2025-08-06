@@ -81,6 +81,7 @@ export const api = {
         interests: data.interests,
         whyJoin: data.whyJoin,
         idealBuddy: data.idealBuddy,
+        expectEvent: data.expectEvent,
       }).then(res => res.data),
     login: (email: string, password: string) =>
       client.post('/api/auth/login', { email, password }).then(res => res.data),
