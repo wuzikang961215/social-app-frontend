@@ -7,7 +7,4 @@ module.exports = {
   reactStrictMode: false, // Disable double-rendering in development
   productionBrowserSourceMaps: false, // Disable source maps in production
   swcMinify: true, // Use SWC for faster minification
-  experimental: {
-    optimizeCss: true, // Enable CSS optimization
-  },
 }
