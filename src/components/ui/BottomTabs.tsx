@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, memo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Users, Bell, User, MessageSquare, Compass, Settings, Calendar } from "lucide-react";
@@ -14,7 +14,7 @@ interface TabItem {
   label: string;
 }
 
-export default function BottomTabs() {
+const BottomTabs = memo(function BottomTabs() {
   const pathname = usePathname();
   const { user } = useAuth();
   const { pendingReviewCount, pendingCheckinCount } = usePendingCounts();
@@ -127,4 +127,6 @@ export default function BottomTabs() {
       </div>
     </nav>
   );
-}
+});
+
+export default BottomTabs;

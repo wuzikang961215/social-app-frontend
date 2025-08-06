@@ -1,11 +1,13 @@
 "use client";
+import { memo } from 'react';
+
 interface Props {
   options: string[];
   selected: string;
   onSelect: (val: string) => void;
 }
 
-export default function MainInterestSelector({ options, selected, onSelect }: Props) {
+const MainInterestSelector = memo(function MainInterestSelector({ options, selected, onSelect }: Props) {
   return (
     <div className="grid grid-cols-2 gap-2 w-full">
       {options.map((opt) => (
@@ -23,4 +25,6 @@ export default function MainInterestSelector({ options, selected, onSelect }: Pr
       ))}
     </div>
   );
-}
+});
+
+export default MainInterestSelector;

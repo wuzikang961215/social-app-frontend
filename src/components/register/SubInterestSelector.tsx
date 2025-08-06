@@ -1,4 +1,5 @@
 "use client";
+import { memo, useCallback } from 'react';
 import { X } from "lucide-react";
 
 interface Props {
@@ -7,7 +8,7 @@ interface Props {
   onToggle: (val: string) => void;
 }
 
-export default function SubInterestSelector({ options, selected, onToggle }: Props) {
+const SubInterestSelector = memo(function SubInterestSelector({ options, selected, onToggle }: Props) {
   return (
     <div className="flex flex-wrap gap-1.5 justify-center">
       {options.map((item) => {
@@ -38,4 +39,6 @@ export default function SubInterestSelector({ options, selected, onToggle }: Pro
       })}
     </div>
   );
-}
+});
+
+export default SubInterestSelector;
