@@ -15,11 +15,28 @@ export default function StepPromote({
 
   const handleSubmit = async () => {
     try {
-      await registerUser(formData);
-      router.push("/register/success");
-    } catch (err) {
-      console.error("注册失败", err);
-      alert("提交失败，请稍后再试");
+      const response = await registerUser(formData);
+      console.log("Registration response:", response);
+      
+      // Check if registration was successful
+      if (response && response.token) {
+        // Save token to localStorage
+        localStorage.setItem('token', response.token);
+        router.push("/register/success");
+      } else {
+        console.error("注册响应异常:", response);
+        alert("注册成功但响应异常，请尝试登录");
+        router.push("/login");
+      }
+    } catch (err: any) {
+      console.error("注册失败:", err);
+      
+      // Check if it's actually a success but parsing failed
+      if (err.message && !err.message.includes('失败')) {
+        alert(err.message);
+      } else {
+        alert("提交失败，请稍后再试");
+      }
     }
   };
 

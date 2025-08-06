@@ -82,9 +82,9 @@ export const api = {
         tags: data.tags,
         whyJoin: data.whyJoin,
         idealBuddy: data.idealBuddy,
-      }),
+      }).then(res => res.data),
     login: (email: string, password: string) =>
-      client.post('/api/auth/login', { email, password }),
+      client.post('/api/auth/login', { email, password }).then(res => res.data),
     requestPasswordReset: (email: string) =>
       client.post('/api/auth/request-reset', { email }),
     resetPassword: (token: string, newPassword: string) =>
