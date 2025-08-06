@@ -79,11 +79,8 @@ export const api = {
         password: data.password,
         mbti: data.mbti,
         interests: data.interests,
-        tags: data.tags || [],
         whyJoin: data.whyJoin,
         idealBuddy: data.idealBuddy,
-        // Note: Other fields like lookingForBuddy, expectingHighQualityBuddy, etc. 
-        // are collected by frontend but not stored in backend
       }).then(res => res.data),
     login: (email: string, password: string) =>
       client.post('/api/auth/login', { email, password }).then(res => res.data),
