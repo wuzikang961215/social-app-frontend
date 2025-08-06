@@ -10,8 +10,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   
   // List of public routes that don't require authentication
-  const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
-  const isPublicRoute = publicRoutes.includes(pathname);
+  const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password', '/register/success', '/register/rejected'];
+  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
   
   useEffect(() => {
     // Don't redirect if still loading or on a public route

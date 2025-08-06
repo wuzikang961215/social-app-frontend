@@ -54,7 +54,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const response = await api.auth.login(email, password);
-    const { token: newToken, user: userData } = response.data;
+    // response is already the data (not wrapped)
+    const { token: newToken, user: userData } = response;
     
     // Store in localStorage
     localStorage.setItem('token', newToken);

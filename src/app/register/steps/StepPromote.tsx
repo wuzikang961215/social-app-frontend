@@ -24,19 +24,14 @@ export default function StepPromote({
         localStorage.setItem('token', response.token);
         router.push("/register/success");
       } else {
-        console.error("注册响应异常:", response);
-        alert("注册成功但响应异常，请尝试登录");
-        router.push("/login");
+        // This shouldn't happen with the fixed backend
+        console.error("Unexpected response format:", response);
+        alert("注册响应格式错误，请联系管理员");
       }
     } catch (err: any) {
       console.error("注册失败:", err);
-      
-      // Check if it's actually a success but parsing failed
-      if (err.message && !err.message.includes('失败')) {
-        alert(err.message);
-      } else {
-        alert("提交失败，请稍后再试");
-      }
+      // Show the actual error message from backend
+      alert(err.message || "提交失败，请稍后再试");
     }
   };
 
