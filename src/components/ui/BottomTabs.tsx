@@ -72,6 +72,11 @@ export default function BottomTabs() {
       label: "找搭子"
     },
     {
+      href: "/tree-hole",
+      icon: <MessageSquare size={20} />,
+      label: "树洞"
+    },
+    {
       href: "/notifications",
       icon: <Bell size={20} />,
       label: "消息"
@@ -90,7 +95,7 @@ export default function BottomTabs() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30">
-      <div className={`grid ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'} h-12`}>
+      <div className={`grid ${isAdmin ? 'grid-cols-6' : 'grid-cols-5'} h-12`}>
         {tabs.map((tab) => {
           const isActive = pathname === tab.href;
 
