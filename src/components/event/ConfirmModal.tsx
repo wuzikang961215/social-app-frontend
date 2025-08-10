@@ -30,7 +30,7 @@ export default function ConfirmModal({
         
         {/* 温馨提示 */}
         <p className="text-xs text-gray-500">
-          点击确认即表示你已了解
+          点击"好的，加入"即表示已同意
           <button 
             type="button"
             onClick={() => setShowDisclaimer(true)}
@@ -38,7 +38,7 @@ export default function ConfirmModal({
           >
             免责声明
           </button>
-          ，请注意活动安全。
+          ，并已阅读安全提示。
         </p>
         <div className="flex justify-end gap-3 pt-4">
           <button
