@@ -151,17 +151,6 @@ export const api = {
     toggleLike: (postId: string) => 
       client.post(`/api/tree-hole/posts/${postId}/like`),
   },
-  
-  externalEvents: {
-    getEvents: () => 
-      client.get('/api/external-events'),
-    create: (data: any) => 
-      client.post('/api/external-events', data),
-    update: (id: string, data: any) => 
-      client.put(`/api/external-events/${id}`, data),
-    delete: (id: string) => 
-      client.delete(`/api/external-events/${id}`),
-  },
 };
 
 // Legacy function wrappers for backward compatibility
