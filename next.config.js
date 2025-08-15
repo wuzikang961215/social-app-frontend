@@ -7,4 +7,18 @@ module.exports = {
   reactStrictMode: false, // Disable double-rendering in development
   productionBrowserSourceMaps: false, // Disable source maps in production
   // swcMinify is deprecated in Next.js 15 - SWC is now the default
+  
+  // Proxy API requests to avoid cross-origin cookie issues
+  async rewrites() {
+    // Only in production when API is on different domain
+    if (process.env.NODE_ENV === 'production') {
+      return [
+        {
+          source: '/backend/:path*',
+          destination: 'https://social-app-backend.fly.dev/:path*',
+        },
+      ];
+    }
+    return [];
+  },
 }
