@@ -22,19 +22,22 @@ const BottomTabs = memo(function BottomTabs() {
   
   // Fetch unread notification count
   const fetchUnreadCount = useCallback(async () => {
+    // Only fetch if user is logged in
+    if (!user) return;
+    
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      if (!token) return;
-      
       const { count } = await api.notifications.getUnreadCount();
       setUnreadNotifications(count);
     } catch (error) {
       console.error("Failed to fetch unread count", error);
     }
-  }, []);
+  }, [user]);
   
   // Listen for notification updates
   useEffect(() => {
+    // Only set up polling if user is logged in
+    if (!user) return;
+    
     // Initial fetch
     fetchUnreadCount();
     
@@ -47,7 +50,7 @@ const BottomTabs = memo(function BottomTabs() {
       window.removeEventListener('notification-update', fetchUnreadCount);
       clearInterval(interval);
     };
-  }, [fetchUnreadCount]);
+  }, [fetchUnreadCount, user]);
   
   // Hide tabs on auth pages or when not logged in
   const authPages = ['/login', '/register', '/forgot-password'];

@@ -17,8 +17,11 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     // Don't redirect if still loading or on a public route
     if (loading || isPublicRoute) return;
     
-    // Redirect to login if not authenticated and not on a public route
-    if (!user) {
+    // Check localStorage as a fallback during transitions
+    const storedUser = localStorage.getItem('userData');
+    
+    // Only redirect to login if truly not authenticated
+    if (!user && !storedUser) {
       router.push('/login');
     }
   }, [user, loading, router, pathname, isPublicRoute]);

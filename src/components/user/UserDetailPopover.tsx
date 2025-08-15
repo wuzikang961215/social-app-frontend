@@ -84,7 +84,7 @@ export default function UserDetailPopover({
         api.user.getStats(userId)
       ])
         .then(([userRes, statsRes]) => {
-          setUserInfo(userRes.data);
+          setUserInfo(userRes);
           setUserStats(statsRes);
         })
         .catch(err => console.error('Failed to fetch user details:', err))

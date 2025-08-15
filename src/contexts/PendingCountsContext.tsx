@@ -25,11 +25,11 @@ export function PendingCountsProvider({ children }: { children: ReactNode }) {
       console.log('[polling] checking pending reviews from context');
       const res = await api.events.getManageable();
       
-      const pendingCount = res.data.reduce((total: number, event: any) => {
+      const pendingCount = res.reduce((total: number, event: any) => {
         return total + event.participants.filter((p: any) => p.status === 'pending').length;
       }, 0);
       
-      const checkinCount = res.data.reduce((total: number, event: any) => {
+      const checkinCount = res.reduce((total: number, event: any) => {
         return total + event.participants.filter((p: any) => 
           p.status === 'approved' && hasEventStarted(event.startTime)
         ).length;
@@ -37,8 +37,11 @@ export function PendingCountsProvider({ children }: { children: ReactNode }) {
       
       setPendingReviewCount(pendingCount);
       setPendingCheckinCount(checkinCount);
-    } catch (err) {
-      console.error('Failed to fetch pending reviews:', err);
+    } catch (err: any) {
+      // Only log error if it's not an authentication issue
+      if (!err?.message?.includes('未授权') && !err?.message?.includes('unauthorized')) {
+        console.error('Failed to fetch pending reviews:', err);
+      }
     }
   }, [user?.id]);
 

@@ -100,8 +100,10 @@ export default function MyProfileModal({
   };
 
   // ✅ 统一 enrich 所有活动
-  const enrichEvents = (events: any[], userId: string) =>
-    events.map((e) => {
+  const enrichEvents = (events: any[], userId: string) => {
+    if (!events || !Array.isArray(events)) return [];
+    
+    return events.map((e) => {
       const approvedCount = e.participants.filter((p: any) => p.status === "approved").length;
       const currentUser = e.participants.find((p: any) =>
         (typeof p.user === "object" ? p.user.id : p.user.toString()) === userId
@@ -114,6 +116,7 @@ export default function MyProfileModal({
         userCancelCount: currentUser?.cancelCount || 0,
       };
     });
+  };
 
   const enrichedCreated = enrichEvents(createdEvents, userInfo?.id);
   const enrichedJoined = enrichEvents(joinedEvents, userInfo?.id);

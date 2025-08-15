@@ -23,7 +23,7 @@ export default function ForgotPassword() {
     setLoading(true);
     try {
       const response = await api.auth.requestPasswordReset(email);
-      toast.success(response.data.message);
+      toast.success(response.message);
       setSubmitted(true);
     } catch (error: any) {
       toast.error(error.message || "发送重置邮件失败");

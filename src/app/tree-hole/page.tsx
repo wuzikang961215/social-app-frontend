@@ -27,7 +27,7 @@ export default function TreeHolePage() {
   const fetchPosts = async () => {
     try {
       const response = await api.treeHole.getPosts();
-      setPosts(response.data.data || []);
+      setPosts(response.data || []);
     } catch (error) {
       console.error("Failed to fetch posts:", error);
       toast.error("加载失败，请稍后再试");
@@ -73,7 +73,7 @@ export default function TreeHolePage() {
       const response = await api.treeHole.toggleLike(postId);
       setPosts(posts.map(post => 
         post.id === postId 
-          ? { ...post, likes: response.data.data.likes, hasLiked: response.data.data.hasLiked }
+          ? { ...post, likes: response.data.likes, hasLiked: response.data.hasLiked }
           : post
       ));
     } catch (error) {

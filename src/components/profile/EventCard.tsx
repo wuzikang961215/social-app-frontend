@@ -114,7 +114,7 @@ export default function EventCard({
         {onEdit && !isPast && (
           <Button
             size="sm"
-            className="text-[9px] px-2 py-0.5 rounded-full bg-indigo-500 text-white"
+            className="text-[9px] px-2 py-0.5 rounded-lg bg-indigo-500 text-white"
             onClick={onEdit}
           >
             编辑

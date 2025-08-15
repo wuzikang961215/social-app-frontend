@@ -119,17 +119,16 @@ export default function EventDetailModal({
     const fetchOrganizer = async () => {
       if (event.organizer?.id) {
         try {
-          const token = localStorage.getItem("token");
           const [userRes, statsRes] = await Promise.all([
             getUserById(event.organizer.id),
             api.user.getStats(event.organizer.id)
           ]);
           
           setOrganizerInfo({
-            idealBuddy: userRes.data.idealBuddy,
-            hobbies: userRes.data.interests,
-            whyJoin: userRes.data.whyJoin,
-            mbti: userRes.data.mbti,
+            idealBuddy: userRes.idealBuddy,
+            hobbies: userRes.interests,
+            whyJoin: userRes.whyJoin,
+            mbti: userRes.mbti,
           });
           
           setOrganizerStats(statsRes);

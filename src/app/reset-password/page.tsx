@@ -54,7 +54,7 @@ function ResetPasswordForm() {
     setLoading(true);
     try {
       const response = await api.auth.resetPassword(token, newPassword);
-      toast.success(response.data.message);
+      toast.success(response.message);
       
       // 延迟跳转，让用户看到成功消息
       setTimeout(() => {

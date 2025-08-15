@@ -18,7 +18,7 @@ export default function StepUsername({
 
     try {
       const res = await checkUsernameExists(formData.username);
-      if (res.data.exists) {
+      if (res.exists) {
         onError?.("username", "该用户名已被使用");
         return;
       }

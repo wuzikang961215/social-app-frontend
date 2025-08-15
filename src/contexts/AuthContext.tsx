@@ -13,7 +13,6 @@ interface UserData {
 
 interface AuthContextType {
   user: UserData | null;
-  token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -25,54 +24,62 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [user, setUser] = useState<UserData | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Initialize auth state from localStorage
+  // Initialize auth state by checking if user is authenticated
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const storedToken = localStorage.getItem('token');
-      const storedUser = localStorage.getItem('userData');
-      
-      if (storedToken && storedUser) {
+      const checkAuth = async () => {
         try {
-          const userData = JSON.parse(storedUser);
-          setToken(storedToken);
-          setUser(userData);
-        } catch (error) {
-          console.error('Failed to parse user data:', error);
-          localStorage.removeItem('token');
+          // Try to get current user (cookie will be sent automatically)
+          const userData = await api.user.getProfile();
+          if (userData) {
+            setUser(userData);
+            localStorage.setItem('userData', JSON.stringify(userData));
+          }
+        } catch (error: any) {
+          // Not authenticated - this is normal for logged out users
+          console.log('Auth check:', error?.message || 'Not authenticated');
           localStorage.removeItem('userData');
+          setUser(null);
+        } finally {
+          setIsInitialized(true);
+          setLoading(false);
         }
-      }
+      };
       
-      setIsInitialized(true);
-      setLoading(false);
+      checkAuth();
     }
   }, []);
 
   const login = async (email: string, password: string) => {
     const response = await api.auth.login(email, password);
     // response is already the data (not wrapped)
-    const { token: newToken, user: userData } = response;
+    const { user: userData } = response;
     
-    // Store in localStorage
-    localStorage.setItem('token', newToken);
+    // Store user data in localStorage for UI
     localStorage.setItem('userData', JSON.stringify(userData));
     
-    // Update state
-    setToken(newToken);
+    // Update state immediately
     setUser(userData);
+    
+    // Small delay to ensure cookies are set before navigation
+    await new Promise(resolve => setTimeout(resolve, 100));
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      // Call logout endpoint (cookies are sent automatically)
+      await api.auth.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    
     // Clear localStorage
-    localStorage.removeItem('token');
     localStorage.removeItem('userData');
     
     // Clear state
-    setToken(null);
     setUser(null);
     
     // Redirect to login
@@ -85,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

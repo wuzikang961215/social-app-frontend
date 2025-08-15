@@ -24,7 +24,7 @@ export default function StepEmail({
     // ✅ 检查邮箱是否重复
     try {
       const res = await checkEmailExists(formData.email);
-      if (res.data.exists) {
+      if (res.exists) {
         onError?.("email", "该邮箱已被使用");
         return;
       }

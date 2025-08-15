@@ -19,9 +19,8 @@ export default function StepPromote({
       console.log("Registration response:", response);
       
       // Check if registration was successful
-      if (response && response.token) {
-        // Save token to localStorage
-        localStorage.setItem('token', response.token);
+      if (response && response.user) {
+        // Registration successful, cookies are set by backend
         router.push("/register/success");
       } else {
         // This shouldn't happen with the fixed backend

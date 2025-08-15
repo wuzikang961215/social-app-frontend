@@ -42,11 +42,10 @@ export default function FindBuddyPage() {
     joinedEvents, 
     loading: userLoading,
     logout,
-    checkPendingReviews,
     refreshJoinedEvents 
   } = useUserInfo();
   
-  const { pendingReviewCount, pendingCheckinCount } = usePendingCounts();
+  const { pendingReviewCount, pendingCheckinCount, checkPendingReviews } = usePendingCounts();
   
   const { 
     events, 

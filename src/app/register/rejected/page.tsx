@@ -13,7 +13,6 @@ export default function RejectedPage() {
         {/* 🔒 右上角登出按钮 */}
         <LogOut
           onClick={() => {
-            localStorage.removeItem("token");
             router.push("/login");
           }}
           className="absolute top-3 right-3 w-4 h-4 text-gray-500 hover:text-gray-800 cursor-pointer hover:scale-110"

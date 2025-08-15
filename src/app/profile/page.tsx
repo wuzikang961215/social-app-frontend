@@ -33,8 +33,8 @@ export default function ProfilePage() {
       ]);
       
       setEventsData({
-        createdEvents: createdRes.data,
-        joinedEvents: joinedRes.data
+        createdEvents: createdRes,
+        joinedEvents: joinedRes
       });
     } catch (error) {
       console.error("Failed to fetch events:", error);

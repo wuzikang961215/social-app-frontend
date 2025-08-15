@@ -3,22 +3,22 @@
 import { useEffect, useState, useCallback } from "react";
 import { Bell } from "lucide-react";
 import { getUnreadCount } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface NotificationBellProps {
   onClick: () => void;
 }
 
 export default function NotificationBell({ onClick }: NotificationBellProps) {
+  const { user } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchUnreadCount = useCallback(async () => {
+    // Only fetch if user is logged in
+    if (!user) return;
+    
     try {
-      // Check if user is authenticated before making API call
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      if (!token) {
-        return;
-      }
-      
+      // API call will use cookies automatically for authentication
       const { count } = await getUnreadCount();
       setUnreadCount(prevCount => {
         // Only trigger refresh if there are NEW notifications (not just unread ones)
@@ -34,9 +34,12 @@ export default function NotificationBell({ onClick }: NotificationBellProps) {
     } catch (error) {
       console.error("Failed to fetch unread count", error);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
+    // Only set up polling if user is logged in
+    if (!user) return;
+    
     // Fetch initial count
     fetchUnreadCount();
 
@@ -51,7 +54,7 @@ export default function NotificationBell({ onClick }: NotificationBellProps) {
       clearInterval(interval);
       window.removeEventListener('notification-update', handleUpdate);
     };
-  }, [fetchUnreadCount]);
+  }, [fetchUnreadCount, user]);
 
   return (
     <button

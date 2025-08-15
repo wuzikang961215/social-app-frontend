@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { hasEventStarted } from '@/lib/dateUtils';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface UserInfo {
@@ -14,19 +13,18 @@ interface UserInfo {
 
 export function useUserInfo() {
   const router = useRouter();
-  const { user: authUser, token } = useAuth();
+  const { user: authUser } = useAuth();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [createdEvents, setCreatedEvents] = useState<any[]>([]);
   const [joinedEvents, setJoinedEvents] = useState<any[]>([]);
-  const [pendingReviewCount, setPendingReviewCount] = useState(0);
-  const [pendingCheckinCount, setPendingCheckinCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   // Fetch user data and related events
   const fetchUserData = useCallback(async () => {
-    if (!token) {
-      router.replace('/login');
+    if (!authUser) {
+      // Don't redirect here - let AuthGuard handle it
+      setLoading(false);
       return;
     }
 
@@ -34,30 +32,15 @@ export function useUserInfo() {
       setLoading(true);
       
       // Fetch all user-related data in parallel
-      const [userRes, createdRes, joinedRes, manageRes] = await Promise.all([
+      const [userRes, createdRes, joinedRes] = await Promise.all([
         api.user.getProfile(),
         api.events.getCreated(),
-        api.events.getJoined(),
-        api.events.getManageable()
+        api.events.getJoined()
       ]);
 
-      setUserInfo(userRes.data);
-      setCreatedEvents(createdRes.data);
-      setJoinedEvents(joinedRes.data);
-
-      // Calculate pending review count
-      const pendingCount = manageRes.data.reduce((total: number, event: any) => {
-        return total + event.participants.filter((p: any) => p.status === 'pending').length;
-      }, 0);
-      setPendingReviewCount(pendingCount);
-
-      // Calculate pending check-in count
-      const checkinCount = manageRes.data.reduce((total: number, event: any) => {
-        return total + event.participants.filter((p: any) => 
-          p.status === 'approved' && hasEventStarted(event.startTime)
-        ).length;
-      }, 0);
-      setPendingCheckinCount(checkinCount);
+      setUserInfo(userRes);  // userRes is already the user object, not wrapped
+      setCreatedEvents(createdRes);
+      setJoinedEvents(joinedRes);
 
       setError(null);
     } catch (err) {
@@ -70,37 +53,8 @@ export function useUserInfo() {
     } finally {
       setLoading(false);
     }
-  }, [router, token]);
+  }, [router, authUser]);
 
-  // Check for pending reviews (with polling)
-  const checkPendingReviews = useCallback(async () => {
-    if (!userInfo?.id) return;
-
-    try {
-      const res = await api.events.getManageable();
-      const pendingCount = res.data.reduce((total: number, event: any) => {
-        return total + event.participants.filter((p: any) => p.status === 'pending').length;
-      }, 0);
-      const prevPendingCount = pendingReviewCount;
-      setPendingReviewCount(pendingCount);
-
-      // Also update check-in count
-      const checkinCount = res.data.reduce((total: number, event: any) => {
-        return total + event.participants.filter((p: any) => 
-          p.status === 'approved' && hasEventStarted(event.startTime)
-        ).length;
-      }, 0);
-      const prevCheckinCount = pendingCheckinCount;
-      setPendingCheckinCount(checkinCount);
-      
-      // If counts changed, trigger refresh event to sync all components
-      if (prevPendingCount !== pendingCount || prevCheckinCount !== checkinCount) {
-        window.dispatchEvent(new Event('pending-counts-updated'));
-      }
-    } catch (err) {
-      console.error('Failed to fetch pending reviews:', err);
-    }
-  }, [userInfo?.id, pendingReviewCount, pendingCheckinCount]);
 
   // Initial fetch
   useEffect(() => {
@@ -110,23 +64,13 @@ export function useUserInfo() {
     fetchUserData();
   }, [fetchUserData, authUser]);
 
-  // Poll for pending review updates
-  useEffect(() => {
-    if (!userInfo?.id) return;
-
-    // Check every 30 seconds
-    const interval = setInterval(checkPendingReviews, 30000);
-
-    return () => clearInterval(interval);
-  }, [checkPendingReviews, userInfo?.id]);
-
   // Refresh joined events only
   const refreshJoinedEvents = useCallback(async () => {
     if (!userInfo?.id) return;
     
     try {
       const joinedRes = await api.events.getJoined();
-      setJoinedEvents(joinedRes.data);
+      setJoinedEvents(joinedRes);
     } catch (err) {
       console.error('Failed to refresh joined events:', err);
     }
@@ -134,7 +78,6 @@ export function useUserInfo() {
 
   // Logout function
   const logout = useCallback(() => {
-    localStorage.removeItem('token');
     router.push('/login');
   }, [router]);
 
@@ -142,12 +85,9 @@ export function useUserInfo() {
     userInfo,
     createdEvents,
     joinedEvents,
-    pendingReviewCount,
-    pendingCheckinCount,
     loading,
     error,
     fetchUserData,
-    checkPendingReviews,
     refreshJoinedEvents,
     logout,
   };

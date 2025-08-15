@@ -74,7 +74,17 @@ export function useEvents({ userId }: UseEventsProps = {}) {
       if (a.spotsLeft <= 0 && b.spotsLeft > 0) return 1;
       if (a.spotsLeft > 0 && b.spotsLeft <= 0) return -1;
 
-      // Score comparison
+      // Sort by time first (earlier events first)
+      const timeA = new Date(a.startTime).getTime();
+      const timeB = new Date(b.startTime).getTime();
+      const timeDiff = timeA - timeB;
+      
+      // If events are on the same day (within 24 hours of each other), prioritize by time
+      if (Math.abs(timeDiff) < 24 * 60 * 60 * 1000) {
+        return timeDiff; // Earlier time comes first
+      }
+      
+      // For events on different days, use the original scoring
       return (a.countdown + a.spotsLeft * 2) - (b.countdown + b.spotsLeft * 2);
     });
   }, [getUserPriority]);
@@ -84,7 +94,7 @@ export function useEvents({ userId }: UseEventsProps = {}) {
     try {
       setLoading(true);
       const response = await api.events.list();
-      const transformed = response.data.map((e: any) => transformEvent(e, userId));
+      const transformed = response.map((e: any) => transformEvent(e, userId));
       const sorted = sortEvents(transformed);
       setEvents(sorted);
       setError(null);

@@ -69,17 +69,17 @@ export default function NotificationsModal({
       });
       
       if (reset) {
-        setNotifications(res.data);
+        setNotifications(res);
         setPage(1);
       } else {
-        setNotifications(prev => [...prev, ...res.data]);
+        setNotifications(prev => [...prev, ...res]);
         setPage(prev => prev + 1);
       }
       
-      setHasMore(res.data.length === 20);
+      setHasMore(res.length === 20);
       
       // Mark unread notifications as read
-      const unreadIds = res.data
+      const unreadIds = res
         .filter((n: Notification) => !n.read)
         .map((n: Notification) => n.id);
         

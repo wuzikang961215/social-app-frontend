@@ -49,11 +49,11 @@ export default function ReviewAndCheckinModal({
   const fetchData = async () => {
     try {
       const res = await getManageEvents();
-      setData(res.data);
+      setData(res);  // res is already the data array
       
       // Fetch stats for all users
       const allUserIds = new Set<string>();
-      res.data.forEach((event: EventItem) => {
+      res.forEach((event: EventItem) => {
         event.participants.forEach(p => {
           if (p.status === "pending" || (p.status === "approved" && hasEventStarted(event.startTime))) {
             allUserIds.add(p.user.id);
