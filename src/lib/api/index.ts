@@ -6,19 +6,55 @@ interface ApiError {
   errors?: string[];
 }
 
+// Token storage
+let accessToken: string | null = null;
+
+// Token management functions
+export const setAccessToken = (token: string | null) => {
+  accessToken = token;
+};
+
+export const getAccessToken = () => accessToken;
+
+export const getRefreshToken = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('refreshToken');
+  }
+  return null;
+};
+
+export const setRefreshToken = (token: string | null) => {
+  if (typeof window !== 'undefined') {
+    if (token) {
+      localStorage.setItem('refreshToken', token);
+    } else {
+      localStorage.removeItem('refreshToken');
+    }
+  }
+};
+
+export const clearTokens = () => {
+  accessToken = null;
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('refreshToken');
+  }
+};
+
 // Create axios instance with defaults
 const client: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  withCredentials: true, // Send cookies with requests
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor (cookies are sent automatically)
+// Request interceptor to add token
 client.interceptors.request.use(
   (config) => {
-    // No need to manually add token - cookies are sent automatically
+    // Add access token to headers if available
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
     return config;
   },
   (error) => {
@@ -55,10 +91,10 @@ client.interceptors.response.use(
                             originalRequest.url?.includes('/auth/register') ||
                             originalRequest.url?.includes('/auth/refresh');
       
-      // Check if user is logged in (has userData in localStorage)
-      const userData = localStorage.getItem('userData');
+      // Check if user is logged in (has refresh token)
+      const refreshToken = getRefreshToken();
       
-      if (!isAuthEndpoint && userData) {
+      if (!isAuthEndpoint && refreshToken) {
         if (isRefreshing) {
           // If already refreshing, queue this request
           return new Promise((resolve, reject) => {
@@ -74,27 +110,38 @@ client.interceptors.response.use(
         isRefreshing = true;
 
         try {
-          // Refresh token is in httpOnly cookie, sent automatically
+          // Call refresh endpoint with refresh token
           const response = await axios.post(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/refresh`,
-            {},
-            { withCredentials: true }
+            { refreshToken }
           );
           
-          const { user } = response.data;
+          const { user, accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
+          
+          // Update tokens
+          setAccessToken(newAccessToken);
+          setRefreshToken(newRefreshToken);
+          
           // Update user data in localStorage for UI
-          localStorage.setItem('userData', JSON.stringify(user));
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('userData', JSON.stringify(user));
+          }
           
           processQueue(null);
           
+          // Retry original request with new token
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
           return client(originalRequest);
         } catch (refreshError) {
           processQueue(refreshError);
-          localStorage.removeItem('userData');
-          // Only redirect to login if we're not already on a public page
-          const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
-          if (!publicPaths.some(path => window.location.pathname.startsWith(path))) {
-            window.location.href = '/login';
+          clearTokens();
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('userData');
+            // Only redirect to login if we're not already on a public page
+            const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
+            if (!publicPaths.some(path => window.location.pathname.startsWith(path))) {
+              window.location.href = '/login';
+            }
           }
           return Promise.reject(refreshError);
         } finally {
@@ -116,7 +163,7 @@ client.interceptors.response.use(
     }
     
     // For 401 errors when user is not logged in, silently reject
-    if (error.response?.status === 401 && !localStorage.getItem('userData')) {
+    if (error.response?.status === 401 && !getRefreshToken()) {
       return Promise.reject(error);
     }
 
@@ -137,9 +184,6 @@ client.interceptors.response.use(
     
     const message = error.response?.data?.message || '请求失败，请稍后再试';
     
-    // Don't auto-redirect on token errors - let the refresh token handler deal with it
-    // The cookie-based auth will handle this properly
-    
     return Promise.reject(new Error(message));
   }
 );
@@ -157,13 +201,38 @@ export const api = {
         whyJoin: data.whyJoin,
         idealBuddy: data.idealBuddy,
         expectEvent: data.expectEvent,
-      }).then(res => res.data),
+      }).then(res => {
+        const { user, accessToken, refreshToken } = res.data;
+        setAccessToken(accessToken);
+        setRefreshToken(refreshToken);
+        return res.data;
+      }),
     login: (email: string, password: string) =>
-      client.post('/api/auth/login', { email, password }).then(res => res.data),
-    refresh: () =>
-      client.post('/api/auth/refresh', {}).then(res => res.data),
-    logout: () =>
-      client.post('/api/auth/logout', {}).then(res => res.data),
+      client.post('/api/auth/login', { email, password }).then(res => {
+        const { user, accessToken, refreshToken } = res.data;
+        setAccessToken(accessToken);
+        setRefreshToken(refreshToken);
+        return res.data;
+      }),
+    refresh: () => {
+      const refreshToken = getRefreshToken();
+      if (!refreshToken) {
+        return Promise.reject(new Error('No refresh token'));
+      }
+      return client.post('/api/auth/refresh', { refreshToken }).then(res => {
+        const { user, accessToken, refreshToken: newRefreshToken } = res.data;
+        setAccessToken(accessToken);
+        setRefreshToken(newRefreshToken);
+        return res.data;
+      });
+    },
+    logout: () => {
+      const refreshToken = getRefreshToken();
+      return client.post('/api/auth/logout', { refreshToken }).then(res => {
+        clearTokens();
+        return res.data;
+      });
+    },
     requestPasswordReset: (email: string) =>
       client.post('/api/auth/request-reset', { email }).then(res => res.data),
     resetPassword: (token: string, newPassword: string) =>

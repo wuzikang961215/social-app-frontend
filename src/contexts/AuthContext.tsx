@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import { api, setAccessToken, setRefreshToken, getRefreshToken, clearTokens } from '@/lib/api';
 
 interface UserData {
   id: string;
@@ -27,21 +27,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Initialize auth state by checking if user is authenticated
+  // Initialize auth state by checking localStorage and refresh token
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const checkAuth = async () => {
+      const initAuth = async () => {
         try {
-          // Try to get current user (cookie will be sent automatically)
-          const userData = await api.user.getProfile();
-          if (userData) {
-            setUser(userData);
-            localStorage.setItem('userData', JSON.stringify(userData));
+          // Check if we have a refresh token
+          const refreshToken = getRefreshToken();
+          
+          if (refreshToken) {
+            // Try to refresh the access token
+            try {
+              const response = await api.auth.refresh();
+              const { user: userData } = response;
+              
+              if (userData) {
+                setUser(userData);
+                localStorage.setItem('userData', JSON.stringify(userData));
+              }
+            } catch (error) {
+              // Refresh failed, clear tokens
+              console.log('Token refresh failed:', error);
+              clearTokens();
+              localStorage.removeItem('userData');
+              setUser(null);
+            }
+          } else {
+            // No refresh token, check if we have stored user data
+            const storedUserData = localStorage.getItem('userData');
+            if (storedUserData) {
+              // Clear it since we don't have tokens
+              localStorage.removeItem('userData');
+            }
+            setUser(null);
           }
-        } catch (error: any) {
-          // Not authenticated - this is normal for logged out users
-          console.log('Auth check:', error?.message || 'Not authenticated');
-          localStorage.removeItem('userData');
+        } catch (error) {
+          console.error('Auth initialization error:', error);
           setUser(null);
         } finally {
           setIsInitialized(true);
@@ -49,13 +70,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       };
       
-      checkAuth();
+      initAuth();
     }
   }, []);
 
   const login = async (email: string, password: string) => {
     const response = await api.auth.login(email, password);
-    // response is already the data (not wrapped)
+    // response already contains user, accessToken, and refreshToken
+    // tokens are already stored by the api.auth.login method
     const { user: userData } = response;
     
     // Store user data in localStorage for UI
@@ -64,19 +86,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Update state immediately
     setUser(userData);
     
-    // Small delay to ensure cookies are set before navigation
+    // Small delay to ensure everything is set before navigation
     await new Promise(resolve => setTimeout(resolve, 100));
   };
 
   const logout = async () => {
     try {
-      // Call logout endpoint (cookies are sent automatically)
+      // Call logout endpoint
       await api.auth.logout();
     } catch (error) {
       console.error('Logout error:', error);
     }
     
-    // Clear localStorage
+    // Clear tokens and localStorage (tokens are cleared by api.auth.logout)
     localStorage.removeItem('userData');
     
     // Clear state
